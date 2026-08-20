@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>原料详情 - 沃土之环</title>
+    <style id="theme-vars">
+/* ===== TerraHalo Brand CSS ===== */
+/* Apple-inspired typography + spacing system with brown/green earth palette */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;700&display=swap');
+
+/* ----- Primitive Palette ----- */
+:root {
+  /* Brown (earth) - brand primary */
+  --th-brown-50: #fef9ed;
+  --th-brown-100: #fdf3d6;
+  --th-brown-200: #fae5a4;
+  --th-brown-300: #f5d06a;
+  --th-brown-400: #e8b830;
+  --th-brown-500: #8B6914;
+  --th-brown-600: #7a5c11;
+  --th-brown-700: #6B4F10;
+  --th-brown-800: #5a3f0a;
+  --th-brown-900: #3d2807;
+
+  /* Green (crop) - accent / state success */
+  --th-green-50: #eef5ec;
+  --th-green-100: #d9ebd5;
+  --th-green-200: #b5d6ab;
+  --th-green-300: #8abd79;
+  --th-green-400: #5f9a4a;
+  --th-green-500: #2D5A27;
+  --th-green-600: #264e21;
+  --th-green-700: #1B3D18;
+  --th-green-800: #143012;
+  --th-green-900: #0d200c;
+
+  /* Background - warm earth */
+  --th-background-50: #ffffff;
+  --th-background-100: #faf8f2;
+  --th-background-200: #f5f1e7;
+  --th-background-300: #ede6d5;
+  --th-background-400: #ddd2ba;
+  --th-background-500: #b8ac94;
+  --th-background-600: #8c8070;
+  --th-background-700: #5c5448;
+  --th-background-800: #2b2416;
+  --th-background-900: #1c1814;
+
+  /* Text */
+  --th-text-50: #f5f3ef;
+  --th-text-100: #e5e0d8;
+  --th-text-200: #c4bcae;
+  --th-text-300: #a39887;
+  --th-text-400: #8c8070;
+  --th-text-500: #6e6456;
+  --th-text-600: #5c5448;
+  --th-text-700: #3d362e;
+  --th-text-800: #2b2416;
+  --th-text-900: #1c1814;
+
+  /* State colors */
+  --th-state-success: #2D5A27;
+  --th-state-success-surface: #eef5ec;
+  --th-state-warning: #d97706;
+  --th-state-warning-surface: #fffbeb;
+  --th-state-error: #dc2626;
+  --th-state-error-surface: #fef2f2;
+  --th-state-info: #2563eb;
+  --th-state-info-surface: #eff6ff;
+
+  /* ----- Semantic Roles ----- */
+  --th-background: var(--th-background-100);
+  --th-foreground: var(--th-text-800);
+  --th-primary: var(--th-brown-500);
+  --th-primary-foreground: #ffffff;
+  --th-secondary: var(--th-background-200);
+  --th-secondary-foreground: var(--th-text-700);
+  --th-muted: var(--th-background-200);
+  --th-muted-foreground: var(--th-text-500);
+  --th-accent: var(--th-green-500);
+  --th-accent-foreground: #ffffff;
+  --th-card: var(--th-background-50);
+  --th-card-foreground: var(--th-text-800);
+  --th-border: var(--th-background-300);
+  --th-input: var(--th-background-400);
+  --th-ring: var(--th-brown-500);
+
+  /* ----- Typography ----- */
+  --th-font-sans: 'DM Sans', ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
+  --th-font-mono: 'JetBrains Mono', monospace;
+  --th-font-size-hero: clamp(3rem, 6vw, 5rem);
+  --th-font-size-h1: clamp(2rem, 4vw, 3rem);
+  --th-font-size-h2: clamp(1.5rem, 3vw, 2.25rem);
+  --th-font-size-h3: 1.25rem;
+  --th-font-size-body: 1rem;
+  --th-font-size-sm: 0.875rem;
+  --th-font-size-xs: 0.75rem;
+  --th-font-size-eyebrow: 0.6875rem;
+  --th-line-height-tight: 0.92;
+  --th-line-height-snug: 1.15;
+  --th-line-height-body: 1.55;
+  --th-letter-spacing-hero: -0.04em;
+  --th-letter-spacing-eyebrow: 0.08em;
+
+  /* ----- Spacing ----- */
+  --th-spacing: 0.24rem;
+
+  /* ----- Radius ----- */
+  --th-radius: 1.2rem;
+  --th-radius-sm: 0.5rem;
+  --th-radius-full: 9999px;
+
+  /* ----- Shadow (whisper-light) ----- */
+  --th-shadow-xs: 0 1px 2px 0 rgba(0,0,0,0.04);
+  --th-shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05), 0 1px 3px -1px rgba(0,0,0,0.05);
+  --th-shadow: 0 2px 4px -1px rgba(0,0,0,0.06), 0 1px 2px -1px rgba(0,0,0,0.05);
+  --th-shadow-md: 0 4px 8px -2px rgba(0,0,0,0.06), 0 2px 4px -2px rgba(0,0,0,0.05);
+  --th-shadow-lg: 0 8px 24px -8px rgba(0,0,0,0.08), 0 4px 8px -4px rgba(0,0,0,0.05);
+  --th-shadow-xl: 0 16px 40px -10px rgba(0,0,0,0.10), 0 8px 16px -8px rgba(0,0,0,0.06);
+  --th-shadow-2xl: 0 24px 64px -12px rgba(0,0,0,0.12);
+
+  /* ----- Hero Gradient ----- */
+  --th-hero-gradient: linear-gradient(135deg, var(--th-brown-700) 0%, var(--th-green-500) 60%, var(--th-green-700) 100%);
+
+  /* ----- Motion ----- */
+  --th-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --th-duration-fast: 150ms;
+  --th-duration-base: 250ms;
+  --th-duration-slow: 350ms;
+}
+
+/* ----- Typography Utility Classes ----- */
+.th-h1 { font-family: var(--th-font-sans); font-size: var(--th-font-size-h1); font-weight: 600; line-height: var(--th-line-height-tight); letter-spacing: -0.03em; color: var(--th-foreground); }
+.th-h2 { font-family: var(--th-font-sans); font-size: var(--th-font-size-h2); font-weight: 600; line-height: var(--th-line-height-snug); letter-spacing: -0.02em; color: var(--th-foreground); }
+.th-h3 { font-family: var(--th-font-sans); font-size: var(--th-font-size-h3); font-weight: 600; line-height: var(--th-line-height-snug); color: var(--th-foreground); }
+.th-body { font-family: var(--th-font-sans); font-size: var(--th-font-size-body); font-weight: 400; line-height: var(--th-line-height-body); color: var(--th-foreground); }
+.th-body-sm { font-family: var(--th-font-sans); font-size: var(--th-font-size-sm); font-weight: 400; line-height: var(--th-line-height-body); color: var(--th-muted-foreground); }
+.th-eyebrow { font-family: var(--th-font-sans); font-size: var(--th-font-size-eyebrow); font-weight: 700; line-height: 1; letter-spacing: var(--th-letter-spacing-eyebrow); text-transform: uppercase; color: var(--th-muted-foreground); }
+.th-mono { font-family: var(--th-font-mono); }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--th-background);
+    --color-foreground: var(--th-foreground);
+    --color-card: var(--th-card);
+    --color-card-foreground: var(--th-card-foreground);
+    --color-primary: var(--th-primary);
+    --color-primary-foreground: var(--th-primary-foreground);
+    --color-secondary: var(--th-secondary);
+    --color-secondary-foreground: var(--th-secondary-foreground);
+    --color-muted: var(--th-muted);
+    --color-muted-foreground: var(--th-muted-foreground);
+    --color-accent: var(--th-accent);
+    --color-accent-foreground: var(--th-accent-foreground);
+    --color-border: var(--th-border);
+    --color-input: var(--th-input);
+    --color-ring: var(--th-ring);
+  }
+  @layer base {
+    body { background: var(--th-background); color: var(--th-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+<main class="overflow-hidden">
+
+<!-- ===== Navigation Bar ===== -->
+<nav class="sticky top-0 z-50 w-full border-b" style="border-color: var(--th-border); background: color-mix(in srgb, var(--th-background) 80%, transparent); backdrop-filter: blur(16px) saturate(1.2); -webkit-backdrop-filter: blur(16px) saturate(1.2);">
+    <div class="mx-auto flex h-11 max-w-[1184px] items-center justify-between px-6 lg:px-8">
+        <a href="#" class="flex items-center gap-2 no-underline" style="color: var(--th-foreground);">
+            <span class="text-xl leading-none" aria-hidden="true">🌱</span>
+            <span class="th-h3" style="font-size: 1.125rem; color: var(--th-foreground);">沃土之环</span>
+        </a>
+        <div class="flex items-center gap-6">
+            <a href="#" data-dom-id="nav-market" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-foreground);">原料市场</a>
+            <a href="#" data-dom-id="nav-fertilizer" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-foreground);">有机肥商城</a>
+            <a href="#" data-dom-id="nav-about" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-foreground);">关于我们</a>
+            <a href="#" data-dom-id="cta-login" class="inline-flex items-center justify-center whitespace-nowrap rounded-full px-5 py-1.5 text-sm font-semibold no-underline transition-all hover:opacity-90 active:scale-[0.98]" style="background: var(--th-primary); color: var(--th-primary-foreground); font-family: var(--th-font-sans);">登录</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ===== Breadcrumb ===== -->
+<div class="mx-auto max-w-[1184px] px-6 lg:px-8 pt-6">
+    <a href="#" data-dom-id="breadcrumb-back" class="inline-flex items-center gap-1.5 th-body-sm no-underline transition-all duration-150 ease-out hover:gap-2" style="color: var(--th-muted-foreground);">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i> 返回原料市场
+    </a>
+</div>
+
+<!-- ===== Main Detail – Two-Column Layout ===== -->
+<section class="py-6 lg:py-10" style="background: var(--th-background);">
+    <div class="mx-auto max-w-[1184px] px-6 lg:px-8">
+        <div class="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
+
+            <!-- Left Column: Image (≈60%) -->
+            <div class="lg:col-span-7">
+                <div class="relative overflow-hidden rounded-[var(--th-radius)] detail-image-frame" style="box-shadow: var(--th-shadow-sm); background: var(--th-secondary);">
+                    <img src="../assets/image_1_yi19x4.jpg" alt="鸡粪有机原料 - 原料图片展示" class="w-full object-cover" style="aspect-ratio: 4/3;" loading="eager">
+                </div>
+                <!-- Carousel Dot Indicators -->
+                <div class="flex items-center justify-center gap-2 mt-4">
+                    <span class="carousel-dot active block w-2.5 h-2.5 rounded-full shrink-0" style="background: var(--th-primary);"></span>
+                    <span class="carousel-dot block w-2.5 h-2.5 rounded-full shrink-0" style="background: var(--th-border); cursor: pointer;"></span>
+                    <span class="carousel-dot block w-2.5 h-2.5 rounded-full shrink-0" style="background: var(--th-border); cursor: pointer;"></span>
+                    <span class="carousel-dot block w-2.5 h-2.5 rounded-full shrink-0" style="background: var(--th-border); cursor: pointer;"></span>
+                </div>
+            </div>
+
+            <!-- Right Column: Info (≈40%) -->
+            <div class="lg:col-span-5 flex flex-col gap-5">
+
+                <!-- Title + Status Badge -->
+                <div class="flex items-start justify-between gap-4">
+                    <h1 class="th-h2" style="text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">鸡粪有机原料</h1>
+                    <span class="inline-flex items-center whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold shrink-0" style="background: var(--th-state-success-surface); color: var(--th-state-success); font-family: var(--th-font-sans);">待收购</span>
+                </div>
+
+                <!-- Info Grid 2 Columns -->
+                <div class="grid grid-cols-2 gap-x-6 gap-y-4">
+                    <div class="flex flex-col gap-0.5">
+                        <span class="th-body-sm" style="color: var(--th-muted-foreground);">品类</span>
+                        <span class="th-body font-medium truncate">禽畜粪便</span>
+                    </div>
+                    <div class="flex flex-col gap-0.5">
+                        <span class="th-body-sm" style="color: var(--th-muted-foreground);">重量</span>
+                        <span class="th-body font-medium th-mono truncate">50 吨</span>
+                    </div>
+                    <div class="flex flex-col gap-0.5">
+                        <span class="th-body-sm" style="color: var(--th-muted-foreground);">地点</span>
+                        <span class="th-body font-medium truncate">河北邢台</span>
+                    </div>
+                    <div class="flex flex-col gap-0.5">
+                        <span class="th-body-sm" style="color: var(--th-muted-foreground);">发布时间</span>
+                        <span class="th-body font-medium th-mono truncate">2026-06-25</span>
+                    </div>
+                </div>
+
+                <!-- Divider -->
+                <div style="border-top: 1px solid var(--th-border);"></div>
+
+                <!-- Supplier Card -->
+                <div class="flex items-center gap-3 rounded-[var(--th-radius)] border p-4 supplier-card" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-xs);">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full shrink-0" style="background: var(--th-secondary);">
+                        <i data-lucide="user" class="w-5 h-5" style="color: var(--th-muted-foreground);"></i>
+                    </div>
+                    <div class="flex flex-col gap-0.5 min-w-0 flex-1">
+                        <span class="th-body font-semibold truncate">绿色农场</span>
+                        <div class="flex items-center gap-0.5">
+                            <i data-lucide="star" class="w-3.5 h-3.5 star-filled"></i>
+                            <i data-lucide="star" class="w-3.5 h-3.5 star-filled"></i>
+                            <i data-lucide="star" class="w-3.5 h-3.5 star-filled"></i>
+                            <i data-lucide="star" class="w-3.5 h-3.5 star-filled"></i>
+                            <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--th-border);"></i>
+                            <span class="th-body-sm ml-1.5 truncate" style="color: var(--th-muted-foreground);">河北邢台</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Price Highlight -->
+                <div class="flex items-baseline gap-1.5">
+                    <span class="th-mono" style="font-size: var(--th-font-size-h1); font-weight: 700; color: var(--th-primary); line-height: 1.1;">¥150</span>
+                    <span class="th-body" style="color: var(--th-muted-foreground);">/吨</span>
+                </div>
+
+                <!-- Description -->
+                <p class="th-body line-clamp-4" style="color: var(--th-muted-foreground);">优质鸡粪有机原料，来自规模化养殖场，经过初步堆肥发酵处理，含水率控制在30%以下，无沙石杂质，适合有机肥加工企业直接使用。长期供应，质量稳定。</p>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== Match Progress Timeline ===== -->
+<section class="py-12 lg:py-16" style="background: var(--th-secondary);">
+    <div class="mx-auto max-w-[1184px] px-6 lg:px-8">
+        <h2 class="th-h2 mb-8" style="text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">匹配进度</h2>
+
+        <!-- Timeline -->
+        <div class="flex items-start">
+            <!-- Step 1: 发布审核 (completed) -->
+            <div class="flex-1 flex flex-col items-center gap-2">
+                <div class="flex items-center w-full">
+                    <span class="inline-flex items-center justify-center w-10 h-10 rounded-full shrink-0" style="background: var(--th-state-success); color: var(--th-accent-foreground); font-family: var(--th-font-sans);">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                    </span>
+                    <div class="flex-1 h-0.5 ml-2" style="background: var(--th-state-success);"></div>
+                </div>
+                <span class="th-body-sm font-semibold text-center whitespace-nowrap">发布审核</span>
+            </div>
+
+            <!-- Step 2: 待匹配 (current) -->
+            <div class="flex-1 flex flex-col items-center gap-2" style="margin-left: -2px;">
+                <div class="flex items-center w-full">
+                    <span class="inline-flex items-center justify-center w-10 h-10 rounded-full shrink-0 text-sm font-bold" style="background: var(--th-primary); color: var(--th-primary-foreground); font-family: var(--th-font-sans);">2</span>
+                    <div class="flex-1 h-0.5 ml-2" style="background: var(--th-border);"></div>
+                </div>
+                <span class="th-body-sm font-semibold text-center whitespace-nowrap" style="color: var(--th-foreground);">待匹配</span>
+            </div>
+
+            <!-- Step 3: 运输中 (pending) -->
+            <div class="flex-1 flex flex-col items-center gap-2" style="margin-left: -2px;">
+                <div class="flex items-center w-full">
+                    <span class="inline-flex items-center justify-center w-10 h-10 rounded-full border-2 shrink-0 text-sm font-semibold" style="border-color: var(--th-border); color: var(--th-muted-foreground); font-family: var(--th-font-sans);">3</span>
+                    <div class="flex-1 h-0.5 ml-2" style="background: var(--th-border);"></div>
+                </div>
+                <span class="th-body-sm font-semibold text-center whitespace-nowrap" style="color: var(--th-muted-foreground);">运输中</span>
+            </div>
+
+            <!-- Step 4: 已完成 (pending) -->
+            <div class="flex flex-col items-center gap-2 shrink-0" style="margin-left: -2px;">
+                <span class="inline-flex items-center justify-center w-10 h-10 rounded-full border-2 shrink-0 text-sm font-semibold" style="border-color: var(--th-border); color: var(--th-muted-foreground); font-family: var(--th-font-sans);">4</span>
+                <span class="th-body-sm font-semibold text-center whitespace-nowrap" style="color: var(--th-muted-foreground);">已完成</span>
+            </div>
+        </div>
+
+        <!-- Timeline Labels Row (mobile fallback, hidden on lg) -->
+        <div class="hidden max-sm:grid max-sm:grid-cols-4 max-sm:gap-2 max-sm:mt-3">
+            <span class="th-body-sm text-center" style="color: var(--th-foreground);">发布审核</span>
+            <span class="th-body-sm text-center" style="color: var(--th-foreground);">待匹配</span>
+            <span class="th-body-sm text-center" style="color: var(--th-muted-foreground);">运输中</span>
+            <span class="th-body-sm text-center" style="color: var(--th-muted-foreground);">已完成</span>
+        </div>
+    </div>
+</section>
+
+<!-- ===== CTA Row ===== -->
+<section class="py-8 lg:py-10" style="background: var(--th-background);">
+    <div class="mx-auto max-w-[1184px] px-6 lg:px-8">
+        <div class="flex flex-wrap items-center gap-4">
+            <!-- Primary CTA: 联系农户 -->
+            <a href="#" data-dom-id="cta-contact-farmer" class="cta-primary inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full px-6 py-3 text-base font-semibold no-underline transition-all hover:translate-y-[-1px] hover:opacity-90 active:scale-[0.98]" style="background: var(--th-primary); color: var(--th-primary-foreground); font-family: var(--th-font-sans); box-shadow: var(--th-shadow-xs);">
+                <i data-lucide="message-circle" class="w-5 h-5"></i>
+                联系农户
+            </a>
+            <!-- Secondary CTA: 收藏 -->
+            <a href="#" data-dom-id="cta-bookmark" class="cta-secondary inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border px-5 py-2.5 text-base font-medium no-underline transition-all hover:opacity-80 active:scale-[0.98]" style="border-color: var(--th-border); color: var(--th-foreground); font-family: var(--th-font-sans);">
+                <i data-lucide="bookmark" class="w-5 h-5"></i>
+                收藏
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ===== Footer ===== -->
+<footer class="py-16 lg:py-20" style="background: var(--th-background-800);">
+    <div class="mx-auto max-w-[1184px] px-6 lg:px-8">
+        <div class="grid grid-cols-1 gap-10 md:grid-cols-3">
+            <div class="flex flex-col gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl leading-none" aria-hidden="true">🌱</span>
+                    <span class="th-h3" style="color: var(--th-text-100);">沃土之环</span>
+                </div>
+                <p class="th-body-sm" style="color: var(--th-text-300);">绿色农业 · 循环经济<br>连接农户、企业与司机的一站式平台</p>
+            </div>
+            <div class="flex flex-col gap-3">
+                <span class="text-sm font-semibold" style="color: var(--th-text-100); font-family: var(--th-font-sans);">快速链接</span>
+                <a href="#" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-text-300);">原料市场</a>
+                <a href="#" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-text-300);">有机肥商城</a>
+                <a href="#" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-text-300);">司机收运</a>
+                <a href="#" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-text-300);">关于我们</a>
+            </div>
+            <div class="flex flex-col gap-3">
+                <span class="text-sm font-semibold" style="color: var(--th-text-100); font-family: var(--th-font-sans);">联系我们</span>
+                <p class="th-body-sm" style="color: var(--th-text-300);">客服热线：400-888-9999</p>
+                <p class="th-body-sm" style="color: var(--th-text-300);">邮箱：contact@terrahalo.com</p>
+                <p class="th-body-sm" style="color: var(--th-text-300);">地址：北京市海淀区中关村科技园</p>
+            </div>
+        </div>
+        <div class="mt-12 border-t pt-8" style="border-color: var(--th-background-700);">
+            <p class="th-body-sm text-center" style="color: var(--th-text-400);">© 2026 沃土之环. 绿色农业 · 循环经济</p>
+        </div>
+    </div>
+</footer>
+
+</main>
+
+<!-- ===== Custom Styles (in body, before </body>) ===== -->
+<style>
+    /* Image frame hover reveal */
+    .detail-image-frame {
+        transition: box-shadow var(--th-duration-base) var(--th-ease);
+    }
+    .detail-image-frame:hover {
+        box-shadow: var(--th-shadow-md);
+    }
+
+    /* Supplier card hover */
+    .supplier-card {
+        transition: box-shadow var(--th-duration-fast) var(--th-ease);
+    }
+    .supplier-card:hover {
+        box-shadow: var(--th-shadow-sm);
+    }
+
+    /* CTA primary hover — icon slide */
+    .cta-primary i {
+        transition: transform var(--th-duration-fast) var(--th-ease);
+    }
+    .cta-primary:hover i {
+        transform: translateX(2px);
+    }
+
+    /* CTA secondary hover */
+    .cta-secondary {
+        transition: border-color var(--th-duration-fast) var(--th-ease), opacity var(--th-duration-fast) var(--th-ease);
+    }
+    .cta-secondary:hover {
+        border-color: var(--th-primary);
+        opacity: 1;
+    }
+
+    /* Star filled color */
+    .star-filled {
+        color: var(--th-state-warning);
+        fill: var(--th-state-warning);
+    }
+
+    /* Carousel dot hover */
+    .carousel-dot {
+        transition: background var(--th-duration-fast) var(--th-ease);
+    }
+
+    /* Breadcrumb arrow transition */
+    nav a {
+        transition: opacity var(--th-duration-fast) var(--th-ease);
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+        .detail-image-frame,
+        .supplier-card,
+        .cta-primary,
+        .cta-primary i,
+        .cta-secondary,
+        .carousel-dot,
+        nav a {
+            transition-duration: 0.01ms !important;
+            animation-duration: 0.01ms !important;
+        }
+        .cta-primary:hover i { transform: none; }
+        .cta-primary:hover { transform: none; }
+        .cta-secondary:hover { opacity: 1; }
+    }
+</style>
+
+<script>lucide.createIcons();</script>
+</body>
+</html>

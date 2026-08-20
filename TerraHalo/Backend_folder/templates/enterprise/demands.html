@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}采购需求管理 - 沃土之环{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-search-dollar"></i> 采购需求管理</h2>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDemandModal">
+            <i class="fas fa-plus"></i> 新建需求
+        </button>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div id="demandsList">
+                <p class="text-center text-muted py-4">加载中...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 新建需求弹窗 -->
+<div class="modal fade" id="addDemandModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">新建采购需求</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="demandForm">
+                    <div class="row mb-3">
+                        <label class="col-sm-3 col-form-label">原料品类 *</label>
+                        <div class="col-sm-9">
+                            <select class="form-select" name="category_name" required>
+                                <option value="">请选择</option>
+                                {% for name in category_names %}
+                                <option value="{{ name }}">{{ name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-3 col-form-label">目标数量(吨) *</label>
+                        <div class="col-sm-9">
+                            <input type="number" class="form-control" name="target_weight" min="0.1" step="0.1" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-3 col-form-label">最低收购量(吨)</label>
+                        <div class="col-sm-9">
+                            <input type="number" class="form-control" name="min_weight" min="0" step="0.1" value="0">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-3 col-form-label">期望价格区间(元/吨)</label>
+                        <div class="col-sm-4">
+                            <input type="number" class="form-control" name="expected_price_min" min="0" step="1" placeholder="最低价">
+                        </div>
+                        <div class="col-sm-1 text-center pt-2">—</div>
+                        <div class="col-sm-4">
+                            <input type="number" class="form-control" name="expected_price_max" min="0" step="1" placeholder="最高价">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-3 col-form-label">收购半径(km)</label>
+                        <div class="col-sm-9">
+                            <input type="number" class="form-control" name="purchase_radius_km" value="50" min="1">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-3 col-form-label">质量要求</label>
+                        <div class="col-sm-9">
+                            <textarea class="form-control" name="quality_requirement" rows="2" placeholder="含水率、杂质等要求"></textarea>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-3 col-form-label">备注</label>
+                        <div class="col-sm-9">
+                            <textarea class="form-control" name="remark" rows="2"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="submitDemand()">发布需求</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function loadDemands() {
+    fetch('/enterprise/api/demands')
+        .then(r => r.json())
+        .then(data => {
+            if (!data.length) {
+                document.getElementById('demandsList').innerHTML =
+                    '<p class="text-center text-muted py-5">暂无采购需求，点击右上角新建</p>';
+                return;
+            }
+            let html = '<div class="table-responsive"><table class="table table-hover">';
+            html += '<thead><tr><th>编号</th><th>品类</th><th>目标数量</th><th>价格区间</th><th>状态</th><th>创建时间</th><th>操作</th></tr></thead><tbody>';
+            data.forEach(d => {
+                const statusMap = {active:'进行中',matching:'匹配中',matched:'已匹配',closed:'已关闭'};
+                const badgeMap = {active:'success',matching:'info',matched:'primary',closed:'secondary'};
+                html += `<tr>
+                    <td><small>${d.demand_no}</small></td>
+                    <td>${d.category_name||'-'}</td>
+                    <td>${d.target_weight}吨</td>
+                    <td>${d.expected_price_min||'?'}-${d.expected_price_max||'?'} 元/吨</td>
+                    <td><span class="badge bg-${badgeMap[d.status]||'secondary'}">${statusMap[d.status]||d.status}</span></td>
+                    <td><small>${(d.created_at||'').substr(0,10)}</small></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-info" onclick="viewMatches(${d.id})">查看匹配</button>
+                        ${d.status!=='closed'?`<button class="btn btn-sm btn-outline-danger ms-1" onclick="closeDemand(${d.id})">关闭</button>`:''}
+                    </td>
+                </tr>`;
+            });
+            html += '</tbody></table></div>';
+            document.getElementById('demandsList').innerHTML = html;
+        });
+}
+
+function submitDemand() {
+    const form = document.getElementById('demandForm');
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+    const fd = new FormData(form);
+    const data = Object.fromEntries(fd.entries());
+    fetch('/enterprise/api/demands', {
+        method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)
+    }).then(r=>r.json()).then(d=>{
+        if(d.demand_id){ alert(`需求发布成功！已自动匹配 ${d.matches_count} 条供给`); location.reload(); }
+        else alert(d.error||'发布失败');
+    });
+}
+
+function viewMatches(id) {
+    window.location.href = '/enterprise/matches?demand_id=' + id;
+}
+
+function closeDemand(id) {
+    if(!confirm('确认关闭该需求？')) return;
+    fetch('/enterprise/api/demands/'+id+'/close', {method:'POST'})
+        .then(r=>r.json()).then(d=>{ alert(d.message); loadDemands(); });
+}
+
+loadDemands();
+</script>
+{% endblock %}

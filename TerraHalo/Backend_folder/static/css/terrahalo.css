@@ -1,0 +1,156 @@
+/* ===== TerraHalo Brand Design System =====
+   抽取自设计稿（首页等8个设计），棕色/绿色大地色系 + Apple风格排版 */
+
+/* ===== TerraHalo Brand CSS ===== */
+/* Apple-inspired typography + spacing system with brown/green earth palette */
+/* 注：Google Fonts 已移除，离线环境回退到系统字体（PingFang SC / Microsoft YaHei 等） */
+
+/* ----- Primitive Palette ----- */
+:root {
+  /* Brown (earth) - brand primary */
+  --th-brown-50: #fef9ed;
+  --th-brown-100: #fdf3d6;
+  --th-brown-200: #fae5a4;
+  --th-brown-300: #f5d06a;
+  --th-brown-400: #e8b830;
+  --th-brown-500: #8B6914;
+  --th-brown-600: #7a5c11;
+  --th-brown-700: #6B4F10;
+  --th-brown-800: #5a3f0a;
+  --th-brown-900: #3d2807;
+
+  /* Green (crop) - accent / state success */
+  --th-green-50: #eef5ec;
+  --th-green-100: #d9ebd5;
+  --th-green-200: #b5d6ab;
+  --th-green-300: #8abd79;
+  --th-green-400: #5f9a4a;
+  --th-green-500: #2D5A27;
+  --th-green-600: #264e21;
+  --th-green-700: #1B3D18;
+  --th-green-800: #143012;
+  --th-green-900: #0d200c;
+
+  /* Background - warm earth */
+  --th-background-50: #ffffff;
+  --th-background-100: #faf8f2;
+  --th-background-200: #f5f1e7;
+  --th-background-300: #ede6d5;
+  --th-background-400: #ddd2ba;
+  --th-background-500: #b8ac94;
+  --th-background-600: #8c8070;
+  --th-background-700: #5c5448;
+  --th-background-800: #2b2416;
+  --th-background-900: #1c1814;
+
+  /* Text */
+  --th-text-50: #f5f3ef;
+  --th-text-100: #e5e0d8;
+  --th-text-200: #c4bcae;
+  --th-text-300: #a39887;
+  --th-text-400: #8c8070;
+  --th-text-500: #6e6456;
+  --th-text-600: #5c5448;
+  --th-text-700: #3d362e;
+  --th-text-800: #2b2416;
+  --th-text-900: #1c1814;
+
+  /* State colors */
+  --th-state-success: #2D5A27;
+  --th-state-success-surface: #eef5ec;
+  --th-state-warning: #d97706;
+  --th-state-warning-surface: #fffbeb;
+  --th-state-error: #dc2626;
+  --th-state-error-surface: #fef2f2;
+  --th-state-info: #2563eb;
+  --th-state-info-surface: #eff6ff;
+
+  /* ----- Semantic Roles ----- */
+  --th-background: var(--th-background-100);
+  --th-foreground: var(--th-text-800);
+  --th-primary: var(--th-brown-500);
+  --th-primary-foreground: #ffffff;
+  --th-secondary: var(--th-background-200);
+  --th-secondary-foreground: var(--th-text-700);
+  --th-muted: var(--th-background-200);
+  --th-muted-foreground: var(--th-text-500);
+  --th-accent: var(--th-green-500);
+  --th-accent-foreground: #ffffff;
+  --th-card: var(--th-background-50);
+  --th-card-foreground: var(--th-text-800);
+  --th-border: var(--th-background-300);
+  --th-input: var(--th-background-400);
+  --th-ring: var(--th-brown-500);
+
+  /* ----- Typography ----- */
+  --th-font-sans: 'DM Sans', ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
+  --th-font-mono: 'JetBrains Mono', monospace;
+  --th-font-size-hero: clamp(3rem, 6vw, 5rem);
+  --th-font-size-h1: clamp(2rem, 4vw, 3rem);
+  --th-font-size-h2: clamp(1.5rem, 3vw, 2.25rem);
+  --th-font-size-h3: 1.25rem;
+  --th-font-size-body: 1rem;
+  --th-font-size-sm: 0.875rem;
+  --th-font-size-xs: 0.75rem;
+  --th-font-size-eyebrow: 0.6875rem;
+  --th-line-height-tight: 0.92;
+  --th-line-height-snug: 1.15;
+  --th-line-height-body: 1.55;
+  --th-letter-spacing-hero: -0.04em;
+  --th-letter-spacing-eyebrow: 0.08em;
+
+  /* ----- Spacing ----- */
+  --th-spacing: 0.24rem;
+
+  /* ----- Radius ----- */
+  --th-radius: 1.2rem;
+  --th-radius-sm: 0.5rem;
+  --th-radius-full: 9999px;
+
+  /* ----- Shadow (whisper-light) ----- */
+  --th-shadow-xs: 0 1px 2px 0 rgba(0,0,0,0.04);
+  --th-shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05), 0 1px 3px -1px rgba(0,0,0,0.05);
+  --th-shadow: 0 2px 4px -1px rgba(0,0,0,0.06), 0 1px 2px -1px rgba(0,0,0,0.05);
+  --th-shadow-md: 0 4px 8px -2px rgba(0,0,0,0.06), 0 2px 4px -2px rgba(0,0,0,0.05);
+  --th-shadow-lg: 0 8px 24px -8px rgba(0,0,0,0.08), 0 4px 8px -4px rgba(0,0,0,0.05);
+  --th-shadow-xl: 0 16px 40px -10px rgba(0,0,0,0.10), 0 8px 16px -8px rgba(0,0,0,0.06);
+  --th-shadow-2xl: 0 24px 64px -12px rgba(0,0,0,0.12);
+
+  /* ----- Hero Gradient ----- */
+  --th-hero-gradient: linear-gradient(135deg, var(--th-brown-700) 0%, var(--th-green-500) 60%, var(--th-green-700) 100%);
+
+  /* ----- Motion ----- */
+  --th-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --th-duration-fast: 150ms;
+  --th-duration-base: 250ms;
+  --th-duration-slow: 350ms;
+}
+
+/* ----- Typography Utility Classes ----- */
+.th-h1 { font-family: var(--th-font-sans); font-size: var(--th-font-size-h1); font-weight: 600; line-height: var(--th-line-height-tight); letter-spacing: -0.03em; color: var(--th-foreground); }
+.th-h2 { font-family: var(--th-font-sans); font-size: var(--th-font-size-h2); font-weight: 600; line-height: var(--th-line-height-snug); letter-spacing: -0.02em; color: var(--th-foreground); }
+.th-h3 { font-family: var(--th-font-sans); font-size: var(--th-font-size-h3); font-weight: 600; line-height: var(--th-line-height-snug); color: var(--th-foreground); }
+.th-body { font-family: var(--th-font-sans); font-size: var(--th-font-size-body); font-weight: 400; line-height: var(--th-line-height-body); color: var(--th-foreground); }
+.th-body-sm { font-family: var(--th-font-sans); font-size: var(--th-font-size-sm); font-weight: 400; line-height: var(--th-line-height-body); color: var(--th-muted-foreground); }
+.th-eyebrow { font-family: var(--th-font-sans); font-size: var(--th-font-size-eyebrow); font-weight: 700; line-height: 1; letter-spacing: var(--th-letter-spacing-eyebrow); text-transform: uppercase; color: var(--th-muted-foreground); }
+.th-mono { font-family: var(--th-font-mono); }
+
+    
+
+/* ----- 全局工具 ----- */
+<style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>

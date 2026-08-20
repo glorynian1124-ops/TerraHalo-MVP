@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}有机肥商城 - 沃土之环{% endblock %}
+
+{% block content %}
+<main class="overflow-hidden">
+    <!-- Hero Banner -->
+    <section class="relative flex min-h-[360px] items-center justify-center overflow-hidden lg:min-h-[440px]">
+        <img src="{{ url_for('static', filename='img/image_2_yi19x4.jpg') }}" alt="有机肥产品展示" class="absolute inset-0 w-full h-full object-cover">
+        <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(28,24,20,0.65) 0%, rgba(28,24,20,0.45) 100%);"></div>
+        <div class="relative z-10 mx-auto w-full max-w-[1184px] px-6 text-center lg:px-8">
+            <h1 class="th-h1" style="color: var(--th-background-50);">有机肥商城</h1>
+            <p class="th-body mt-4 mx-auto max-w-lg" style="color: rgba(255,255,255,0.75); line-height: var(--th-line-height-body);">优质有机肥，滋养每一寸土地</p>
+        </div>
+    </section>
+
+    <!-- 主内容 -->
+    <main class="mx-auto max-w-[1184px] px-6 py-8 lg:px-8 lg:py-12">
+        <div class="flex flex-col gap-6 mb-8">
+            <!-- 分类 Pills -->
+            <div class="flex flex-nowrap overflow-x-auto items-center gap-2 pb-1" id="cat-pills">
+                <button data-category-id="" class="pcat-pill pcat-active shrink-0 inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-semibold no-underline transition-all hover:opacity-90 active:scale-[0.98]" style="background: var(--th-primary); color: var(--th-primary-foreground);">全部</button>
+                <button data-category-id="1" class="pcat-pill shrink-0 inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-medium no-underline transition-all hover:opacity-80 active:scale-[0.98]" style="background: var(--th-secondary); color: var(--th-secondary-foreground);">有机肥料</button>
+                <button data-category-id="2" class="pcat-pill shrink-0 inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-medium no-underline transition-all hover:opacity-80 active:scale-[0.98]" style="background: var(--th-secondary); color: var(--th-secondary-foreground);">土壤调理剂</button>
+                <button data-category-id="3" class="pcat-pill shrink-0 inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-medium no-underline transition-all hover:opacity-80 active:scale-[0.98]" style="background: var(--th-secondary); color: var(--th-secondary-foreground);">营养基质</button>
+                <button data-category-id="4" class="pcat-pill shrink-0 inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-medium no-underline transition-all hover:opacity-80 active:scale-[0.98]" style="background: var(--th-secondary); color: var(--th-secondary-foreground);">叶面肥</button>
+            </div>
+
+            <!-- 搜索 + 排序 -->
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div class="relative flex-1 max-w-md">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="width: 18px; height: 18px; color: var(--th-muted-foreground);"></i>
+                    <input type="text" id="search-input" placeholder="搜索有机肥产品..." class="w-full rounded-lg border py-2 pl-10 pr-4 text-sm outline-none transition-colors focus:ring-2" style="border-color: var(--th-border); background: var(--th-card); color: var(--th-foreground); font-family: var(--th-font-sans); --tw-ring-color: var(--th-ring);">
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="th-body-sm whitespace-nowrap" style="color: var(--th-muted-foreground);">排序：</span>
+                    <select id="sort-select" class="rounded-lg border py-2 px-3 text-sm outline-none cursor-pointer transition-colors focus:ring-2" style="border-color: var(--th-border); background: var(--th-card); color: var(--th-foreground); font-family: var(--th-font-sans); --tw-ring-color: var(--th-ring);">
+                        <option value="created_at">默认排序</option>
+                        <option value="price_asc">价格从低到高</option>
+                        <option value="price_desc">价格从高到低</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 商品网格 -->
+        <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4" id="product-grid">
+            <div class="col-span-full text-center py-16 th-body" style="color: var(--th-muted-foreground);">加载中...</div>
+        </div>
+    </main>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    var state = { category_id: '', search: '', sort_by: 'created_at' };
+
+    function loadProducts() {
+        var grid = document.getElementById('product-grid');
+        grid.innerHTML = '<div class="col-span-full text-center py-16 th-body" style="color: var(--th-muted-foreground);">加载中...</div>';
+        var params = new URLSearchParams();
+        if (state.category_id) params.set('category_id', state.category_id);
+        if (state.search) params.set('search', state.search);
+        params.set('sort_by', state.sort_by);
+
+        fetch('{{ url_for("api.get_products") }}?' + params.toString())
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (!data || !data.length) {
+                    grid.innerHTML = '<div class="col-span-full text-center py-16 th-body" style="color: var(--th-muted-foreground);">暂无商品</div>';
+                    return;
+                }
+                grid.innerHTML = data.map(function(p) {
+                    var img = (p.images && p.images.length) ? p.images[0].url : '';
+                    return '<a href="/product/' + p.id + '" class="flex flex-col gap-3 rounded-[var(--th-radius)] border p-4 no-underline transition-all hover:-translate-y-0.5" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-xs);">' +
+                        '<div class="flex h-32 items-center justify-center rounded-[var(--th-radius-sm)] text-4xl overflow-hidden" style="background: var(--th-secondary);">' + (img ? '<img src="' + img + '" class="w-full h-full object-cover">' : '🧪') + '</div>' +
+                        '<div class="flex flex-col gap-1">' +
+                            '<span class="th-h3 truncate" style="font-size: 0.95rem;">' + (p.product_name || '商品') + '</span>' +
+                            '<span class="th-body-sm truncate" style="color: var(--th-muted-foreground);">' + (p.specification || '') + '</span>' +
+                            '<div class="flex items-baseline gap-2">' +
+                                '<span class="th-mono font-bold" style="color: var(--th-primary); font-size: 1.1rem;">¥' + (p.price || 0) + '</span>' +
+                                (p.market_price ? '<span class="th-body-sm line-through" style="color: var(--th-text-400);">¥' + p.market_price + '</span>' : '') +
+                            '</div>' +
+                            '<span class="th-body-sm" style="color: var(--th-muted-foreground);">库存 ' + (p.stock_qty || 0) + ' ' + (p.unit === 'bag' ? '袋' : p.unit) + '</span>' +
+                        '</div>' +
+                    '</a>';
+                }).join('');
+            })
+            .catch(function() { grid.innerHTML = '<div class="col-span-full text-center py-16 th-body" style="color: var(--th-state-error);">加载失败，请刷新重试</div>'; });
+    }
+
+    document.getElementById('cat-pills').addEventListener('click', function(e) {
+        var btn = e.target.closest('.pcat-pill');
+        if (!btn) return;
+        state.category_id = btn.getAttribute('data-category-id');
+        document.querySelectorAll('.pcat-pill').forEach(function(p) {
+            p.classList.remove('pcat-active');
+            p.style.background = 'var(--th-secondary)';
+            p.style.color = 'var(--th-secondary-foreground)';
+            p.style.borderRadius = 'var(--th-radius-sm)';
+        });
+        btn.classList.add('pcat-active');
+        btn.style.background = 'var(--th-primary)';
+        btn.style.color = 'var(--th-primary-foreground)';
+        btn.style.borderRadius = 'var(--th-radius-full)';
+        loadProducts();
+    });
+
+    var searchTimer;
+    document.getElementById('search-input').addEventListener('input', function(e) {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(function() {
+            state.search = e.target.value.trim();
+            loadProducts();
+        }, 400);
+    });
+
+    document.getElementById('sort-select').addEventListener('change', function(e) {
+        state.sort_by = e.target.value;
+        loadProducts();
+    });
+
+    loadProducts();
+</script>
+{% endblock %}

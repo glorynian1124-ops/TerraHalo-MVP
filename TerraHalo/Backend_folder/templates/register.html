@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}注册 - 沃土之环{% endblock %}
+
+{% block content %}
+<main class="flex-1 flex flex-col md:flex-row" style="min-height: calc(100vh - 44px);">
+    <!-- 左侧品牌面板 -->
+    <div class="w-full md:w-[45%] lg:w-[42%] flex items-center justify-center px-8 py-12 md:py-0" style="background: linear-gradient(160deg, var(--th-brown-100) 0%, var(--th-background-200) 40%, var(--th-green-100) 100%);">
+        <div class="text-center max-w-sm">
+            <span class="text-6xl md:text-7xl leading-none block mb-6 select-none" role="img" aria-label="沃土之环">🌱</span>
+            <h1 class="th-h1 mb-4">沃土之环</h1>
+            <p class="th-body" style="color: var(--th-muted-foreground); max-width: 280px; margin-left: auto; margin-right: auto;">绿色农业 · 循环经济</p>
+            <div class="mt-10 hidden md:block" style="width: 48px; height: 1px; background-color: var(--th-border); margin-left: auto; margin-right: auto;"></div>
+            <p class="th-body-sm mt-6 hidden md:block" style="color: var(--th-text-400); max-width: 260px; margin-left: auto; margin-right: auto;">连接农田与工厂，让每一份废弃物都重获新生</p>
+        </div>
+    </div>
+
+    <!-- 右侧表单 -->
+    <div class="w-full md:w-[55%] lg:w-[58%] flex items-center justify-center px-4 sm:px-8 py-8 md:py-0">
+        <div class="w-full max-w-md">
+            <div class="w-full p-6 sm:p-8" style="background-color: var(--th-card); border: 1px solid var(--th-border); border-radius: var(--th-radius);">
+                <h2 class="th-h2 mb-6" style="font-size: 1.5rem;">创建账号</h2>
+                <form id="form-register" class="flex flex-col gap-5" onsubmit="return doRegister(event);">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="th-body-sm font-medium" style="color: var(--th-foreground);">角色</label>
+                        <div class="flex gap-2">
+                            <button type="button" class="role-pill role-active flex-1 flex items-center justify-center whitespace-nowrap font-medium text-sm border transition-all cursor-pointer" style="height: 36px; padding: 0 0.75rem; border-radius: var(--th-radius-full); background-color: var(--th-primary); color: var(--th-primary-foreground); border-color: var(--th-primary);" data-role="farmer" onclick="selectRole(this)">农户</button>
+                            <button type="button" class="role-pill flex-1 flex items-center justify-center whitespace-nowrap font-medium text-sm border transition-all cursor-pointer" style="height: 36px; padding: 0 0.75rem; border-radius: var(--th-radius-full); background-color: transparent; color: var(--th-muted-foreground); border-color: var(--th-border);" data-role="enterprise" onclick="selectRole(this)">企业</button>
+                            <button type="button" class="role-pill flex-1 flex items-center justify-center whitespace-nowrap font-medium text-sm border transition-all cursor-pointer" style="height: 36px; padding: 0 0.75rem; border-radius: var(--th-radius-full); background-color: transparent; color: var(--th-muted-foreground); border-color: var(--th-border);" data-role="driver" onclick="selectRole(this)">司机</button>
+                        </div>
+                        <input type="hidden" id="reg-role" value="farmer">
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="th-body-sm font-medium" style="color: var(--th-foreground);">用户名</label>
+                        <input type="text" id="reg-username" placeholder="请输入用户名" class="w-full th-body outline-none transition-all px-4 form-input-focus" style="height: 44px; border: 1px solid var(--th-input); border-radius: var(--th-radius); background-color: var(--th-background); color: var(--th-foreground); font-family: var(--th-font-sans);">
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="th-body-sm font-medium" style="color: var(--th-foreground);">手机号</label>
+                        <input type="tel" id="reg-phone" placeholder="请输入手机号" class="w-full th-body outline-none transition-all px-4 form-input-focus" style="height: 44px; border: 1px solid var(--th-input); border-radius: var(--th-radius); background-color: var(--th-background); color: var(--th-foreground); font-family: var(--th-font-sans);">
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="th-body-sm font-medium" style="color: var(--th-foreground);">邮箱</label>
+                        <input type="email" id="reg-email" placeholder="请输入邮箱" class="w-full th-body outline-none transition-all px-4 form-input-focus" style="height: 44px; border: 1px solid var(--th-input); border-radius: var(--th-radius); background-color: var(--th-background); color: var(--th-foreground); font-family: var(--th-font-sans);">
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="th-body-sm font-medium" style="color: var(--th-foreground);">密码</label>
+                        <input type="password" id="reg-password" placeholder="请输入密码" class="w-full th-body outline-none transition-all px-4 form-input-focus" style="height: 44px; border: 1px solid var(--th-input); border-radius: var(--th-radius); background-color: var(--th-background); color: var(--th-foreground); font-family: var(--th-font-sans);">
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="th-body-sm font-medium" style="color: var(--th-foreground);">确认密码</label>
+                        <input type="password" id="reg-password2" placeholder="请再次输入密码" class="w-full th-body outline-none transition-all px-4 form-input-focus" style="height: 44px; border: 1px solid var(--th-input); border-radius: var(--th-radius); background-color: var(--th-background); color: var(--th-foreground); font-family: var(--th-font-sans);">
+                    </div>
+                    <button type="submit" class="w-full flex items-center justify-center whitespace-nowrap font-semibold text-base border-none cursor-pointer transition-all mt-2 hover:opacity-90 active:scale-[0.98]" style="height: 48px; padding: 0 1.5rem; border-radius: var(--th-radius-full); background-color: var(--th-primary); color: var(--th-primary-foreground);">注册</button>
+                </form>
+                <div class="mt-6 pt-5 border-t text-center" style="border-color: var(--th-border);">
+                    <span class="th-body-sm" style="color: var(--th-muted-foreground);">已有账号？</span>
+                    <a href="{{ url_for('auth.login_page') }}" class="th-body-sm no-underline font-semibold" style="color: var(--th-primary);">直接登录</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<style>
+    .form-input-focus:focus { border-color: var(--th-ring) !important; box-shadow: 0 0 0 3px color-mix(in srgb, var(--th-ring) 15%, transparent) !important; }
+</style>
+<script>
+    var currentRole = 'farmer';
+    function selectRole(btn) {
+        var pills = document.querySelectorAll('.role-pill');
+        pills.forEach(function(p) {
+            p.style.backgroundColor = 'transparent';
+            p.style.color = 'var(--th-muted-foreground)';
+            p.style.borderColor = 'var(--th-border)';
+        });
+        btn.style.backgroundColor = 'var(--th-primary)';
+        btn.style.color = 'var(--th-primary-foreground)';
+        btn.style.borderColor = 'var(--th-primary)';
+        currentRole = btn.getAttribute('data-role');
+        document.getElementById('reg-role').value = currentRole;
+    }
+
+    function doRegister(e) {
+        e.preventDefault();
+        var username = document.getElementById('reg-username').value.trim();
+        var phone = document.getElementById('reg-phone').value.trim();
+        var email = document.getElementById('reg-email').value.trim();
+        var password = document.getElementById('reg-password').value;
+        var password2 = document.getElementById('reg-password2').value;
+
+        if (!username || !phone || !email || !password) { thToast('请填写完整信息', 'error'); return false; }
+        if (password !== password2) { thToast('两次密码不一致', 'error'); return false; }
+
+        fetchJSON('{{ url_for("auth.register_api") }}', {
+            method: 'POST',
+            body: JSON.stringify({username: username, password: password, email: email, phone: phone, role: currentRole})
+        }).then(function(d) {
+            if (d.message) {
+                thToast('注册成功，请登录', 'success');
+                setTimeout(function() { window.location.href = '{{ url_for("auth.login_page") }}'; }, 800);
+            } else {
+                thToast(d.error || '注册失败', 'error');
+            }
+        }).catch(function() { thToast('网络错误，请稍后重试', 'error'); });
+        return false;
+    }
+</script>
+{% endblock %}

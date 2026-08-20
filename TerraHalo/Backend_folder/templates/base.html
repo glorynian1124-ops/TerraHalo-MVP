@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}沃土之环 - 农业废弃物资源化利用平台{% endblock %}</title>
+
+    <!-- TerraHalo Brand 设计系统 -->
+    <link href="{{ url_for('static', filename='css/terrahalo.css') }}" rel="stylesheet">
+
+    <!-- Tailwind Browser + Lucide 图标 -->
+    <script src="{{ url_for('static', filename='vendor/tailwind.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/lucide.js') }}"></script>
+    <style type="text/tailwindcss">
+      @theme inline {
+        --color-background: var(--th-background);
+        --color-foreground: var(--th-foreground);
+        --color-card: var(--th-card);
+        --color-card-foreground: var(--th-card-foreground);
+        --color-primary: var(--th-primary);
+        --color-primary-foreground: var(--th-primary-foreground);
+        --color-secondary: var(--th-secondary);
+        --color-secondary-foreground: var(--th-secondary-foreground);
+        --color-muted: var(--th-muted);
+        --color-muted-foreground: var(--th-muted-foreground);
+        --color-accent: var(--th-accent);
+        --color-accent-foreground: var(--th-accent-foreground);
+        --color-border: var(--th-border);
+        --color-input: var(--th-input);
+        --color-ring: var(--th-ring);
+      }
+      @layer base {
+        body { background: var(--th-background); color: var(--th-foreground); }
+        td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+        th { @apply whitespace-nowrap; }
+      }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="min-h-screen font-sans antialiased" style="background-color: var(--th-background); font-family: var(--th-font-sans); color: var(--th-foreground);">
+
+    <!-- ===== 顶部导航 ===== -->
+    <nav class="sticky top-0 z-50 w-full border-b" style="border-color: var(--th-border); background: color-mix(in srgb, var(--th-background) 80%, transparent); backdrop-filter: blur(16px) saturate(1.2); -webkit-backdrop-filter: blur(16px) saturate(1.2);">
+        <div class="mx-auto flex h-11 max-w-[1184px] items-center justify-between px-6 lg:px-8">
+            <a href="{{ url_for('main.home') }}" class="flex items-center gap-2 no-underline" style="color: var(--th-foreground);">
+                <span class="text-xl leading-none" aria-hidden="true">🌱</span>
+                <span class="th-h3" style="font-size: 1.125rem; color: var(--th-foreground);">沃土之环</span>
+            </a>
+            <div class="flex items-center gap-6">
+                <a href="{{ url_for('materials.materials_page') }}" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-foreground);">原料市场</a>
+                <a href="{{ url_for('main.shop') }}" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-foreground);">有机肥商城</a>
+                {% if current_user %}
+                    {% if current_user.role_type == 'enterprise' %}
+                    <a href="{{ url_for('enterprise.dashboard') }}" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-foreground);">企业工作台</a>
+                    {% elif current_user.role_type == 'driver' %}
+                    <a href="{{ url_for('driver.tasks_page') }}" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-foreground);">司机任务</a>
+                    {% elif current_user.role_type == 'admin' %}
+                    <a href="{{ url_for('admin.dashboard_page') }}" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-foreground);">管理后台</a>
+                    {% elif current_user.role_type == 'supplier' %}
+                    <a href="{{ url_for('materials.my_materials_page') }}" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-foreground);">我的原料</a>
+                    {% endif %}
+                    <a href="{{ url_for('auth.logout') }}" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-muted-foreground);">退出</a>
+                    <span class="inline-flex items-center gap-1.5 th-body-sm" style="color: var(--th-foreground); font-weight: 600;">
+                        <span class="inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold" style="background: var(--th-primary); color: var(--th-primary-foreground);">{{ current_user.username[0] }}</span>
+                        {{ current_user.username }}
+                    </span>
+                {% else %}
+                    <a href="{{ url_for('auth.login_page') }}" class="inline-flex items-center justify-center whitespace-nowrap rounded-full px-5 py-1.5 text-sm font-semibold no-underline transition-all hover:opacity-90 active:scale-[0.98]" style="background: var(--th-primary); color: var(--th-primary-foreground); font-family: var(--th-font-sans);">登录</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    {% block content %}{% endblock %}
+
+    <!-- ===== 页脚 ===== -->
+    <footer class="py-16 lg:py-20" style="background: var(--th-background-800);">
+        <div class="mx-auto max-w-[1184px] px-6 lg:px-8">
+            <div class="grid grid-cols-1 gap-10 md:grid-cols-3">
+                <div class="flex flex-col gap-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl leading-none" aria-hidden="true">🌱</span>
+                        <span class="th-h3" style="color: var(--th-text-100);">沃土之环</span>
+                    </div>
+                    <p class="th-body-sm" style="color: var(--th-text-300);">绿色农业 · 循环经济<br>连接农户、企业与司机的一站式平台</p>
+                </div>
+                <div class="flex flex-col gap-3">
+                    <span class="text-sm font-semibold" style="color: var(--th-text-100); font-family: var(--th-font-sans);">快速链接</span>
+                    <a href="{{ url_for('materials.materials_page') }}" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-text-300);">原料市场</a>
+                    <a href="{{ url_for('main.shop') }}" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-text-300);">有机肥商城</a>
+                    <a href="{{ url_for('main.home') }}" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-text-300);">关于我们</a>
+                </div>
+                <div class="flex flex-col gap-3">
+                    <span class="text-sm font-semibold" style="color: var(--th-text-100); font-family: var(--th-font-sans);">联系我们</span>
+                    <p class="th-body-sm" style="color: var(--th-text-300);">客服热线：400-888-9999</p>
+                    <p class="th-body-sm" style="color: var(--th-text-300);">邮箱：contact@terrahalo.com</p>
+                    <p class="th-body-sm" style="color: var(--th-text-300);">地址：北京市海淀区中关村科技园</p>
+                </div>
+            </div>
+            <div class="mt-12 border-t pt-8" style="border-color: var(--th-background-700);">
+                <p class="th-body-sm text-center" style="color: var(--th-text-400);">© 2026 沃土之环. 绿色农业 · 循环经济</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast 通知 -->
+    <div id="th-toast" class="fixed top-6 left-1/2 z-[9999] hidden -translate-x-1/2"></div>
+
+    <script>
+        lucide.createIcons();
+
+        // 轻量 toast 通知
+        function thToast(msg, type) {
+            type = type || 'success';
+            var colors = {
+                success: ['var(--th-state-success-surface)', 'var(--th-state-success)'],
+                error: ['var(--th-state-error-surface)', 'var(--th-state-error)'],
+                info: ['var(--th-state-info-surface)', 'var(--th-state-info)']
+            };
+            var c = colors[type] || colors.success;
+            var box = document.getElementById('th-toast');
+            box.innerHTML = '<div class="th-body-sm font-medium px-5 py-3" style="background:' + c[0] + '; color:' + c[1] + '; border-radius: var(--th-radius); box-shadow: var(--th-shadow-lg); border: 1px solid ' + c[1] + '33;">' + msg + '</div>';
+            box.classList.remove('hidden');
+            clearTimeout(box._t);
+            box._t = setTimeout(function() { box.classList.add('hidden'); }, 2500);
+        }
+
+        // fetch JSON 封装
+        function fetchJSON(url, opts) {
+            opts = opts || {};
+            opts.headers = Object.assign({'Content-Type': 'application/json'}, opts.headers || {});
+            return fetch(url, opts).then(function(r) { return r.json(); });
+        }
+
+        // 加入购物车（原料）
+        function addToCart(materialId, qty) {
+            qty = qty || 1;
+            fetchJSON('{{ url_for("api.add_to_cart") }}', {
+                method: 'POST',
+                body: JSON.stringify({material_id: materialId, quantity: qty})
+            }).then(function(d) {
+                if (d.message) thToast(d.message, 'success');
+                else thToast(d.error || '加入购物车失败', 'error');
+            }).catch(function() { thToast('网络错误，请稍后重试', 'error'); });
+        }
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

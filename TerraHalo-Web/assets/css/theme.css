@@ -1,0 +1,359 @@
+/* =========================================================
+   TerraHalo (沃土之环) Brand CSS
+   棕绿大地色系 · Apple 风格排版与间距系统
+   ========================================================= */
+
+/* ----- 原始色板 ----- */
+:root {
+  /* 棕（大地）— 品牌主色 */
+  --th-brown-50: #fef9ed;
+  --th-brown-100: #fdf3d6;
+  --th-brown-200: #fae5a4;
+  --th-brown-300: #f5d06a;
+  --th-brown-400: #e8b830;
+  --th-brown-500: #8B6914;
+  --th-brown-600: #7a5c11;
+  --th-brown-700: #6B4F10;
+  --th-brown-800: #5a3f0a;
+  --th-brown-900: #3d2807;
+
+  /* 绿（作物）— 强调 / 成功态 */
+  --th-green-50: #eef5ec;
+  --th-green-100: #d9ebd5;
+  --th-green-200: #b5d6ab;
+  --th-green-300: #8abd79;
+  --th-green-400: #5f9a4a;
+  --th-green-500: #2D5A27;
+  --th-green-600: #264e21;
+  --th-green-700: #1B3D18;
+  --th-green-800: #143012;
+  --th-green-900: #0d200c;
+
+  /* 背景 — 温暖大地 */
+  --th-background-50: #ffffff;
+  --th-background-100: #faf8f2;
+  --th-background-200: #f5f1e7;
+  --th-background-300: #ede6d5;
+  --th-background-400: #ddd2ba;
+  --th-background-500: #b8ac94;
+  --th-background-600: #8c8070;
+  --th-background-700: #5c5448;
+  --th-background-800: #2b2416;
+  --th-background-900: #1c1814;
+
+  /* 文本 */
+  --th-text-50: #f5f3ef;
+  --th-text-100: #e5e0d8;
+  --th-text-200: #c4bcae;
+  --th-text-300: #a39887;
+  --th-text-400: #8c8070;
+  --th-text-500: #6e6456;
+  --th-text-600: #5c5448;
+  --th-text-700: #3d362e;
+  --th-text-800: #2b2416;
+  --th-text-900: #1c1814;
+
+  /* 状态色 */
+  --th-state-success: #2D5A27;
+  --th-state-success-surface: #eef5ec;
+  --th-state-warning: #d97706;
+  --th-state-warning-surface: #fffbeb;
+  --th-state-error: #dc2626;
+  --th-state-error-surface: #fef2f2;
+  --th-state-info: #2563eb;
+  --th-state-info-surface: #eff6ff;
+
+  /* ----- 语义角色 ----- */
+  --th-background: var(--th-background-100);
+  --th-foreground: var(--th-text-800);
+  --th-primary: var(--th-brown-500);
+  --th-primary-foreground: #ffffff;
+  --th-secondary: var(--th-background-200);
+  --th-secondary-foreground: var(--th-text-700);
+  --th-muted: var(--th-background-200);
+  --th-muted-foreground: var(--th-text-500);
+  --th-accent: var(--th-green-500);
+  --th-accent-foreground: #ffffff;
+  --th-card: var(--th-background-50);
+  --th-card-foreground: var(--th-text-800);
+  --th-border: var(--th-background-300);
+  --th-input: var(--th-background-400);
+  --th-ring: var(--th-brown-500);
+
+  /* ----- 排版 ----- */
+  --th-font-sans: 'DM Sans', ui-sans-serif, -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --th-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --th-font-size-hero: clamp(3rem, 6vw, 5rem);
+  --th-font-size-h1: clamp(2rem, 4vw, 3rem);
+  --th-font-size-h2: clamp(1.5rem, 3vw, 2.25rem);
+  --th-font-size-h3: 1.25rem;
+  --th-font-size-body: 1rem;
+  --th-font-size-sm: 0.875rem;
+  --th-font-size-xs: 0.75rem;
+  --th-font-size-eyebrow: 0.6875rem;
+  --th-line-height-tight: 0.92;
+  --th-line-height-snug: 1.15;
+  --th-line-height-body: 1.55;
+  --th-letter-spacing-hero: -0.04em;
+  --th-letter-spacing-eyebrow: 0.08em;
+
+  /* ----- 间距 ----- */
+  --th-spacing: 0.24rem;
+
+  /* ----- 圆角 ----- */
+  --th-radius: 1.2rem;
+  --th-radius-sm: 0.5rem;
+  --th-radius-full: 9999px;
+
+  /* ----- 阴影（轻量） ----- */
+  --th-shadow-xs: 0 1px 2px 0 rgba(0,0,0,0.04);
+  --th-shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05), 0 1px 3px -1px rgba(0,0,0,0.05);
+  --th-shadow: 0 2px 4px -1px rgba(0,0,0,0.06), 0 1px 2px -1px rgba(0,0,0,0.05);
+  --th-shadow-md: 0 4px 8px -2px rgba(0,0,0,0.06), 0 2px 4px -2px rgba(0,0,0,0.05);
+  --th-shadow-lg: 0 8px 24px -8px rgba(0,0,0,0.08), 0 4px 8px -4px rgba(0,0,0,0.05);
+  --th-shadow-xl: 0 16px 40px -10px rgba(0,0,0,0.10), 0 8px 16px -8px rgba(0,0,0,0.06);
+  --th-shadow-2xl: 0 24px 64px -12px rgba(0,0,0,0.12);
+
+  /* ----- Hero 渐变 ----- */
+  --th-hero-gradient: linear-gradient(135deg, var(--th-brown-700) 0%, var(--th-green-500) 60%, var(--th-green-700) 100%);
+
+  /* ----- 动效 ----- */
+  --th-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --th-duration-fast: 150ms;
+  --th-duration-base: 250ms;
+  --th-duration-slow: 350ms;
+}
+
+/* ----- 排版工具类 ----- */
+.th-h1 { font-family: var(--th-font-sans); font-size: var(--th-font-size-h1); font-weight: 600; line-height: var(--th-line-height-tight); letter-spacing: -0.03em; color: var(--th-foreground); }
+.th-h2 { font-family: var(--th-font-sans); font-size: var(--th-font-size-h2); font-weight: 600; line-height: var(--th-line-height-snug); letter-spacing: -0.02em; color: var(--th-foreground); }
+.th-h3 { font-family: var(--th-font-sans); font-size: var(--th-font-size-h3); font-weight: 600; line-height: var(--th-line-height-snug); color: var(--th-foreground); }
+.th-body { font-family: var(--th-font-sans); font-size: var(--th-font-size-body); font-weight: 400; line-height: var(--th-line-height-body); color: var(--th-foreground); }
+.th-body-sm { font-family: var(--th-font-sans); font-size: var(--th-font-size-sm); font-weight: 400; line-height: var(--th-line-height-body); color: var(--th-muted-foreground); }
+.th-eyebrow { font-family: var(--th-font-sans); font-size: var(--th-font-size-eyebrow); font-weight: 700; line-height: 1; letter-spacing: var(--th-letter-spacing-eyebrow); text-transform: uppercase; color: var(--th-muted-foreground); }
+.th-mono { font-family: var(--th-font-mono); }
+
+/* ----- 基础样式 ----- */
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--th-background);
+  color: var(--th-foreground);
+  font-family: var(--th-font-sans);
+  margin: 0;
+}
+a { color: inherit; }
+img { max-width: 100%; display: block; }
+
+/* ----- 通用工具 ----- */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+[data-icon] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  background-color: currentColor;
+}
+
+/* 表单聚焦 */
+.form-input-focus:focus {
+  border-color: var(--th-ring) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--th-ring) 15%, transparent) !important;
+}
+
+/* 焦点可见 */
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid var(--th-ring);
+  outline-offset: 2px;
+}
+
+/* ----- Toast 提示 ----- */
+.th-toast-wrap {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  pointer-events: none;
+  width: max-content;
+  max-width: 90vw;
+}
+.th-toast {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: var(--th-radius-full);
+  background: var(--th-foreground);
+  color: var(--th-background-50);
+  font-family: var(--th-font-sans);
+  font-size: var(--th-font-size-sm);
+  box-shadow: var(--th-shadow-lg);
+  animation: th-toast-in var(--th-duration-base) var(--th-ease);
+}
+.th-toast.th-toast-out { animation: th-toast-out var(--th-duration-base) var(--th-ease) forwards; }
+.th-toast .th-toast-ico { width: 16px; height: 16px; flex-shrink: 0; }
+.th-toast-success .th-toast-ico { color: #6ee7b7; }
+.th-toast-error .th-toast-ico { color: #fca5a5; }
+.th-toast-info .th-toast-ico { color: #93c5fd; }
+
+@keyframes th-toast-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes th-toast-out {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-8px); }
+}
+
+/* ----- 移动端导航抽屉 ----- */
+.th-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: color-mix(in srgb, var(--th-background-900) 40%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--th-duration-base) var(--th-ease);
+}
+.th-drawer.th-drawer-open { opacity: 1; pointer-events: auto; }
+.th-drawer-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: min(300px, 80vw);
+  background: var(--th-card);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transform: translateX(100%);
+  transition: transform var(--th-duration-base) var(--th-ease);
+  box-shadow: var(--th-shadow-2xl);
+}
+.th-drawer-open .th-drawer-panel { transform: translateX(0); }
+.th-drawer-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--th-radius);
+  text-decoration: none;
+  color: var(--th-foreground);
+  font-size: var(--th-font-size-body);
+  transition: background var(--th-duration-fast) var(--th-ease);
+}
+.th-drawer-link:hover { background: var(--th-muted); }
+.th-drawer-link.th-drawer-link-active { background: color-mix(in srgb, var(--th-primary) 8%, transparent); color: var(--th-primary); font-weight: 600; }
+
+/* ----- 骨架屏 ----- */
+.th-skeleton { background: linear-gradient(90deg, var(--th-muted) 25%, var(--th-background-300) 50%, var(--th-muted) 75%); background-size: 200% 100%; animation: th-shimmer 1.4s infinite; }
+@keyframes th-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* ----- 减少动态 ----- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* =========================================================
+   桌面画幅锁定 · 桌面交互增强
+   定位：桌面优先网页端；移动端响应式能力保留于上方原代码
+   如需恢复移动端优先形态，删除本区块即可
+   ========================================================= */
+
+/* ----- 1. 桌面画幅：移除移动端专属 UI，桌面导航常显 ----- */
+@media (min-width: 1024px) {
+  /* 移动端汉堡菜单与侧滑抽屉在桌面端不再出现 */
+  [data-nav-toggle],
+  .th-drawer,
+  #th-mobile-drawer {
+    display: none !important;
+  }
+
+  /* 桌面导航链接：hover 主色 + 下划线滑入动画（覆盖运行时注入的 inline 样式） */
+  #th-nav a.no-underline {
+    position: relative;
+    transition: color var(--th-duration-fast) var(--th-ease);
+  }
+  #th-nav a.no-underline:hover {
+    color: var(--th-primary) !important;
+    opacity: 1 !important;
+  }
+  #th-nav a.no-underline::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--th-primary);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform var(--th-duration-base) var(--th-ease);
+  }
+  #th-nav a.no-underline:hover::after,
+  #th-nav a.no-underline.font-semibold::after {
+    transform: scaleX(1);
+  }
+}
+
+/* ----- 2. 桌面交互增强（仅指针设备 hover，避免触屏误触） ----- */
+@media (hover: hover) and (pointer: fine) {
+  /* 原料市场 / 有机肥商城 卡片：上浮 + 阴影 + 边框主色 */
+  #material-grid article,
+  #product-grid [data-id] {
+    transition: transform var(--th-duration-base) var(--th-ease),
+                box-shadow var(--th-duration-base) var(--th-ease),
+                border-color var(--th-duration-base) var(--th-ease);
+  }
+  #material-grid article:hover,
+  #product-grid [data-id]:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: var(--th-shadow-lg) !important;
+    border-color: color-mix(in srgb, var(--th-primary) 40%, var(--th-border)) !important;
+  }
+
+  /* 企业端收运任务表格行：hover 高亮 */
+  #task-tbody tr { transition: background var(--th-duration-fast) var(--th-ease); }
+  #task-tbody tr:hover { background: var(--th-muted); }
+
+  /* 详情页操作按钮：hover 上浮 + 阴影 */
+  #cta-contact, #cta-bookmark, #cta-cart, #cta-buy {
+    transition: transform var(--th-duration-fast) var(--th-ease),
+                box-shadow var(--th-duration-fast) var(--th-ease),
+                opacity var(--th-duration-fast) var(--th-ease);
+  }
+  #cta-contact:hover, #cta-bookmark:hover, #cta-cart:hover, #cta-buy:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--th-shadow-md);
+    opacity: 0.92;
+  }
+
+  /* 登录 / 注册主按钮：hover 上浮 + 阴影 */
+  #form-login button[type="submit"],
+  #form-register button[type="submit"] {
+    transition: transform var(--th-duration-fast) var(--th-ease),
+                box-shadow var(--th-duration-fast) var(--th-ease);
+  }
+  #form-login button[type="submit"]:hover,
+  #form-register button[type="submit"]:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--th-shadow-md);
+  }
+}

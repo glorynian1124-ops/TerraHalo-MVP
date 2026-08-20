@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}购物车 - 沃土之环有机肥原料交易平台{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4"><i class="fas fa-shopping-cart"></i> 购物车</h2>
+
+    {% if not cart_items %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">购物车是空的</h4>
+            <p class="text-muted">去原料市场看看吧</p>
+            <a href="{{ url_for('materials.materials_page') }}" class="btn btn-success">前往原料市场</a>
+        </div>
+    </div>
+    {% else %}
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>原料名称</th>
+                            <th>单价</th>
+                            <th>数量</th>
+                            <th>小计</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart_items %}
+                        <tr>
+                            <td>
+                                <strong>{{ item['type'] }}</strong><br>
+                                <small class="text-muted">供应商：{{ item['supplier_name'] }}</small>
+                            </td>
+                            <td>¥{{ item['price'] }}/吨</td>
+                            <td>
+                                <div class="input-group input-group-sm" style="width: 120px;">
+                                    <button class="btn btn-outline-secondary" onclick="updateCart('{{ item['material_id'] }}', -1)">-</button>
+                                    <input type="text" class="form-control text-center" value="{{ item['quantity'] }}" readonly>
+                                    <button class="btn btn-outline-secondary" onclick="updateCart('{{ item['material_id'] }}', 1)">+</button>
+                                </div>
+                            </td>
+                            <td class="fw-bold text-success">¥{{ item['quantity'] * item['price'] }}0</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-danger" onclick="removeFromCart('{{ item['material_id'] }}')">
+                                    <i class="fas fa-trash"></i> 删除
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-light">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <a href="{{ url_for('materials.materials_page') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> 继续购物
+                    </a>
+                </div>
+                <div class="col-md-6 text-end">
+                    <span class="me-3">共 <strong>{{ cart_items|length }}</strong> 件商品</span>
+                    <span class="me-3">总计：<strong class="text-success fs-4">¥{{ total_price }}0</strong></span>
+                    <button class="btn btn-success btn-lg" onclick="createOrderFromCart()">
+                        <i class="fas fa-credit-card"></i> 结算下单
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateCart(materialId, change) {
+    fetch('/api/cart/update', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({material_id: materialId, change: change})
+    }).then(response => response.json())
+      .then(data => {
+          if (data.message) {
+              location.reload();
+          } else {
+              alert(data.error || '更新失败');
+          }
+      }).catch(err => {
+          alert('网络错误，请稍后重试');
+      });
+}
+
+function removeFromCart(materialId) {
+    if (confirm('确定删除该商品？')) {
+        fetch('/api/cart/remove', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({material_id: materialId})
+        }).then(response => response.json())
+          .then(data => {
+              if (data.message) {
+                  location.reload();
+              } else {
+                  alert(data.error || '删除失败');
+              }
+          }).catch(err => {
+              alert('网络错误，请稍后重试');
+          });
+    }
+}
+
+function createOrderFromCart() {
+    if (confirm('确认结算下单？')) {
+        fetch('/api/order/create_from_cart', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({shipping_address: '{{ current_user.get("address", "") if current_user else "" }}'})
+        }).then(response => response.json())
+          .then(data => {
+              if (data.order_id) {
+                  alert('订单创建成功！订单号：' + data.order_id);
+                  location.href = '/orders';
+              } else {
+                  alert(data.error || '创建订单失败');
+              }
+          }).catch(err => {
+              alert('网络错误，请稍后重试');
+          });
+    }
+}
+</script>
+{% endblock %}

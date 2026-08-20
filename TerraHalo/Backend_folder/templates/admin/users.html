@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}用户管理 - 沃土之环{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+  <h3 class="mb-3">用户管理</h3>
+  <table class="table table-striped">
+    <thead><tr><th>ID</th><th>用户名</th><th>角色</th><th>手机</th><th>邮箱</th><th>信用</th><th>状态</th><th>操作</th></tr></thead>
+    <tbody id="user-table"><tr><td colspan="8" class="text-center">加载中...</td></tr></tbody>
+  </table>
+</div>
+<script>
+fetch('/admin/api/audit/users')
+  .then(r=>r.json()).then(data=>{
+    const tb = document.getElementById('user-table')
+    if(!data.length){ tb.innerHTML='<tr><td colspan="8" class="text-center">暂无数据</td></tr>'; return }
+    tb.innerHTML = data.map(u=>`
+      <tr>
+        <td>${u.id}</td><td>${u.username}</td><td>${u.role_type}</td>
+        <td>${u.phone||'-'}</td><td>${u.email||'-'}</td><td>${u.credit_score||'-'}</td>
+        <td><span class="badge bg-${u.status==='normal'?'success':'danger'}">${u.status}</span></td>
+        <td><button class="btn btn-sm btn-${u.status==='normal'?'danger':'success'}" onclick="toggle(${u.id})">${u.status==='normal'?'封禁':'解封'}</button></td>
+      </tr>`).join('')
+  })
+function toggle(id){
+  fetch('/admin/api/audit/users/'+id+'/toggle-status',{method:'POST'})
+    .then(r=>r.json()).then(d=>{alert(d.message);location.reload()})
+}
+</script>
+{% endblock %}

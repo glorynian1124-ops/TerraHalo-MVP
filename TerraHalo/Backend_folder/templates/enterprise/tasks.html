@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}收运任务 - 沃土之环{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4"><i class="fas fa-truck"></i> 收运任务</h2>
+
+    <div id="tasksList">
+        <p class="text-center text-muted py-4">加载中...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function loadTasks() {
+    fetch('/enterprise/api/tasks')
+        .then(r => r.json())
+        .then(data => {
+            if (!data.length) {
+                document.getElementById('tasksList').innerHTML =
+                    '<div class="alert alert-info text-center py-4">暂无收运任务，请在匹配确认页确认收购后生成</div>';
+                return;
+            }
+            const statusMap = {
+                pending_assign:'待派单',pending_accept:'待接单',accepted:'已接单',
+                arrived:'已到场',in_transit:'运输中',signed:'已签收',abnormal:'异常',completed:'已完成'
+            };
+            const badgeMap = {
+                pending_assign:'secondary',pending_accept:'warning',accepted:'info',
+                arrived:'primary',in_transit:'info',signed:'success',abnormal:'danger',completed:'success'
+            };
+            let html = '<div class="row">';
+            data.forEach(t => {
+                html += `
+                <div class="col-md-6 mb-3">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between">
+                            <small>${t.task_no}</small>
+                            <span class="badge bg-${badgeMap[t.status]||'secondary'}">${statusMap[t.status]||t.status}</span>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-1"><strong>提货地：</strong>${t.pickup_address||'-'}</p>
+                            <p class="mb-1"><strong>送达地：</strong>${t.delivery_address||'-'}</p>
+                            <p class="mb-1"><strong>运费：</strong>¥${t.transport_fee||0}</p>
+                            <button class="btn btn-sm btn-outline-primary mt-2" onclick="viewTask(${t.id})">查看详情</button>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            html += '</div>';
+            document.getElementById('tasksList').innerHTML = html;
+        });
+}
+
+function viewTask(taskId) {
+    fetch('/enterprise/api/tasks/' + taskId)
+        .then(r => r.json())
+        .then(data => {
+            const t = data.task;
+            const s = data.supply;
+            let logHtml = (data.logs||[]).map(l => `<li>${l.created_at} [${l.operator_role}] ${l.content}</li>`).join('');
+            alert(`任务: ${t.task_no}\n状态: ${t.status}\n提货: ${t.pickup_address}\n送达: ${t.delivery_address}\n供给: ${s? s.type : '-'} x ${s? s.quantity : '-'}吨\n\n日志:\n${logHtml||'暂无日志'}`);
+        });
+}
+
+loadTasks();
+</script>
+{% endblock %}

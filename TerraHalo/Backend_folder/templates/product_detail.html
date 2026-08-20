@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.product_name if product else '商品详情' }} - 沃土之环{% endblock %}
+
+{% block content %}
+<main class="overflow-hidden">
+    {% if product %}
+    <!-- 面包屑 -->
+    <section style="background: var(--th-background);">
+        <div class="mx-auto max-w-[1184px] px-6 lg:px-8 py-3">
+            <a href="{{ url_for('main.shop') }}" class="inline-flex items-center gap-1.5 th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-muted-foreground);">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> 返回商城
+            </a>
+        </div>
+    </section>
+
+    <section class="pb-12 lg:pb-20" style="background: var(--th-background);">
+        <div class="mx-auto max-w-[1184px] px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14">
+                <!-- 左：图片 -->
+                <div class="flex flex-col gap-4">
+                    <div class="overflow-hidden rounded-[var(--th-radius)]" style="border: 1px solid var(--th-border); background: var(--th-card);">
+                        {% if product.images %}
+                        <img src="{{ product.images[0].image_url }}" alt="{{ product.product_name }}" class="w-full object-cover select-none" style="aspect-ratio: 4/3;" loading="eager">
+                        {% else %}
+                        <div class="w-full flex items-center justify-center text-8xl" style="aspect-ratio: 4/3;">🧪</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- 右：信息 -->
+                <div class="flex flex-col gap-5">
+                    <h1 class="th-h2">{{ product.product_name }}</h1>
+
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <span class="th-body-sm" style="color: var(--th-muted-foreground);">{{ product.specification or '标准规格' }}</span>
+                        <span class="th-body-sm" style="color: var(--th-muted-foreground);">库存 {{ product.stock_qty }} {{ '袋' if product.unit == 'bag' else product.unit }}</span>
+                    </div>
+
+                    <!-- 价格 -->
+                    <div class="flex items-baseline gap-3 flex-wrap">
+                        <span class="th-mono" style="font-size: clamp(1.75rem, 3.5vw, 2.5rem); font-weight: 700; color: var(--th-primary); line-height: 1;">¥{{ product.price }}</span>
+                        {% if product.market_price %}
+                        <span class="th-body-sm line-through" style="color: var(--th-text-400);">¥{{ product.market_price }}</span>
+                        {% endif %}
+                    </div>
+
+                    {% if product.suitable_crops %}
+                    <div class="flex flex-col gap-1.5">
+                        <span class="th-body-sm font-semibold" style="color: var(--th-foreground);">适用作物</span>
+                        <p class="th-body-sm" style="color: var(--th-muted-foreground);">{{ product.suitable_crops }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if product.delivery_scope %}
+                    <div class="flex flex-col gap-1.5">
+                        <span class="th-body-sm font-semibold" style="color: var(--th-foreground);">配送范围</span>
+                        <p class="th-body-sm" style="color: var(--th-muted-foreground);">{{ product.delivery_scope }}</p>
+                    </div>
+                    {% endif %}
+
+                    <div style="border-top: 1px solid var(--th-border);"></div>
+
+                    <!-- 企业信息 -->
+                    <div class="flex items-center gap-3 rounded-[var(--th-radius)] border p-4" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-xs);">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full shrink-0" style="background: var(--th-secondary);">
+                            <i data-lucide="building-2" class="w-5 h-5" style="color: var(--th-muted-foreground);"></i>
+                        </div>
+                        <div class="flex flex-col gap-0.5 min-w-0 flex-1">
+                            <span class="th-body font-semibold truncate">{{ product.supplier_name or '生产企业' }}</span>
+                            <span class="th-body-sm" style="color: var(--th-muted-foreground);">优质有机肥生产企业</span>
+                        </div>
+                    </div>
+
+                    {% if product.detail_content %}
+                    <div class="flex flex-col gap-2">
+                        <span class="th-h3" style="font-size: 1rem;">产品介绍</span>
+                        <p class="th-body-sm" style="color: var(--th-muted-foreground); line-height: 1.7;">{{ product.detail_content }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- 数量 + 购买 -->
+                    <div class="flex items-center gap-4 mt-2">
+                        <div class="flex items-center border rounded-full overflow-hidden" style="border-color: var(--th-border);">
+                            <button onclick="changeQty(-1)" class="w-10 h-10 flex items-center justify-center cursor-pointer" style="background: transparent; border: none; color: var(--th-foreground); font-size: 1.2rem;">−</button>
+                            <span id="qty" class="w-12 text-center th-body font-semibold" style="min-width: 3rem;">1</span>
+                            <button onclick="changeQty(1)" class="w-10 h-10 flex items-center justify-center cursor-pointer" style="background: transparent; border: none; color: var(--th-foreground); font-size: 1.2rem;">+</button>
+                        </div>
+                        <button onclick="buyNow({{ product.id }})" class="flex-1 flex items-center justify-center whitespace-nowrap font-semibold text-base border-none cursor-pointer transition-all hover:opacity-90 active:scale-[0.98]" style="height: 48px; padding: 0 1.5rem; border-radius: var(--th-radius-full); background-color: var(--th-primary); color: var(--th-primary-foreground);">
+                            <i data-lucide="shopping-cart" class="w-5 h-5 mr-2"></i> 立即购买
+                        </button>
+                    </div>
+                    <p class="th-body-sm" style="color: var(--th-muted-foreground);">起订量 {{ product.min_order_qty or 1 }} {{ '袋' if product.unit == 'bag' else product.unit }}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% else %}
+    <div class="mx-auto max-w-[1184px] px-6 py-24 text-center">
+        <div class="text-6xl mb-6">🔍</div>
+        <h1 class="th-h2 mb-4">商品不存在</h1>
+        <a href="{{ url_for('main.shop') }}" class="th-body no-underline font-semibold" style="color: var(--th-primary);">返回商城</a>
+    </div>
+    {% endif %}
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    var qty = 1;
+    var maxStock = {{ product.stock_qty if product else 0 }};
+    function changeQty(delta) {
+        qty = Math.max(1, Math.min(maxStock || 1, qty + delta));
+        document.getElementById('qty').textContent = qty;
+    }
+
+    function buyNow(productId) {
+        var isLoggedIn = {{ 'true' if current_user else 'false' }};
+        if (!isLoggedIn) {
+            thToast('请先登录', 'info');
+            setTimeout(function() { window.location.href = '{{ url_for("auth.login_page") }}'; }, 600);
+            return;
+        }
+        fetchJSON('{{ url_for("api.create_product_order") }}', {
+            method: 'POST',
+            body: JSON.stringify({items: [{product_id: productId, quantity: qty}]})
+        }).then(function(d) {
+            if (d.order_id) {
+                thToast('下单成功，正在跳转支付', 'success');
+                setTimeout(function() { window.location.href = '/product-order/' + d.order_id; }, 600);
+            } else {
+                thToast(d.error || '下单失败', 'error');
+            }
+        }).catch(function() { thToast('网络错误，请稍后重试', 'error'); });
+    }
+</script>
+{% endblock %}

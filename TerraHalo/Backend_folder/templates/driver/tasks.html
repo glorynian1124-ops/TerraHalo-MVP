@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}司机任务中心 - 沃土之环{% endblock %}
+
+{% block content %}
+<main class="overflow-hidden">
+    <!-- 司机身份 Header -->
+    <section class="w-full border-b" style="border-color: var(--th-border); background: var(--th-card);">
+        <div class="mx-auto flex max-w-[1184px] items-center justify-between px-6 py-5 lg:px-8">
+            <div class="flex items-center gap-4">
+                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full" style="background: var(--th-primary); color: var(--th-primary-foreground); font-family: var(--th-font-sans); font-weight: 600; font-size: var(--th-font-size-sm);">{{ current_user.username[0] }}</div>
+                <div class="flex flex-col gap-0.5">
+                    <span class="th-h3 truncate" style="font-size: 1.125rem;">{{ current_user.username }}</span>
+                    <span class="th-body-sm truncate flex items-center gap-1.5">
+                        <span class="inline-flex items-center gap-1"><i data-lucide="truck" class="h-3.5 w-3.5"></i> 司机承运</span>
+                        <span style="color: var(--th-border);">·</span>
+                        <span>农业废弃物收运</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 状态 Tabs -->
+    <section class="w-full border-b" style="border-color: var(--th-border); background: var(--th-background);">
+        <div class="mx-auto max-w-[1184px] px-6 py-3 lg:px-8">
+            <div class="flex flex-nowrap gap-2 overflow-x-auto">
+                <button data-tab="pending_accept" class="tab-btn tab-active inline-flex items-center justify-center whitespace-nowrap rounded-full px-5 py-2 text-sm font-semibold transition-all hover:opacity-90 shrink-0" style="background: var(--th-primary); color: var(--th-primary-foreground); font-family: var(--th-font-sans);">待接单</button>
+                <button data-tab="accepted" class="tab-btn inline-flex items-center justify-center whitespace-nowrap rounded-full px-5 py-2 text-sm font-medium transition-all hover:opacity-80 shrink-0" style="background: transparent; color: var(--th-muted-foreground); font-family: var(--th-font-sans); border: 1px solid var(--th-border);">进行中</button>
+                <button data-tab="completed" class="tab-btn inline-flex items-center justify-center whitespace-nowrap rounded-full px-5 py-2 text-sm font-medium transition-all hover:opacity-80 shrink-0" style="background: transparent; color: var(--th-muted-foreground); font-family: var(--th-font-sans); border: 1px solid var(--th-border);">已完成</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 任务列表 -->
+    <section class="mx-auto max-w-[1184px] px-6 py-8 lg:px-8">
+        <div class="flex flex-col gap-4" id="task-list">
+            <div class="th-body-sm text-center py-12" style="color: var(--th-muted-foreground);">加载中...</div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    var currentTab = 'pending_accept';
+
+    function switchTab(tab) {
+        currentTab = tab;
+        document.querySelectorAll('.tab-btn').forEach(function(btn) {
+            var active = btn.getAttribute('data-tab') === tab;
+            if (active) {
+                btn.style.background = 'var(--th-primary)';
+                btn.style.color = 'var(--th-primary-foreground)';
+                btn.style.border = 'none';
+            } else {
+                btn.style.background = 'transparent';
+                btn.style.color = 'var(--th-muted-foreground)';
+                btn.style.border = '1px solid var(--th-border)';
+            }
+        });
+        loadTasks();
+    }
+
+    function loadTasks() {
+        var list = document.getElementById('task-list');
+        list.innerHTML = '<div class="th-body-sm text-center py-12" style="color: var(--th-muted-foreground);">加载中...</div>';
+        fetch('/driver/api/tasks?status=' + currentTab)
+            .then(function(r) { return r.json(); })
+            .then(function(tasks) {
+                if (!tasks || !tasks.length) {
+                    list.innerHTML = '<div class="rounded-[var(--th-radius)] border p-10 text-center th-body" style="border-color: var(--th-border); background: var(--th-card); color: var(--th-muted-foreground);">暂无任务</div>';
+                    return;
+                }
+                list.innerHTML = tasks.map(function(t) {
+                    var pickup = t.pickup_address || (t.supply && t.supply.location) || '起点';
+                    var delivery = t.delivery_address || '终点';
+                    var actionBtn = '';
+                    if (t.status === 'pending_accept') {
+                        actionBtn = '<button onclick="acceptTask(' + t.id + ')" class="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold cursor-pointer shrink-0" style="background: var(--th-primary); color: var(--th-primary-foreground);">接单</button>';
+                    } else if (t.status === 'accepted') {
+                        actionBtn = '<button onclick="completeTask(' + t.id + ')" class="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold cursor-pointer shrink-0" style="background: var(--th-accent); color: var(--th-accent-foreground);">确认送达</button>';
+                    }
+                    return '<div class="flex flex-col gap-4 rounded-[var(--th-radius)] border p-5 transition-shadow" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-xs);">' +
+                        '<div class="flex items-start justify-between gap-4">' +
+                            '<div class="flex flex-col gap-1 min-w-0 flex-1">' +
+                                '<div class="flex items-center gap-2">' +
+                                    '<i data-lucide="map-pin" class="h-4 w-4 shrink-0" style="color: var(--th-primary);"></i>' +
+                                    '<span class="th-h3 truncate" style="font-size: 1rem;">' + pickup + ' → ' + delivery + '</span>' +
+                                '</div>' +
+                                '<span class="th-body-sm" style="color: var(--th-muted-foreground);">任务编号：' + (t.task_no || ('DT-' + t.id)) + '</span>' +
+                            '</div>' +
+                            actionBtn +
+                        '</div>' +
+                    '</div>';
+                }).join('');
+                lucide.createIcons();
+            })
+            .catch(function() { list.innerHTML = '<div class="th-body-sm text-center py-12" style="color: var(--th-state-error);">加载失败，请刷新重试</div>'; });
+    }
+
+    function acceptTask(taskId) {
+        fetchJSON('/driver/api/tasks/' + taskId + '/accept', { method: 'POST', body: '{}' })
+            .then(function(d) {
+                if (d.message) { thToast('接单成功', 'success'); loadTasks(); }
+                else thToast(d.error || '接单失败', 'error');
+            }).catch(function() { thToast('网络错误', 'error'); });
+    }
+
+    function completeTask(taskId) {
+        fetchJSON('/driver/api/tasks/' + taskId + '/complete', { method: 'POST', body: '{}' })
+            .then(function(d) {
+                if (d.message) { thToast('已确认送达', 'success'); loadTasks(); }
+                else thToast(d.error || '操作失败', 'error');
+            }).catch(function() { thToast('网络错误', 'error'); });
+    }
+
+    loadTasks();
+</script>
+{% endblock %}

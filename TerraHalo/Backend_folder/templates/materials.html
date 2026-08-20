@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}原料市场 - 沃土之环{% endblock %}
+
+{% block content %}
+<main class="overflow-hidden">
+    <!-- 页头 -->
+    <section class="w-full" style="background: var(--th-background);">
+        <div class="mx-auto max-w-[1184px] px-6 lg:px-8 pt-10 pb-4">
+            <div class="flex flex-col gap-3">
+                <h1 class="th-h1">原料市场</h1>
+                <p class="th-body-sm">浏览全国优质农业废弃物原料供给，找到适合您的有机循环资源</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 搜索 & 筛选 -->
+    <section class="w-full" style="background: var(--th-background);">
+        <div class="mx-auto max-w-[1184px] px-6 lg:px-8 pb-6">
+            <div class="relative mb-5">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                    <i data-lucide="search" class="w-5 h-5" style="color: var(--th-muted-foreground);"></i>
+                </div>
+                <input type="text" id="search-input" placeholder="搜索原料名称、产地或品类..." class="w-full pl-11 pr-4 py-3 th-body-sm focus:outline-none transition-all" style="background: var(--th-card); border: 1px solid var(--th-border); border-radius: var(--th-radius); color: var(--th-foreground);">
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex flex-nowrap items-center gap-2 overflow-x-auto no-scrollbar" id="category-pills">
+                    <button data-category-id="" class="cat-pill cat-active inline-flex items-center justify-center whitespace-nowrap px-4 py-2 th-body-sm font-medium transition-all cursor-pointer" style="border-radius: var(--th-radius-full); background: var(--th-primary); color: var(--th-primary-foreground); border: none;">全部</button>
+                    {% for cat in categories %}
+                    <button data-category-id="{{ cat.id }}" class="cat-pill inline-flex items-center justify-center whitespace-nowrap px-4 py-2 th-body-sm font-medium transition-all cursor-pointer" style="border-radius: var(--th-radius-full); background: transparent; color: var(--th-muted-foreground); border: 1px solid var(--th-border);">{{ cat.name }}</button>
+                    {% endfor %}
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    <span class="th-body-sm" style="color: var(--th-muted-foreground);">排序</span>
+                    <select id="sort-select" class="th-body-sm rounded-lg border py-2 px-3 outline-none cursor-pointer" style="border-color: var(--th-border); background: var(--th-card); color: var(--th-foreground);">
+                        <option value="created_at">最新发布</option>
+                        <option value="price">价格从低到高</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 原料卡片网格 -->
+    <section class="w-full" style="background: var(--th-background);">
+        <div class="mx-auto max-w-[1184px] px-6 lg:px-8 pb-16">
+            <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4" id="material-grid">
+                <div class="col-span-full text-center py-16 th-body" style="color: var(--th-muted-foreground);">加载中...</div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    var state = { category_id: '', search: '', sort_by: 'created_at' };
+
+    function loadMaterials() {
+        var grid = document.getElementById('material-grid');
+        grid.innerHTML = '<div class="col-span-full text-center py-16 th-body" style="color: var(--th-muted-foreground);">加载中...</div>';
+        var params = new URLSearchParams();
+        if (state.category_id) params.set('category_id', state.category_id);
+        if (state.search) params.set('search', state.search);
+        params.set('sort_by', state.sort_by);
+
+        fetch('{{ url_for("api.get_materials_api") }}?' + params.toString())
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (!data || !data.length) {
+                    grid.innerHTML = '<div class="col-span-full text-center py-16 th-body" style="color: var(--th-muted-foreground);">暂无原料数据</div>';
+                    return;
+                }
+                grid.innerHTML = data.map(function(m) {
+                    var loc = (m.province || '') + (m.city || '');
+                    var img = (m.images && m.images.length) ? m.images[0] : '';
+                    return '<a href="/materials/' + m.id + '" class="flex flex-col gap-3 rounded-[var(--th-radius)] border p-4 no-underline transition-all hover:-translate-y-0.5" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-xs);">' +
+                        '<div class="flex h-24 items-center justify-center rounded-[var(--th-radius-sm)] text-4xl overflow-hidden" style="background: var(--th-secondary);">' + (img ? '<img src="' + img + '" class="w-full h-full object-cover">' : '🌾') + '</div>' +
+                        '<div class="flex flex-col gap-1">' +
+                            '<span class="th-h3 truncate" style="font-size: 1rem;">' + (m.type || '原料') + '</span>' +
+                            '<span class="th-body-sm truncate" style="color: var(--th-muted-foreground);">' + (loc || '未知产地') + '</span>' +
+                            '<div class="flex items-center justify-between">' +
+                                '<span class="th-mono font-bold" style="color: var(--th-primary);">¥' + (m.price || 0) + '/吨</span>' +
+                                '<span class="th-body-sm" style="color: var(--th-muted-foreground);">' + (m.quantity || 0) + '吨</span>' +
+                            '</div>' +
+                            '<div class="flex items-center justify-between mt-1">' +
+                                '<span class="th-body-sm" style="color: var(--th-muted-foreground);">评分 ' + (m.rating || 0).toFixed(1) + ' (' + (m.review_count || 0) + '条)</span>' +
+                                '<button onclick="event.preventDefault(); event.stopPropagation(); addToCart(' + m.id + ')" class="inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold cursor-pointer" style="background: var(--th-primary); color: var(--th-primary-foreground);">加入购物车</button>' +
+                            '</div>' +
+                        '</div>' +
+                    '</a>';
+                }).join('');
+            })
+            .catch(function() { grid.innerHTML = '<div class="col-span-full text-center py-16 th-body" style="color: var(--th-state-error);">加载失败，请刷新重试</div>'; });
+    }
+
+    // 分类筛选
+    document.getElementById('category-pills').addEventListener('click', function(e) {
+        var btn = e.target.closest('.cat-pill');
+        if (!btn) return;
+        state.category_id = btn.getAttribute('data-category-id');
+        document.querySelectorAll('.cat-pill').forEach(function(p) {
+            p.classList.remove('cat-active');
+            p.style.background = 'transparent';
+            p.style.color = 'var(--th-muted-foreground)';
+            p.style.border = '1px solid var(--th-border)';
+        });
+        btn.classList.add('cat-active');
+        btn.style.background = 'var(--th-primary)';
+        btn.style.color = 'var(--th-primary-foreground)';
+        btn.style.border = 'none';
+        loadMaterials();
+    });
+
+    // 搜索（防抖）
+    var searchTimer;
+    document.getElementById('search-input').addEventListener('input', function(e) {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(function() {
+            state.search = e.target.value.trim();
+            loadMaterials();
+        }, 400);
+    });
+
+    // 排序
+    document.getElementById('sort-select').addEventListener('change', function(e) {
+        state.sort_by = e.target.value;
+        loadMaterials();
+    });
+
+    loadMaterials();
+</script>
+{% endblock %}

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理总控室 - 沃土之环</title>
+  <meta name="description" content="沃土之环平台总控室：企业情况、用户管理、司机调度、产品管理">
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <script src="assets/vendor/tailwind.js"></script>
+  <script src="assets/vendor/lucide.js"></script>
+  <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--th-background);
+    --color-foreground: var(--th-foreground);
+    --color-card: var(--th-card);
+    --color-card-foreground: var(--th-card-foreground);
+    --color-primary: var(--th-primary);
+    --color-primary-foreground: var(--th-primary-foreground);
+    --color-secondary: var(--th-secondary);
+    --color-secondary-foreground: var(--th-secondary-foreground);
+    --color-muted: var(--th-muted);
+    --color-muted-foreground: var(--th-muted-foreground);
+    --color-accent: var(--th-accent);
+    --color-accent-foreground: var(--th-accent-foreground);
+    --color-border: var(--th-border);
+    --color-input: var(--th-input);
+    --color-ring: var(--th-ring);
+  }
+  </style>
+</head>
+<body class="min-h-screen font-sans antialiased" style="background:var(--th-background);">
+
+  <!-- 顶栏 -->
+  <header class="sticky top-0 z-40 border-b" style="background:color-mix(in srgb, var(--th-background-50) 85%, transparent); backdrop-filter:blur(16px); border-color:var(--th-border);">
+    <div class="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-4 sm:px-6">
+      <a href="index.html" class="flex items-center gap-3 no-underline">
+        <span class="text-2xl leading-none" aria-hidden="true">🌱</span>
+        <div class="flex flex-col leading-tight">
+          <span class="th-h3" style="font-size:1.05rem; color:var(--th-foreground);">沃土之环 · 管理总控室</span>
+          <span class="th-eyebrow" style="font-size:0.625rem;">PLATFORM CONTROL CENTER</span>
+        </div>
+      </a>
+      <div class="flex items-center gap-3">
+        <button id="btn-notify" class="relative inline-flex h-10 w-10 items-center justify-center rounded-full transition-colors hover:opacity-80" style="background:var(--th-secondary);" aria-label="通知">
+          <span data-lucide="bell" style="width:18px;height:18px;"></span>
+          <span id="notify-badge" class="absolute -top-0.5 -right-0.5 hidden h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-bold" style="background:var(--th-state-error); color:#fff;">0</span>
+        </button>
+        <div class="flex items-center gap-2">
+          <span class="inline-flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold" style="background:var(--th-primary); color:var(--th-primary-foreground);">管</span>
+          <span class="th-body-sm hidden md:inline" style="color:var(--th-foreground);">管理员</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="mx-auto flex max-w-[1400px] flex-col gap-6 px-4 py-6 sm:px-6 lg:flex-row">
+    <!-- 侧边栏 -->
+    <aside class="w-full shrink-0 lg:w-52">
+      <nav id="admin-nav" class="flex flex-row gap-1 overflow-x-auto pb-1 lg:flex-col lg:pb-0">
+        <button data-mod="dashboard" class="adm-nav inline-flex shrink-0 items-center gap-2.5 rounded-xl px-4 py-2.5 text-sm font-medium transition-all" style="background:var(--th-primary); color:var(--th-primary-foreground);"><span data-lucide="layout-dashboard" class="w-4 h-4"></span>数据看板</button>
+        <button data-mod="enterprises" class="adm-nav inline-flex shrink-0 items-center gap-2.5 rounded-xl px-4 py-2.5 text-sm font-medium transition-all" style="background:var(--th-secondary); color:var(--th-secondary-foreground);"><span data-lucide="factory" class="w-4 h-4"></span>企业情况</button>
+        <button data-mod="users" class="adm-nav inline-flex shrink-0 items-center gap-2.5 rounded-xl px-4 py-2.5 text-sm font-medium transition-all" style="background:var(--th-secondary); color:var(--th-secondary-foreground);"><span data-lucide="users" class="w-4 h-4"></span>用户管理</button>
+        <button data-mod="drivers" class="adm-nav inline-flex shrink-0 items-center gap-2.5 rounded-xl px-4 py-2.5 text-sm font-medium transition-all" style="background:var(--th-secondary); color:var(--th-secondary-foreground);"><span data-lucide="truck" class="w-4 h-4"></span>司机调度</button>
+        <button data-mod="products" class="adm-nav inline-flex shrink-0 items-center gap-2.5 rounded-xl px-4 py-2.5 text-sm font-medium transition-all" style="background:var(--th-secondary); color:var(--th-secondary-foreground);"><span data-lucide="package" class="w-4 h-4"></span>产品管理</button>
+      </nav>
+    </aside>
+
+    <!-- 主内容 -->
+    <main class="min-w-0 flex-1">
+
+      <!-- 数据看板 -->
+      <section id="panel-dashboard">
+        <div class="mb-6">
+          <h1 class="th-h2" style="font-size:1.5rem;">平台数据看板</h1>
+          <p class="th-body-sm mt-1" style="color:var(--th-muted-foreground);">一屏掌握平台运行全貌</p>
+        </div>
+        <div class="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6">
+          <div class="adm-kpi rounded-2xl border p-5" style="border-color:var(--th-border); background:var(--th-card);"><span class="th-body-sm" style="color:var(--th-muted-foreground);">总用户</span><span class="th-mono mt-1 block" style="font-size:1.75rem; font-weight:700; color:var(--th-primary);" id="k-total-users">-</span></div>
+          <div class="adm-kpi rounded-2xl border p-5" style="border-color:var(--th-border); background:var(--th-card);"><span class="th-body-sm" style="color:var(--th-muted-foreground);">企业</span><span class="th-mono mt-1 block" style="font-size:1.75rem; font-weight:700; color:var(--th-primary);" id="k-enterprises">-</span></div>
+          <div class="adm-kpi rounded-2xl border p-5" style="border-color:var(--th-border); background:var(--th-card);"><span class="th-body-sm" style="color:var(--th-muted-foreground);">司机</span><span class="th-mono mt-1 block" style="font-size:1.75rem; font-weight:700; color:var(--th-primary);" id="k-drivers">-</span></div>
+          <div class="adm-kpi rounded-2xl border p-5" style="border-color:var(--th-border); background:var(--th-card);"><span class="th-body-sm" style="color:var(--th-muted-foreground);">上架商品</span><span class="th-mono mt-1 block" style="font-size:1.75rem; font-weight:700; color:var(--th-primary);" id="k-online-products">-</span></div>
+          <div class="adm-kpi rounded-2xl border p-5" style="border-color:var(--th-border); background:var(--th-card);"><span class="th-body-sm" style="color:var(--th-muted-foreground);">已支付订单</span><span class="th-mono mt-1 block" style="font-size:1.75rem; font-weight:700; color:var(--th-primary);" id="k-paid-orders">-</span></div>
+          <div class="adm-kpi rounded-2xl border p-5" style="border-color:var(--th-border); background:var(--th-card);"><span class="th-body-sm" style="color:var(--th-muted-foreground);">交易额</span><span class="th-mono mt-1 block" style="font-size:1.75rem; font-weight:700; color:var(--th-primary);" id="k-total-amount">-</span></div>
+        </div>
+        <div class="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+          <div class="rounded-2xl border p-4" style="border-color:var(--th-border); background:var(--th-card);"><span class="th-body-sm" style="color:var(--th-muted-foreground);">农户 / 供应商</span><span class="th-mono mt-1 block text-lg font-semibold" id="k-farmers" style="color:var(--th-foreground);">-</span></div>
+          <div class="rounded-2xl border p-4" style="border-color:var(--th-border); background:var(--th-card);"><span class="th-body-sm" style="color:var(--th-muted-foreground);">原料供给</span><span class="th-mono mt-1 block text-lg font-semibold" id="k-materials" style="color:var(--th-foreground);">-</span></div>
+          <div class="rounded-2xl border p-4" style="border-color:var(--th-border); background:var(--th-card);"><span class="th-body-sm" style="color:var(--th-muted-foreground);">待审核商品</span><span class="th-mono mt-1 block text-lg font-semibold" id="k-pending-products" style="color:var(--th-state-warning);">-</span></div>
+          <div class="rounded-2xl border p-4" style="border-color:var(--th-border); background:var(--th-card);"><span class="th-body-sm" style="color:var(--th-muted-foreground);">进行中需求</span><span class="th-mono mt-1 block text-lg font-semibold" id="k-active-demands" style="color:var(--th-foreground);">-</span></div>
+        </div>
+      </section>
+
+      <!-- 企业情况 -->
+      <section id="panel-enterprises" class="hidden">
+        <div class="mb-6 flex items-center justify-between">
+          <div><h1 class="th-h2" style="font-size:1.5rem;">企业情况</h1><p class="th-body-sm mt-1" style="color:var(--th-muted-foreground);">所有入驻企业的认证与经营状态</p></div>
+          <button id="ent-refresh" class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all hover:opacity-85" style="background:var(--th-secondary); color:var(--th-foreground);"><span data-lucide="refresh-cw" class="w-4 h-4"></span>刷新</button>
+        </div>
+        <div class="overflow-x-auto rounded-2xl border" style="border-color:var(--th-border); background:var(--th-card);">
+          <table class="w-full text-sm">
+            <thead><tr class="border-b th-body-sm" style="border-color:var(--th-border); color:var(--th-muted-foreground);">
+              <th class="px-4 py-3 text-left font-medium">企业</th><th class="px-4 py-3 text-left font-medium">认证</th><th class="px-4 py-3 text-right font-medium">需求</th><th class="px-4 py-3 text-right font-medium">商品(在线)</th><th class="px-4 py-3 text-right font-medium">订单额</th><th class="px-4 py-3 text-left font-medium">联系人</th><th class="px-4 py-3 text-center font-medium">操作</th>
+            </tr></thead>
+            <tbody id="ent-tbody"></tbody>
+          </table>
+          <div id="ent-empty" class="hidden py-16 text-center th-body-sm" style="color:var(--th-muted-foreground);">暂无企业数据</div>
+        </div>
+      </section>
+
+      <!-- 用户管理 -->
+      <section id="panel-users" class="hidden">
+        <div class="mb-6 flex items-center justify-between">
+          <div><h1 class="th-h2" style="font-size:1.5rem;">用户管理</h1><p class="th-body-sm mt-1" style="color:var(--th-muted-foreground);">平台所有用户（农户 / 供应商 / 企业 / 司机 / 专家等）</p></div>
+          <div class="flex gap-2" id="role-filter">
+            <button data-role="" class="role-btn rounded-full px-3.5 py-1.5 text-sm font-medium transition-all" style="background:var(--th-primary); color:var(--th-primary-foreground);">全部</button>
+            <button data-role="farmer" class="role-btn rounded-full px-3.5 py-1.5 text-sm font-medium transition-all" style="background:var(--th-secondary); color:var(--th-secondary-foreground);">农户</button>
+            <button data-role="enterprise" class="role-btn rounded-full px-3.5 py-1.5 text-sm font-medium transition-all" style="background:var(--th-secondary); color:var(--th-secondary-foreground);">企业</button>
+            <button data-role="driver" class="role-btn rounded-full px-3.5 py-1.5 text-sm font-medium transition-all" style="background:var(--th-secondary); color:var(--th-secondary-foreground);">司机</button>
+            <button data-role="supplier" class="role-btn rounded-full px-3.5 py-1.5 text-sm font-medium transition-all" style="background:var(--th-secondary); color:var(--th-secondary-foreground);">供应商</button>
+            <button data-role="buyer" class="role-btn rounded-full px-3.5 py-1.5 text-sm font-medium transition-all" style="background:var(--th-secondary); color:var(--th-secondary-foreground);">买家</button>
+          </div>
+        </div>
+        <div class="overflow-x-auto rounded-2xl border" style="border-color:var(--th-border); background:var(--th-card);">
+          <table class="w-full text-sm">
+            <thead><tr class="border-b th-body-sm" style="border-color:var(--th-border); color:var(--th-muted-foreground);">
+              <th class="px-4 py-3 text-left font-medium">用户</th><th class="px-4 py-3 text-left font-medium">角色</th><th class="px-4 py-3 text-left font-medium">手机</th><th class="px-4 py-3 text-left font-medium">邮箱</th><th class="px-4 py-3 text-left font-medium">状态</th><th class="px-4 py-3 text-left font-medium">注册时间</th><th class="px-4 py-3 text-center font-medium">操作</th>
+            </tr></thead>
+            <tbody id="user-tbody"></tbody>
+          </table>
+          <div id="user-empty" class="hidden py-16 text-center th-body-sm" style="color:var(--th-muted-foreground);">暂无用户数据</div>
+        </div>
+      </section>
+
+      <!-- 司机调度 -->
+      <section id="panel-drivers" class="hidden">
+        <div class="mb-6"><h1 class="th-h2" style="font-size:1.5rem;">司机调度</h1><p class="th-body-sm mt-1" style="color:var(--th-muted-foreground);">司机资源与收运任务派单</p></div>
+        <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+          <div>
+            <h2 class="th-h3 mb-3" style="font-size:1.05rem;">司机列表</h2>
+            <div class="overflow-x-auto rounded-2xl border" style="border-color:var(--th-border); background:var(--th-card);">
+              <table class="w-full text-sm">
+                <thead><tr class="border-b th-body-sm" style="border-color:var(--th-border); color:var(--th-muted-foreground);">
+                  <th class="px-4 py-3 text-left font-medium">司机</th><th class="px-4 py-3 text-left font-medium">车辆</th><th class="px-4 py-3 text-left font-medium">载重</th><th class="px-4 py-3 text-left font-medium">审核</th><th class="px-4 py-3 text-right font-medium">进行中</th>
+                </tr></thead>
+                <tbody id="driver-tbody"></tbody>
+              </table>
+              <div id="driver-empty" class="hidden py-12 text-center th-body-sm" style="color:var(--th-muted-foreground);">暂无司机数据</div>
+            </div>
+          </div>
+          <div>
+            <h2 class="th-h3 mb-3" style="font-size:1.05rem;">待派单任务</h2>
+            <div class="flex flex-col gap-3" id="task-list">
+              <div class="py-12 text-center th-body-sm" style="color:var(--th-muted-foreground);">加载中…</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 产品管理 -->
+      <section id="panel-products" class="hidden">
+        <div class="mb-6 flex items-center justify-between">
+          <div><h1 class="th-h2" style="font-size:1.5rem;">产品管理</h1><p class="th-body-sm mt-1" style="color:var(--th-muted-foreground);">全部商品（含待审核）及上下架管理</p></div>
+          <select id="prod-status" class="rounded-full border px-3.5 py-1.5 text-sm outline-none" style="border-color:var(--th-border); background:var(--th-card); color:var(--th-foreground);">
+            <option value="all">全部状态</option>
+            <option value="online">已上架</option>
+            <option value="pending_audit">待审核</option>
+            <option value="offline">已下架</option>
+          </select>
+        </div>
+        <div class="overflow-x-auto rounded-2xl border" style="border-color:var(--th-border); background:var(--th-card);">
+          <table class="w-full text-sm">
+            <thead><tr class="border-b th-body-sm" style="border-color:var(--th-border); color:var(--th-muted-foreground);">
+              <th class="px-4 py-3 text-left font-medium">商品</th><th class="px-4 py-3 text-left font-medium">企业</th><th class="px-4 py-3 text-left font-medium">分类</th><th class="px-4 py-3 text-right font-medium">价格</th><th class="px-4 py-3 text-right font-medium">库存</th><th class="px-4 py-3 text-left font-medium">状态</th><th class="px-4 py-3 text-center font-medium">操作</th>
+            </tr></thead>
+            <tbody id="prod-tbody"></tbody>
+          </table>
+          <div id="prod-empty" class="hidden py-16 text-center th-body-sm" style="color:var(--th-muted-foreground);">暂无商品数据</div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <style>
+    .adm-nav { cursor: pointer; }
+    .adm-kpi { transition: transform var(--th-duration-fast) var(--th-ease), box-shadow var(--th-duration-fast) var(--th-ease); }
+    .adm-kpi:hover { transform: translateY(-2px); box-shadow: var(--th-shadow-md); }
+    #admin-nav button { white-space: nowrap; }
+  </style>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      if (!window.TH_API) return;
+
+      var ROLE_TEXT = { farmer: '农户', supplier: '供应商', enterprise: '企业', driver: '司机', buyer: '买家', expert: '专家', admin: '管理员' };
+      var activeMod = 'dashboard';
+      var userRoleFilter = '';
+
+      function esc(s) { return TH.esc(s); }
+      function badge(text, kind) {
+        var map = {
+          success: ['var(--th-state-success-surface)', 'var(--th-state-success)'],
+          warning: ['color-mix(in srgb, var(--th-brown-100) 70%, transparent)', 'var(--th-brown-600)'],
+          error: ['var(--th-state-error-surface)', 'var(--th-state-error)'],
+          neutral: ['var(--th-secondary)', 'var(--th-secondary-foreground)']
+        };
+        var c = map[kind] || map.neutral;
+        return '<span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium" style="background:' + c[0] + '; color:' + c[1] + ';">' + esc(text) + '</span>';
+      }
+      function authBadge(s) {
+        if (s === 'approved') return badge('已认证', 'success');
+        if (s === 'pending') return badge('待审核', 'warning');
+        if (s === 'rejected') return badge('已拒绝', 'error');
+        return badge(s || '-', 'neutral');
+      }
+      function prodBadge(s) {
+        if (s === 'online') return badge('已上架', 'success');
+        if (s === 'pending_audit') return badge('待审核', 'warning');
+        if (s === 'offline') return badge('已下架', 'neutral');
+        return badge(s, 'neutral');
+      }
+      function userBadge(s) {
+        if (s === 'normal') return badge('正常', 'success');
+        if (s === 'banned') return badge('已禁用', 'error');
+        return badge(s, 'neutral');
+      }
+      function fmtDate(iso) { return iso ? String(iso).slice(0, 10) : '-'; }
+      function money(n) { return '¥' + TH.fmtMoney(Number(n || 0)); }
+
+      function switchMod(key) {
+        activeMod = key;
+        document.querySelectorAll('.adm-nav').forEach(function (b) {
+          var on = b.getAttribute('data-mod') === key;
+          b.style.background = on ? 'var(--th-primary)' : 'var(--th-secondary)';
+          b.style.color = on ? 'var(--th-primary-foreground)' : 'var(--th-secondary-foreground)';
+        });
+        document.querySelectorAll('#panel-dashboard,#panel-enterprises,#panel-users,#panel-drivers,#panel-products').forEach(function (s) {
+          s.classList.toggle('hidden', s.id !== 'panel-' + key);
+        });
+      }
+      document.getElementById('admin-nav').addEventListener('click', function (e) {
+        var b = e.target.closest('.adm-nav');
+        if (b) switchMod(b.getAttribute('data-mod'));
+      });
+
+      /* ---------- 数据看板 ---------- */
+      function loadDashboard() {
+        TH_API.admin.stats().then(function (s) {
+          s = s || {};
+          document.getElementById('k-total-users').textContent = s.total_users || 0;
+          document.getElementById('k-enterprises').textContent = s.enterprises || 0;
+          document.getElementById('k-drivers').textContent = s.drivers || 0;
+          document.getElementById('k-online-products').textContent = s.online_products || 0;
+          document.getElementById('k-paid-orders').textContent = s.paid_orders || 0;
+          document.getElementById('k-total-amount').textContent = money(s.total_amount);
+          document.getElementById('k-farmers').textContent = (s.farmers || 0) + (s.suppliers || 0);
+          document.getElementById('k-materials').textContent = s.total_materials || 0;
+          document.getElementById('k-pending-products').textContent = s.pending_products || 0;
+          document.getElementById('k-active-demands').textContent = s.active_demands || 0;
+          var pd = s.pending_products || 0;
+          var badge = document.getElementById('notify-badge');
+          badge.textContent = pd;
+          badge.style.display = pd > 0 ? 'flex' : 'none';
+        }).catch(function (err) { TH.toast(err.message || '看板加载失败', 'error'); });
+      }
+
+      /* ---------- 企业情况 ---------- */
+      function loadEnterprises() {
+        TH_API.admin.enterprises().then(function (list) {
+          var tbody = document.getElementById('ent-tbody');
+          var empty = document.getElementById('ent-empty');
+          list = list || [];
+          empty.classList.toggle('hidden', list.length !== 0);
+          tbody.innerHTML = list.map(function (e) {
+            return '<tr class="border-b transition-colors" style="border-color:var(--th-border);">' +
+              '<td class="px-4 py-3"><div class="font-semibold" style="color:var(--th-foreground);">' + esc(e.enterprise_name) + '</div><div class="th-body-sm">' + esc(e.username || '') + '</div></td>' +
+              '<td class="px-4 py-3">' + authBadge(e.audit_status) + '</td>' +
+              '<td class="px-4 py-3 text-right th-mono">' + (e.demand_count || 0) + '</td>' +
+              '<td class="px-4 py-3 text-right th-mono">' + (e.product_count || 0) + ' (<span style="color:var(--th-state-success);">' + (e.online_products || 0) + '</span>)</td>' +
+              '<td class="px-4 py-3 text-right th-mono" style="color:var(--th-primary); font-weight:600;">' + money(e.order_amount) + '</td>' +
+              '<td class="px-4 py-3">' + esc(e.contact_name || '-') + '</td>' +
+              '<td class="px-4 py-3 text-center"><a href="enterprise.html" class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium no-underline transition-all hover:opacity-80" style="background:var(--th-secondary); color:var(--th-foreground);">查看 <span data-lucide="external-link" class="w-3 h-3"></span></a></td>' +
+            '</tr>';
+          }).join('');
+          TH.refreshIcons();
+        }).catch(function (err) { TH.toast(err.message || '企业列表加载失败', 'error'); });
+      }
+      document.getElementById('ent-refresh').addEventListener('click', loadEnterprises);
+
+      /* ---------- 用户管理 ---------- */
+      function loadUsers() {
+        TH_API.admin.users(userRoleFilter).then(function (list) {
+          var tbody = document.getElementById('user-tbody');
+          var empty = document.getElementById('user-empty');
+          list = list || [];
+          empty.classList.toggle('hidden', list.length !== 0);
+          tbody.innerHTML = list.map(function (u) {
+            return '<tr class="border-b transition-colors" style="border-color:var(--th-border);">' +
+              '<td class="px-4 py-3"><span class="font-semibold" style="color:var(--th-foreground);">' + esc(u.username) + '</span>' + (u.id === 1 ? ' <span class="th-body-sm">(管理员)</span>' : '') + '</td>' +
+              '<td class="px-4 py-3">' + badge(ROLE_TEXT[u.role_type] || u.role_type, 'neutral') + '</td>' +
+              '<td class="px-4 py-3 th-mono">' + esc(u.phone || '-') + '</td>' +
+              '<td class="px-4 py-3">' + esc(u.email || '-') + '</td>' +
+              '<td class="px-4 py-3">' + userBadge(u.status) + '</td>' +
+              '<td class="px-4 py-3 th-body-sm">' + fmtDate(u.created_at) + '</td>' +
+              '<td class="px-4 py-3 text-center">' +
+                (u.id === 1 ? '<span class="th-body-sm" style="color:var(--th-muted-foreground);">-</span>' :
+                '<button data-toggle="' + u.id + '" class="rounded-full px-3 py-1 text-xs font-medium transition-all hover:opacity-80" style="background:' + (u.status === 'normal' ? 'var(--th-state-error-surface); color:var(--th-state-error);' : 'var(--th-state-success-surface); color:var(--th-state-success);') + '">' + (u.status === 'normal' ? '禁用' : '启用') + '</button>') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+          TH.refreshIcons();
+        }).catch(function (err) { TH.toast(err.message || '用户列表加载失败', 'error'); });
+      }
+      document.getElementById('user-tbody').addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-toggle]');
+        if (!btn) return;
+        var id = btn.getAttribute('data-toggle');
+        TH_API.admin.toggleUser(id).then(function (r) {
+          TH.toast('用户状态已更新', 'success');
+          loadUsers();
+        }).catch(function (err) { TH.toast(err.message || '操作失败', 'error'); });
+      });
+      document.getElementById('role-filter').addEventListener('click', function (e) {
+        var b = e.target.closest('.role-btn');
+        if (!b) return;
+        userRoleFilter = b.getAttribute('data-role') || '';
+        document.querySelectorAll('.role-btn').forEach(function (x) {
+          var on = x === b;
+          x.style.background = on ? 'var(--th-primary)' : 'var(--th-secondary)';
+          x.style.color = on ? 'var(--th-primary-foreground)' : 'var(--th-secondary-foreground)';
+        });
+        loadUsers();
+      });
+
+      /* ---------- 司机调度 ---------- */
+      function loadDrivers() {
+        TH_API.admin.drivers().then(function (list) {
+          var tbody = document.getElementById('driver-tbody');
+          var empty = document.getElementById('driver-empty');
+          list = list || [];
+          empty.classList.toggle('hidden', list.length !== 0);
+          tbody.innerHTML = list.map(function (d) {
+            return '<tr class="border-b" style="border-color:var(--th-border);">' +
+              '<td class="px-4 py-3"><span class="font-semibold" style="color:var(--th-foreground);">' + esc(d.name) + '</span><div class="th-body-sm">' + esc(d.phone || '') + '</div></td>' +
+              '<td class="px-4 py-3">' + esc(d.vehicle_no || '-') + '<div class="th-body-sm">' + esc(d.vehicle_type || '') + '</div></td>' +
+              '<td class="px-4 py-3 th-mono">' + d.vehicle_capacity_ton + ' 吨</td>' +
+              '<td class="px-4 py-3">' + authBadge(d.audit_status) + '</td>' +
+              '<td class="px-4 py-3 text-right th-mono" style="color:var(--th-state-warning); font-weight:600;">' + (d.active_tasks || 0) + '</td>' +
+            '</tr>';
+          }).join('');
+          TH.refreshIcons();
+        }).catch(function (err) { TH.toast(err.message || '司机列表加载失败', 'error'); });
+      }
+      function loadTasks() {
+        Promise.all([TH_API.admin.pendingTasks(), TH_API.admin.dispatchDrivers()])
+          .then(function (res) {
+            var tasks = res[0] || [];
+            var drivers = res[1] || [];
+            var host = document.getElementById('task-list');
+            if (!tasks.length) {
+              host.innerHTML = '<div class="rounded-2xl border py-12 text-center th-body-sm" style="border-color:var(--th-border); color:var(--th-muted-foreground);">暂无待派单任务</div>';
+              return;
+            }
+            var opts = drivers.map(function (d) { return '<option value="' + d.id + '">' + esc(d.name) + '（' + esc(d.vehicle_no || '') + '）</option>'; }).join('');
+            host.innerHTML = tasks.map(function (t) {
+              var supply = t.supply || {};
+              return '<div class="rounded-2xl border p-4" style="border-color:var(--th-border); background:var(--th-card);">' +
+                '<div class="flex items-center justify-between gap-2"><span class="th-mono text-xs" style="color:var(--th-muted-foreground);">' + esc(t.task_no || ('任务#' + t.id)) + '</span>' + badge(t.demand_category || supply.type || '收运', 'warning') + '</div>' +
+                '<div class="mt-2 text-sm font-semibold" style="color:var(--th-foreground);">' + esc(supply.type || '原料收运') + ' · ' + esc(supply.location || '') + '</div>' +
+                '<div class="mt-3 flex gap-2">' +
+                  '<select data-task="' + t.id + '" class="min-w-0 flex-1 rounded-lg border px-3 py-2 text-sm outline-none" style="border-color:var(--th-border); background:var(--th-background); color:var(--th-foreground);">' + opts + '</select>' +
+                  '<button data-assign="' + t.id + '" class="rounded-lg px-4 py-2 text-sm font-semibold transition-all hover:opacity-85" style="background:var(--th-primary); color:var(--th-primary-foreground);">派单</button>' +
+                '</div>' +
+              '</div>';
+            }).join('');
+          }).catch(function (err) { TH.toast(err.message || '派单任务加载失败', 'error'); });
+      }
+      document.getElementById('task-list').addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-assign]');
+        if (!btn) return;
+        var taskId = btn.getAttribute('data-assign');
+        var sel = document.querySelector('[data-task="' + taskId + '"]');
+        var driverId = sel ? sel.value : '';
+        if (!driverId) { TH.toast('请选择司机', 'error'); return; }
+        TH_API.admin.assign(taskId, driverId).then(function (r) {
+          TH.toast('派单成功：' + (r.driver_name || ''), 'success');
+          loadTasks();
+        }).catch(function (err) { TH.toast(err.message || '派单失败', 'error'); });
+      });
+
+      /* ---------- 产品管理 ---------- */
+      function loadProducts(status) {
+        TH_API.admin.products(status).then(function (list) {
+          var tbody = document.getElementById('prod-tbody');
+          var empty = document.getElementById('prod-empty');
+          list = list || [];
+          empty.classList.toggle('hidden', list.length !== 0);
+          tbody.innerHTML = list.map(function (p) {
+            return '<tr class="border-b" style="border-color:var(--th-border);">' +
+              '<td class="px-4 py-3"><span class="font-semibold" style="color:var(--th-foreground);">' + esc(p.product_name) + '</span><div class="th-body-sm">' + esc(p.specification || '') + '</div></td>' +
+              '<td class="px-4 py-3">' + esc(p.enterprise_name || '-') + '</td>' +
+              '<td class="px-4 py-3">' + esc(p.category_name || '-') + '</td>' +
+              '<td class="px-4 py-3 text-right th-mono" style="color:var(--th-primary); font-weight:600;">¥' + TH.fmtMoney(p.price) + '</td>' +
+              '<td class="px-4 py-3 text-right th-mono">' + (p.stock_qty || 0) + '</td>' +
+              '<td class="px-4 py-3">' + prodBadge(p.status) + '</td>' +
+              '<td class="px-4 py-3 text-center">' +
+                (p.status === 'pending_audit' ? '<button data-status="' + p.id + '" data-to="online" class="mr-1 rounded-full px-3 py-1 text-xs font-medium transition-all hover:opacity-80" style="background:var(--th-state-success-surface); color:var(--th-state-success);">审核通过</button>' : '') +
+                (p.status === 'online' ? '<button data-status="' + p.id + '" data-to="offline" class="rounded-full px-3 py-1 text-xs font-medium transition-all hover:opacity-80" style="background:var(--th-state-warning-surface); color:var(--th-state-warning);">下架</button>' : '') +
+                (p.status === 'offline' ? '<button data-status="' + p.id + '" data-to="online" class="rounded-full px-3 py-1 text-xs font-medium transition-all hover:opacity-80" style="background:var(--th-state-success-surface); color:var(--th-state-success);">上架</button>' : '') +
+              '</td>' +
+            '</tr>';
+          }).join('');
+          TH.refreshIcons();
+        }).catch(function (err) { TH.toast(err.message || '商品列表加载失败', 'error'); });
+      }
+      document.getElementById('prod-status').addEventListener('change', function (e) { loadProducts(e.target.value); });
+      document.getElementById('prod-tbody').addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-status]');
+        if (!btn) return;
+        var id = btn.getAttribute('data-status');
+        var to = btn.getAttribute('data-to');
+        TH_API.admin.productStatus(id, to).then(function () {
+          TH.toast('商品状态已更新', 'success');
+          loadProducts(document.getElementById('prod-status').value);
+        }).catch(function (err) { TH.toast(err.message || '操作失败', 'error'); });
+      });
+
+      /* ---------- 通知按钮 ---------- */
+      document.getElementById('btn-notify').addEventListener('click', function () {
+        var pd = document.getElementById('notify-badge').textContent;
+        TH.toast(pd > 0 ? ('有 ' + pd + ' 件商品待审核') : '暂无新通知', 'info');
+      });
+
+      /* ---------- 初始化 ---------- */
+      document.getElementById('admin-nav').addEventListener('click', function (e) {
+        var b = e.target.closest('.adm-nav');
+        if (b) {
+          var key = b.getAttribute('data-mod');
+          if (key === 'enterprises') loadEnterprises();
+          if (key === 'users') loadUsers();
+          if (key === 'drivers') { loadDrivers(); loadTasks(); }
+          if (key === 'products') loadProducts(document.getElementById('prod-status').value);
+        }
+      });
+
+      loadDashboard();
+      loadEnterprises();
+      loadUsers();
+      loadDrivers();
+      loadTasks();
+      loadProducts('all');
+    })();
+  </script>
+</body>
+</html>

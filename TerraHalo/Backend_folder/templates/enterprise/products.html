@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}商品管理 - 沃土之环{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-boxes"></i> 商品有机肥管理</h2>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addProductModal">
+            <i class="fas fa-plus"></i> 上架商品
+        </button>
+    </div>
+
+    <div id="productsList">
+        <p class="text-center text-muted py-4">加载中...</p>
+    </div>
+</div>
+
+<!-- 新增商品弹窗 -->
+<div class="modal fade" id="addProductModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">上架新商品</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="productForm">
+                    <div class="row mb-3">
+                        <label class="col-sm-3 col-form-label">商品名称 *</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="product_name" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-3 col-form-label">规格</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="specification" placeholder="例如: 40kg/袋">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-3 col-form-label">单价(元) *</label>
+                        <div class="col-sm-9">
+                            <input type="number" class="form-control" name="price" min="0" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-3 col-form-label">库存 *</label>
+                        <div class="col-sm-9">
+                            <input type="number" class="form-control" name="stock_qty" min="0" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-3 col-form-label">最小起订量</label>
+                        <div class="col-sm-9">
+                            <input type="number" class="form-control" name="min_order_qty" value="1" min="1">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-3 col-form-label">单位</label>
+                        <div class="col-sm-9">
+                            <select class="form-select" name="unit">
+                                <option value="bag">袋</option>
+                                <option value="ton">吨</option>
+                                <option value="box">箱</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-3 col-form-label">适用作物</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="suitable_crops" placeholder="例如: 玉米、小麦、果树">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-3 col-form-label">配送范围</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="delivery_scope" placeholder="例如: XX县全境">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-3 col-form-label">商品详情</label>
+                        <div class="col-sm-9">
+                            <textarea class="form-control" name="detail_content" rows="3" placeholder="成分说明、使用建议等"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-success" onclick="submitProduct()">上架</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function loadProducts() {
+    fetch('/enterprise/api/products')
+        .then(r => r.json())
+        .then(data => {
+            if (!data.length) {
+                document.getElementById('productsList').innerHTML =
+                    '<p class="text-center text-muted py-5">暂无上架商品，点击右上角上架新商品</p>';
+                return;
+            }
+            let html = '<div class="row">';
+            data.forEach(p => {
+                html += `
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5>${p.product_name}</h5>
+                            <p class="mb-1"><small>规格: ${p.specification||'-'} | 单位: ${p.unit||'bag'}</small></p>
+                            <p class="mb-1 text-success fw-bold">¥${p.price}</p>
+                            <p class="mb-1"><small>库存: ${p.stock_qty} | 起订: ${p.min_order_qty}</small></p>
+                            <p class="mb-1"><small>适用: ${p.suitable_crops||'-'}</small></p>
+                            <span class="badge ${p.status==='on_shelf'?'bg-success':'bg-secondary'}">${p.status==='on_shelf'?'在售':'下架'}</span>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-sm btn-outline-${p.status==='on_shelf'?'secondary':'success'}"
+                                    onclick="toggleProduct(${p.id})">${p.status==='on_shelf'?'下架':'上架'}</button>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            html += '</div>';
+            document.getElementById('productsList').innerHTML = html;
+        });
+}
+
+function submitProduct() {
+    const form = document.getElementById('productForm');
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+    const fd = new FormData(form);
+    const data = Object.fromEntries(fd.entries());
+    fetch('/enterprise/api/products', {
+        method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)
+    }).then(r=>r.json()).then(d=>{
+        if(d.product_id){ alert('商品上架成功！'); location.reload(); }
+        else alert(d.error||'上架失败');
+    });
+}
+
+function toggleProduct(id) {
+    fetch('/enterprise/api/products/'+id+'/toggle', {method:'POST'})
+        .then(r=>r.json()).then(d=>{ alert(d.message); loadProducts(); });
+}
+
+loadProducts();
+</script>
+{% endblock %}

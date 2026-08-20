@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}匹配确认 - 沃土之环{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4"><i class="fas fa-handshake"></i> 匹配确认</h2>
+
+    <div class="mb-4">
+        <label class="form-label">选择采购需求：</label>
+        <select class="form-select" id="demandSelect" onchange="loadMatches()" style="max-width:400px;">
+            <option value="">-- 请选择需求 --</option>
+        </select>
+    </div>
+
+    <div id="matchesResult">
+        <p class="text-center text-muted py-4">请先选择一条采购需求</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 加载需求列表
+fetch('/enterprise/api/demands')
+    .then(r => r.json())
+    .then(data => {
+        const sel = document.getElementById('demandSelect');
+        data.forEach(d => {
+            if (d.status !== 'closed') {
+                sel.innerHTML += `<option value="${d.id}">${d.demand_no} - ${d.category_name} (${d.target_weight}吨)</option>`;
+            }
+        });
+        // 自动选择 URL 参数
+        const urlParams = new URLSearchParams(window.location.search);
+        const demandId = urlParams.get('demand_id');
+        if (demandId) { sel.value = demandId; loadMatches(); }
+    });
+
+function loadMatches() {
+    const demandId = document.getElementById('demandSelect').value;
+    if (!demandId) { document.getElementById('matchesResult').innerHTML = '<p class="text-center text-muted py-4">请先选择一条采购需求</p>'; return; }
+
+    document.getElementById('matchesResult').innerHTML = '<p class="text-center py-4">加载匹配结果...</p>';
+
+    fetch('/enterprise/api/demands/' + demandId + '/matches')
+        .then(r => r.json())
+        .then(data => {
+            const matches = data.matches || [];
+            if (!matches.length) {
+                document.getElementById('matchesResult').innerHTML =
+                    '<div class="alert alert-info">暂无匹配的供给，请确认需求品类名称与供给类型一致</div>';
+                return;
+            }
+
+            let html = `<h5 class="mb-3">需求: ${data.category_name} | 共匹配 ${matches.length} 条供给</h5>`;
+            matches.forEach((m, i) => {
+                const s = m.supply;
+                if (!s) return;
+                const badgeMap = {pending:'warning',confirmed:'success'};
+                const statusMap = {pending:'待确认',confirmed:'已确认'};
+                html += `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-7">
+                                <h5>${s.type} <small class="text-muted">${s.location}</small></h5>
+                                <p class="mb-1">供应商: ${s.supplier_name||'-'} | 库存: ${s.quantity}吨 | 价格: ¥${s.price}/吨</p>
+                                <p class="mb-0 small text-muted">${s.description||''}</p>
+                                <p class="mb-0">
+                                    <span class="text-warning">${'★'.repeat(Math.round(s.rating||0))}${'☆'.repeat(5-Math.round(s.rating||0))}</span>
+                                    <small>(${s.review_count}条)</small>
+                                </p>
+                            </div>
+                            <div class="col-md-3 text-center">
+                                <h4 class="text-primary">${m.match_score.toFixed(0)}分</h4>
+                                <span class="badge bg-${badgeMap[m.status]||'secondary'}">${statusMap[m.status]||m.status}</span>
+                            </div>
+                            <div class="col-md-2 text-end">
+                                ${m.status==='pending'?`
+                                <button class="btn btn-success" onclick="confirmMatch(${m.match_id})">确认收购</button>
+                                `:`<span class="text-success"><i class="fas fa-check-circle"></i> 已确认</span>`}
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            document.getElementById('matchesResult').innerHTML = html;
+        });
+}
+
+function confirmMatch(matchId) {
+    if (!confirm('确认收购该供给？确认后将自动生成收运任务。')) return;
+    fetch('/enterprise/api/matches/'+matchId+'/confirm', {method:'POST'})
+        .then(r=>r.json())
+        .then(d=>{
+            if (d.task_id) {
+                alert(`匹配已确认！收运任务 ${d.task_no} 已生成`);
+                loadMatches();
+            } else alert(d.error||'操作失败');
+        });
+}
+
+// 页面加载时如果有 URL 参数自动查询
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('demand_id')) {
+    document.getElementById('demandSelect').value = urlParams.get('demand_id');
+    loadMatches();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,24 @@
+
+  @theme inline {
+    --color-background: var(--th-background);
+    --color-foreground: var(--th-foreground);
+    --color-card: var(--th-card);
+    --color-card-foreground: var(--th-card-foreground);
+    --color-primary: var(--th-primary);
+    --color-primary-foreground: var(--th-primary-foreground);
+    --color-secondary: var(--th-secondary);
+    --color-secondary-foreground: var(--th-secondary-foreground);
+    --color-muted: var(--th-muted);
+    --color-muted-foreground: var(--th-muted-foreground);
+    --color-accent: var(--th-accent);
+    --color-accent-foreground: var(--th-accent-foreground);
+    --color-border: var(--th-border);
+    --color-input: var(--th-input);
+    --color-ring: var(--th-ring);
+  }
+  @layer base {
+    body { background: var(--th-background); color: var(--th-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    

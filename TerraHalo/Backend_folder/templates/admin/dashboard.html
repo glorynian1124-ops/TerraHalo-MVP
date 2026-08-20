@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}管理后台 - 沃土之环{% endblock %}
+
+{% block content %}
+<main class="overflow-hidden">
+    <div class="mx-auto max-w-[1184px] px-6 lg:px-8 py-8">
+        <!-- 欢迎区 -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="th-h2 mb-1">管理后台</h1>
+                <p class="th-body-sm" style="color: var(--th-muted-foreground);">统一进入企业工作台与司机调度，集中管理平台运营</p>
+            </div>
+            <span class="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold" style="background: var(--th-secondary); color: var(--th-secondary-foreground);">
+                <i data-lucide="shield-check" class="w-4 h-4" style="color: var(--th-accent);"></i> 管理员
+            </span>
+        </div>
+
+        <!-- ===== 两个进入窗口（页面上方） ===== -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+            <!-- 企业工作台 -->
+            <a href="{{ url_for('enterprise.dashboard') }}"
+               class="group relative overflow-hidden rounded-[var(--th-radius)] border p-8 no-underline transition-all hover:-translate-y-1"
+               style="border-color: var(--th-border); background: linear-gradient(150deg, var(--th-brown-100) 0%, var(--th-card) 55%); box-shadow: var(--th-shadow-sm);">
+                <div class="flex flex-col gap-5">
+                    <div class="flex items-center justify-between">
+                        <span class="flex h-14 w-14 items-center justify-center rounded-[var(--th-radius)]" style="background: color-mix(in srgb, var(--th-primary) 12%, transparent);">
+                            <i data-lucide="building-2" class="w-7 h-7" style="color: var(--th-primary);"></i>
+                        </span>
+                        <i data-lucide="arrow-up-right" class="w-6 h-6 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" style="color: var(--th-muted-foreground);"></i>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <h2 class="th-h3" style="font-size: 1.35rem;">企业工作台</h2>
+                        <p class="th-body-sm" style="color: var(--th-muted-foreground);">管理采购需求、匹配结果、收运任务与商品上架</p>
+                    </div>
+                    <span class="inline-flex items-center gap-1.5 th-body-sm font-semibold" style="color: var(--th-primary);">
+                        进入工作台
+                        <i data-lucide="arrow-right" class="w-4 h-4 transition-transform group-hover:translate-x-1"></i>
+                    </span>
+                </div>
+            </a>
+
+            <!-- 司机调度 -->
+            <a href="{{ url_for('driver.tasks_page') }}"
+               class="group relative overflow-hidden rounded-[var(--th-radius)] border p-8 no-underline transition-all hover:-translate-y-1"
+               style="border-color: var(--th-border); background: linear-gradient(150deg, var(--th-green-100) 0%, var(--th-card) 55%); box-shadow: var(--th-shadow-sm);">
+                <div class="flex flex-col gap-5">
+                    <div class="flex items-center justify-between">
+                        <span class="flex h-14 w-14 items-center justify-center rounded-[var(--th-radius)]" style="background: color-mix(in srgb, var(--th-accent) 12%, transparent);">
+                            <i data-lucide="truck" class="w-7 h-7" style="color: var(--th-accent);"></i>
+                        </span>
+                        <i data-lucide="arrow-up-right" class="w-6 h-6 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" style="color: var(--th-muted-foreground);"></i>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <h2 class="th-h3" style="font-size: 1.35rem;">司机调度</h2>
+                        <p class="th-body-sm" style="color: var(--th-muted-foreground);">查看司机任务池、接单进度与收运完成情况</p>
+                    </div>
+                    <span class="inline-flex items-center gap-1.5 th-body-sm font-semibold" style="color: var(--th-accent);">
+                        进入调度
+                        <i data-lucide="arrow-right" class="w-4 h-4 transition-transform group-hover:translate-x-1"></i>
+                    </span>
+                </div>
+            </a>
+        </div>
+
+        <!-- ===== 运营管理功能 ===== -->
+        <div class="mb-6">
+            <h2 class="th-h3 mb-4">运营管理</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <a href="{{ url_for('admin.dispatch_page') }}" class="flex items-center gap-4 rounded-[var(--th-radius)] border p-5 no-underline transition-all hover:-translate-y-0.5" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-xs);">
+                    <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--th-radius)]" style="background: color-mix(in srgb, var(--th-state-warning) 12%, transparent);">
+                        <i data-lucide="calendar-check" class="w-5 h-5" style="color: var(--th-state-warning);"></i>
+                    </span>
+                    <div class="flex flex-col gap-0.5 min-w-0">
+                        <span class="th-body font-semibold">调度中心</span>
+                        <span class="th-body-sm truncate" style="color: var(--th-muted-foreground);">待派单任务与司机派单</span>
+                    </div>
+                </a>
+                <a href="{{ url_for('admin.supply_audit_page') }}" class="flex items-center gap-4 rounded-[var(--th-radius)] border p-5 no-underline transition-all hover:-translate-y-0.5" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-xs);">
+                    <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--th-radius)]" style="background: color-mix(in srgb, var(--th-state-info) 12%, transparent);">
+                        <i data-lucide="clipboard-check" class="w-5 h-5" style="color: var(--th-state-info);"></i>
+                    </span>
+                    <div class="flex flex-col gap-0.5 min-w-0">
+                        <span class="th-body font-semibold">供给审核</span>
+                        <span class="th-body-sm truncate" style="color: var(--th-muted-foreground);">审核原料供给信息</span>
+                    </div>
+                </a>
+                <a href="{{ url_for('admin.users_page') }}" class="flex items-center gap-4 rounded-[var(--th-radius)] border p-5 no-underline transition-all hover:-translate-y-0.5" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-xs);">
+                    <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--th-radius)]" style="background: color-mix(in srgb, var(--th-state-success) 12%, transparent);">
+                        <i data-lucide="users" class="w-5 h-5" style="color: var(--th-state-success);"></i>
+                    </span>
+                    <div class="flex flex-col gap-0.5 min-w-0">
+                        <span class="th-body font-semibold">用户管理</span>
+                        <span class="th-body-sm truncate" style="color: var(--th-muted-foreground);">用户封禁与信用管理</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>lucide.createIcons();</script>
+{% endblock %}

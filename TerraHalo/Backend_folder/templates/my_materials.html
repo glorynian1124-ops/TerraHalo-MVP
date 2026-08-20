@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+{% block title %}我的原料 - 沃土之环{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-boxes"></i> 我的原料管理</h2>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addMaterialModal">
+            <i class="fas fa-plus"></i> 发布新原料
+        </button>
+    </div>
+
+    {% if not user_materials %}
+    <div class="alert alert-info text-center py-5">
+        <i class="fas fa-box fa-3x mb-3"></i>
+        <h4>暂无发布的原料</h4>
+        <p>点击右上角按钮发布你的第一个原料吧</p>
+    </div>
+    {% else %}
+    <div class="row">
+        {% for m in user_materials %}
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5>{{ m.type or m.category.name if m.category else '-' }}
+                        <small class="text-muted">{{ m.province }}{{ m.city }}</small>
+                    </h5>
+                    <p class="mb-1"><strong>{{ m.estimated_weight or m.quantity }}{{ m.weight_unit or 'kg' }}</strong>
+                        | <span class="text-success">¥{{ m.price }}/吨</span></p>
+                    <p class="mb-1 small">含水率: {{ m.moisture_range or m.moisture or '-' }}
+                        | 堆放: {{ m.packaging_type or '-' }}
+                        | 装车: {{ '便利' if m.loadable_flag else '不便' }}</p>
+                    <p class="mb-1 small text-muted">{{ m.detail_address or m.location }}</p>
+                    <p class="mb-1">
+                        <span class="badge bg-{{ 'warning' if m.audit_status=='pending' else 'success' if m.audit_status=='approved' else 'danger' }}">
+                            {{ '待审核' if m.audit_status=='pending' else '已通过' if m.audit_status=='approved' else '已驳回' }}
+                        </span>
+                        <span class="badge {{ 'bg-success' if m.is_available else 'bg-secondary' }}">
+                            {{ '在售' if m.is_available else '已下架' }}
+                        </span>
+                    </p>
+                    {% if m.remark %}<p class="mb-1 small">{{ m.remark[:60] }}...</p>{% endif %}
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-sm {{ 'btn-outline-secondary' if m.is_available else 'btn-outline-success' }}"
+                            onclick="toggleStatus('{{ m.id }}')">
+                        {{ '下架' if m.is_available else '上架' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- 发布原料弹窗 - MVP 完整表单 -->
+<div class="modal fade" id="addMaterialModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fas fa-plus me-2"></i>发布新原料</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addMaterialForm" class="row g-3">
+                    <!-- 品类 -->
+                    <div class="col-md-6">
+                        <label class="form-label">原料品类 *</label>
+                        <select class="form-select" name="category_id" required>
+                            <option value="">请选择</option>
+                            {% for cat in categories %}
+                            <option value="{{ cat.id }}">{{ cat.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <!-- 重量 -->
+                    <div class="col-md-3">
+                        <label class="form-label">预估重量 *</label>
+                        <input type="number" class="form-control" name="estimated_weight" min="0.1" step="0.1" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">单位</label>
+                        <select class="form-select" name="weight_unit">
+                            <option value="kg">kg</option><option value="ton">吨</option>
+                        </select>
+                    </div>
+                    <!-- 单价 -->
+                    <div class="col-md-4">
+                        <label class="form-label">单价(元/吨) *</label>
+                        <input type="number" class="form-control" name="price" min="0.1" step="0.1" required>
+                    </div>
+                    <!-- 预估体积 -->
+                    <div class="col-md-4">
+                        <label class="form-label">预估体积(m³)</label>
+                        <input type="number" class="form-control" name="estimated_volume" min="0" step="0.1">
+                    </div>
+                    <!-- 含水率 -->
+                    <div class="col-md-4">
+                        <label class="form-label">含水率区间</label>
+                        <input type="text" class="form-control" name="moisture_range" placeholder="例: 25%-35%">
+                    </div>
+                    <!-- 杂质说明 -->
+                    <div class="col-md-6">
+                        <label class="form-label">杂质说明</label>
+                        <input type="text" class="form-control" name="impurity_desc" placeholder="例: 无杂质 / 少量碎石">
+                    </div>
+                    <!-- 堆放方式 -->
+                    <div class="col-md-3">
+                        <label class="form-label">堆放方式</label>
+                        <select class="form-select" name="packaging_type">
+                            <option value="散装">散装</option><option value="袋装">袋装</option><option value="堆放">堆放</option>
+                        </select>
+                    </div>
+                    <!-- 装车便利 -->
+                    <div class="col-md-3">
+                        <label class="form-label">是否便于装车</label>
+                        <select class="form-select" name="loadable_flag">
+                            <option value="true">是</option><option value="false">否</option>
+                        </select>
+                    </div>
+                    <!-- 省市区 -->
+                    <div class="col-md-4">
+                        <label class="form-label">省 *</label>
+                        <input type="text" class="form-control" name="province" required placeholder="例: 江苏省">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">市 *</label>
+                        <input type="text" class="form-control" name="city" required placeholder="例: 南京市">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">区/县</label>
+                        <input type="text" class="form-control" name="district" placeholder="例: 江宁区">
+                    </div>
+                    <!-- 详细地址 -->
+                    <div class="col-md-12">
+                        <label class="form-label">详细地址 *</label>
+                        <input type="text" class="form-control" name="detail_address" required placeholder="例: XX镇XX村XX组">
+                    </div>
+                    <!-- 时间范围 -->
+                    <div class="col-md-6">
+                        <label class="form-label">可回收开始时间</label>
+                        <input type="datetime-local" class="form-control" name="available_start_time">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">可回收结束时间</label>
+                        <input type="datetime-local" class="form-control" name="available_end_time">
+                    </div>
+                    <!-- 图片上传 -->
+                    <div class="col-md-12">
+                        <label class="form-label">现场图片</label>
+                        <input type="file" class="form-control" id="imageInput" accept="image/*" multiple onchange="uploadImages()">
+                        <div id="imagePreview" class="mt-2 d-flex gap-2 flex-wrap"></div>
+                        <input type="hidden" name="image_urls" id="imageUrls" value="[]">
+                    </div>
+                    <!-- 备注 -->
+                    <div class="col-md-12">
+                        <label class="form-label">补充说明</label>
+                        <textarea class="form-control" name="remark" rows="2" placeholder="其他需要说明的信息"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-success" onclick="submitMaterial()">提交审核</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let uploadedUrls = [];
+
+async function uploadImages() {
+    const files = document.getElementById('imageInput').files;
+    const preview = document.getElementById('imagePreview');
+    preview.innerHTML = '';
+    uploadedUrls = [];
+
+    for (const file of files) {
+        const fd = new FormData();
+        fd.append('file', file);
+        const r = await fetch('/api/upload', {method:'POST', body:fd});
+        const d = await r.json();
+        if (d.url) {
+            uploadedUrls.push(d.url);
+            preview.innerHTML += `<img src="${d.url}" style="height:80px;border-radius:4px;">`;
+        }
+    }
+    document.getElementById('imageUrls').value = JSON.stringify(uploadedUrls);
+}
+
+function submitMaterial() {
+    const form = document.getElementById('addMaterialForm');
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+    const fd = new FormData(form);
+    const data = Object.fromEntries(fd.entries());
+    data.image_urls = JSON.parse(document.getElementById('imageUrls').value || '[]');
+    fetch('/api/materials', {
+        method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)
+    }).then(r=>r.json()).then(d=>{
+        if(d.material_id){ alert('原料发布成功！等待管理员审核'); location.reload(); }
+        else alert(d.error||'发布失败');
+    });
+}
+
+function toggleStatus(id) {
+    fetch('/api/materials/toggle', {
+        method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({material_id:id})
+    }).then(r=>r.json()).then(d=>{ if(d.message){ location.reload(); } else alert(d.error); });
+}
+</script>
+{% endblock %}

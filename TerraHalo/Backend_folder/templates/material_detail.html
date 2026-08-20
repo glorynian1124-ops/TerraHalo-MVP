@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}{{ material.type if material else '原料详情' }} - 沃土之环{% endblock %}
+
+{% block content %}
+<main class="overflow-hidden">
+    {% if material %}
+    <!-- 面包屑 -->
+    <div class="mx-auto max-w-[1184px] px-6 lg:px-8 pt-6">
+        <a href="{{ url_for('materials.materials_page') }}" class="inline-flex items-center gap-1.5 th-body-sm no-underline transition-all duration-150 ease-out hover:gap-2" style="color: var(--th-muted-foreground);">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i> 返回原料市场
+        </a>
+    </div>
+
+    <section class="py-6 lg:py-10" style="background: var(--th-background);">
+        <div class="mx-auto max-w-[1184px] px-6 lg:px-8">
+            <div class="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
+                <!-- 左：图片 -->
+                <div class="lg:col-span-7">
+                    <div class="relative overflow-hidden rounded-[var(--th-radius)]" style="box-shadow: var(--th-shadow-sm); background: var(--th-secondary);">
+                        {% if material.images %}
+                        <img src="{{ material.images[0].image_url }}" alt="{{ material.type }}" class="w-full object-cover" style="aspect-ratio: 4/3;" loading="eager">
+                        {% else %}
+                        <div class="w-full flex items-center justify-center text-7xl" style="aspect-ratio: 4/3;">🌾</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- 右：信息 -->
+                <div class="lg:col-span-5 flex flex-col gap-5">
+                    <div class="flex items-start justify-between gap-4">
+                        <h1 class="th-h2">{{ material.type }}</h1>
+                        {% if material.is_available %}
+                        <span class="inline-flex items-center whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold shrink-0" style="background: var(--th-state-success-surface); color: var(--th-state-success); font-family: var(--th-font-sans);">待收购</span>
+                        {% else %}
+                        <span class="inline-flex items-center whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold shrink-0" style="background: var(--th-secondary); color: var(--th-muted-foreground); font-family: var(--th-font-sans);">已下架</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-x-6 gap-y-4">
+                        <div class="flex flex-col gap-0.5">
+                            <span class="th-body-sm" style="color: var(--th-muted-foreground);">品类</span>
+                            <span class="th-body font-medium truncate">{{ material.category.name if material.category else (material.type or '-') }}</span>
+                        </div>
+                        <div class="flex flex-col gap-0.5">
+                            <span class="th-body-sm" style="color: var(--th-muted-foreground);">重量</span>
+                            <span class="th-body font-medium th-mono truncate">{{ material.quantity or material.estimated_weight or 0 }} 吨</span>
+                        </div>
+                        <div class="flex flex-col gap-0.5">
+                            <span class="th-body-sm" style="color: var(--th-muted-foreground);">地点</span>
+                            <span class="th-body font-medium truncate">{{ material.province or '' }}{{ material.city or '' }}{{ material.district or '' }}</span>
+                        </div>
+                        <div class="flex flex-col gap-0.5">
+                            <span class="th-body-sm" style="color: var(--th-muted-foreground);">价格</span>
+                            <span class="th-body font-medium th-mono truncate" style="color: var(--th-primary);">¥{{ material.price }}/吨</span>
+                        </div>
+                        {% if material.moisture_range %}
+                        <div class="flex flex-col gap-0.5">
+                            <span class="th-body-sm" style="color: var(--th-muted-foreground);">含水率</span>
+                            <span class="th-body font-medium truncate">{{ material.moisture_range }}</span>
+                        </div>
+                        {% endif %}
+                        {% if material.organic_matter %}
+                        <div class="flex flex-col gap-0.5">
+                            <span class="th-body-sm" style="color: var(--th-muted-foreground);">有机质含量</span>
+                            <span class="th-body font-medium truncate">{{ material.organic_matter }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div style="border-top: 1px solid var(--th-border);"></div>
+
+                    <!-- 供应商卡片 -->
+                    <div class="flex items-center gap-3 rounded-[var(--th-radius)] border p-4" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-xs);">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full shrink-0" style="background: var(--th-secondary);">
+                            <i data-lucide="user" class="w-5 h-5" style="color: var(--th-muted-foreground);"></i>
+                        </div>
+                        <div class="flex flex-col gap-0.5 min-w-0 flex-1">
+                            <span class="th-body font-semibold truncate">{{ material.supplier_name or '匿名供应商' }}</span>
+                            <span class="th-body-sm" style="color: var(--th-muted-foreground);">评分 {{ material.rating or 0 }} · {{ material.review_count or 0 }} 条评价</span>
+                        </div>
+                    </div>
+
+                    {% if material.description %}
+                    <div class="flex flex-col gap-2">
+                        <span class="th-body-sm font-semibold" style="color: var(--th-foreground);">原料描述</span>
+                        <p class="th-body-sm" style="color: var(--th-muted-foreground); line-height: 1.6;">{{ material.description }}</p>
+                    </div>
+                    {% endif %}
+
+                    <button onclick="addToCart({{ material.id }})" class="w-full flex items-center justify-center whitespace-nowrap font-semibold text-base border-none cursor-pointer transition-all hover:opacity-90 active:scale-[0.98]" style="height: 48px; padding: 0 1.5rem; border-radius: var(--th-radius-full); background-color: var(--th-primary); color: var(--th-primary-foreground);">
+                        <i data-lucide="shopping-cart" class="w-5 h-5 mr-2"></i> 加入购物车
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% else %}
+    <div class="mx-auto max-w-[1184px] px-6 py-24 text-center">
+        <div class="text-6xl mb-6">🔍</div>
+        <h1 class="th-h2 mb-4">原料不存在</h1>
+        <a href="{{ url_for('materials.materials_page') }}" class="th-body no-underline font-semibold" style="color: var(--th-primary);">返回原料市场</a>
+    </div>
+    {% endif %}
+</main>
+{% endblock %}

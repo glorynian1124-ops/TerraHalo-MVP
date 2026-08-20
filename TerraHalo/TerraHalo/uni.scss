@@ -1,0 +1,90 @@
+/* uview-plus 主题 */
+@import "uview-plus/theme.scss";
+
+/* ===== TerraHalo Brand Color System ===== */
+/* 棕色系 — 品牌主色 (earth) */
+$th-brown-50: #fef9ed;
+$th-brown-100: #fdf3d6;
+$th-brown-200: #fae5a4;
+$th-brown-300: #f5d06a;
+$th-brown-400: #e8b830;
+$th-brown-500: #8B6914;
+$th-brown-600: #7a5c11;
+$th-brown-700: #6B4F10;
+$th-brown-800: #5a3f0a;
+$th-brown-900: #3d2807;
+
+/* 绿色系 — 辅助/成功色 (crop/accent) */
+$th-green-50: #eef5ec;
+$th-green-100: #d9ebd5;
+$th-green-200: #b5d6ab;
+$th-green-300: #8abd79;
+$th-green-400: #5f9a4a;
+$th-green-500: #2D5A27;
+$th-green-600: #264e21;
+$th-green-700: #1B3D18;
+$th-green-800: #143012;
+$th-green-900: #0d200c;
+
+/* 暖土背景系 */
+$th-bg-50: #ffffff;
+$th-bg-100: #faf8f2;
+$th-bg-200: #f5f1e7;
+$th-bg-300: #ede6d5;
+$th-bg-400: #ddd2ba;
+$th-bg-500: #b8ac94;
+$th-bg-600: #8c8070;
+$th-bg-700: #5c5448;
+$th-bg-800: #2b2416;
+$th-bg-900: #1c1814;
+
+/* 文字色系 */
+$th-text-100: #e5e0d8;
+$th-text-200: #c4bcae;
+$th-text-300: #a39887;
+$th-text-400: #8c8070;
+$th-text-500: #6e6456;
+$th-text-600: #5c5448;
+$th-text-700: #3d362e;
+$th-text-800: #2b2416;
+
+/* 语义色 */
+$th-success: #2D5A27;
+$th-success-surface: #eef5ec;
+$th-warning: #d97706;
+$th-warning-surface: #fffbeb;
+$th-error: #dc2626;
+$th-error-surface: #fef2f2;
+$th-info: #2563eb;
+$th-info-surface: #eff6ff;
+
+/* ===== Semantic Roles ===== */
+$th-primary: $th-brown-500;
+$th-primary-light: $th-brown-100;
+$th-accent: $th-green-500;
+$th-bg: $th-bg-100;
+$th-card: $th-bg-50;
+$th-border: $th-bg-300;
+$th-text: $th-text-800;
+$th-text-muted: $th-text-500;
+$th-text-light: $th-text-300;
+
+/* Hero 渐变 */
+$th-hero-gradient: linear-gradient(135deg, $th-brown-700 0%, $th-green-500 60%, $th-green-700 100%);
+
+/* 圆角 */
+$th-radius: 24rpx;
+$th-radius-sm: 10rpx;
+$th-radius-full: 9999rpx;
+
+/* ===== 覆盖 uni-app 默认变量 ===== */
+$uni-color-primary: $th-primary;
+$uni-color-success: $th-success;
+$uni-color-warning: $th-warning;
+$uni-color-error: $th-error;
+$uni-bg-color: $th-bg-100;
+$uni-text-color: $th-text-800;
+
+/* 全局加载指示器 */
+.loading-wrap { display:flex; justify-content:center; align-items:center; padding:80rpx 0; }
+.loading-text { font-size:28rpx; color:#999; }

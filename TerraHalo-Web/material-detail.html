@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>原料详情 - 沃土之环</title>
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <script src="assets/vendor/tailwind.js"></script>
+  <script src="assets/vendor/lucide.js"></script>
+  <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--th-background);
+    --color-foreground: var(--th-foreground);
+    --color-card: var(--th-card);
+    --color-card-foreground: var(--th-card-foreground);
+    --color-primary: var(--th-primary);
+    --color-primary-foreground: var(--th-primary-foreground);
+    --color-secondary: var(--th-secondary);
+    --color-secondary-foreground: var(--th-secondary-foreground);
+    --color-muted: var(--th-muted);
+    --color-muted-foreground: var(--th-muted-foreground);
+    --color-accent: var(--th-accent);
+    --color-accent-foreground: var(--th-accent-foreground);
+    --color-border: var(--th-border);
+    --color-input: var(--th-input);
+    --color-ring: var(--th-ring);
+  }
+  </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+  <div id="th-nav"></div>
+
+  <main class="overflow-hidden">
+    <!-- 面包屑 -->
+    <div class="mx-auto max-w-[1184px] px-6 lg:px-8 pt-6">
+      <a href="materials.html" class="inline-flex items-center gap-1.5 th-body-sm no-underline transition-all hover:gap-2" style="color: var(--th-muted-foreground);">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i> 返回原料市场
+      </a>
+    </div>
+
+    <!-- 主详情 -->
+    <section class="py-6 lg:py-10" style="background: var(--th-background);">
+      <div class="mx-auto max-w-[1184px] px-6 lg:px-8">
+        <div class="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
+          <!-- 左：图片 -->
+          <div class="lg:col-span-7">
+            <div class="relative overflow-hidden rounded-[var(--th-radius)]" style="box-shadow: var(--th-shadow-sm); background: var(--th-secondary);">
+              <img id="main-img" src="" alt="原料图片展示" class="w-full object-cover" style="aspect-ratio: 4/3;">
+            </div>
+            <div class="flex items-center justify-center gap-2 mt-4" id="carousel-dots"></div>
+          </div>
+          <!-- 右：信息 -->
+          <div class="lg:col-span-5 flex flex-col gap-5">
+            <div class="flex items-start justify-between gap-4">
+              <h1 class="th-h2" id="m-title"></h1>
+              <span id="m-status" class="inline-flex items-center whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold shrink-0"></span>
+            </div>
+            <div class="grid grid-cols-2 gap-x-6 gap-y-4" id="m-info"></div>
+            <div style="border-top: 1px solid var(--th-border);"></div>
+            <div class="flex items-center gap-3 rounded-[var(--th-radius)] border p-4" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-xs);">
+              <div class="flex items-center justify-center w-10 h-10 rounded-full shrink-0" style="background: var(--th-secondary);">
+                <i data-lucide="user" class="w-5 h-5" style="color: var(--th-muted-foreground);"></i>
+              </div>
+              <div class="flex flex-col gap-0.5 min-w-0 flex-1">
+                <span class="th-body font-semibold truncate" id="m-supplier"></span>
+                <div class="flex items-center gap-0.5">
+                  <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--th-state-warning); fill: var(--th-state-warning);"></i>
+                  <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--th-state-warning); fill: var(--th-state-warning);"></i>
+                  <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--th-state-warning); fill: var(--th-state-warning);"></i>
+                  <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--th-state-warning); fill: var(--th-state-warning);"></i>
+                  <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--th-border);"></i>
+                  <span class="th-body-sm ml-1.5 truncate" style="color: var(--th-muted-foreground);" id="m-supplier-loc"></span>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-baseline gap-1.5">
+              <span class="th-mono" style="font-size: var(--th-font-size-h1); font-weight: 700; color: var(--th-primary); line-height: 1.1;" id="m-price"></span>
+              <span class="th-body" style="color: var(--th-muted-foreground);">/吨</span>
+            </div>
+            <p class="th-body" style="color: var(--th-muted-foreground);" id="m-desc"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 匹配进度 -->
+    <section class="py-12 lg:py-16" style="background: var(--th-secondary);">
+      <div class="mx-auto max-w-[1184px] px-6 lg:px-8">
+        <h2 class="th-h2 mb-8">匹配进度</h2>
+        <div class="flex items-start">
+          <div class="flex-1 flex flex-col items-center gap-2">
+            <div class="flex items-center w-full">
+              <span class="inline-flex items-center justify-center w-10 h-10 rounded-full shrink-0" style="background: var(--th-state-success); color: var(--th-accent-foreground);"><i data-lucide="check" class="w-4 h-4"></i></span>
+              <div class="flex-1 h-0.5 ml-2" style="background: var(--th-state-success);"></div>
+            </div>
+            <span class="th-body-sm font-semibold text-center whitespace-nowrap">发布审核</span>
+          </div>
+          <div class="flex-1 flex flex-col items-center gap-2" style="margin-left: -2px;">
+            <div class="flex items-center w-full">
+              <span class="inline-flex items-center justify-center w-10 h-10 rounded-full shrink-0 text-sm font-bold" style="background: var(--th-primary); color: var(--th-primary-foreground);">2</span>
+              <div class="flex-1 h-0.5 ml-2" style="background: var(--th-border);"></div>
+            </div>
+            <span class="th-body-sm font-semibold text-center whitespace-nowrap" style="color: var(--th-foreground);">待匹配</span>
+          </div>
+          <div class="flex-1 flex flex-col items-center gap-2" style="margin-left: -2px;">
+            <div class="flex items-center w-full">
+              <span class="inline-flex items-center justify-center w-10 h-10 rounded-full border-2 shrink-0 text-sm font-semibold" style="border-color: var(--th-border); color: var(--th-muted-foreground);">3</span>
+              <div class="flex-1 h-0.5 ml-2" style="background: var(--th-border);"></div>
+            </div>
+            <span class="th-body-sm font-semibold text-center whitespace-nowrap" style="color: var(--th-muted-foreground);">运输中</span>
+          </div>
+          <div class="flex flex-col items-center gap-2 shrink-0" style="margin-left: -2px;">
+            <span class="inline-flex items-center justify-center w-10 h-10 rounded-full border-2 shrink-0 text-sm font-semibold" style="border-color: var(--th-border); color: var(--th-muted-foreground);">4</span>
+            <span class="th-body-sm font-semibold text-center whitespace-nowrap" style="color: var(--th-muted-foreground);">已完成</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="py-8 lg:py-10" style="background: var(--th-background);">
+      <div class="mx-auto max-w-[1184px] px-6 lg:px-8">
+        <div class="flex flex-wrap items-center gap-4">
+          <button id="cta-contact" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full px-6 py-3 text-base font-semibold no-underline transition-all hover:opacity-90 active:scale-[0.98]" style="background: var(--th-primary); color: var(--th-primary-foreground); box-shadow: var(--th-shadow-xs);">
+            <i data-lucide="message-circle" class="w-5 h-5"></i> 联系农户
+          </button>
+          <button id="cta-bookmark" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border px-5 py-2.5 text-base font-medium no-underline transition-all active:scale-[0.98]" style="border-color: var(--th-border); color: var(--th-foreground); background: transparent;">
+            <i data-lucide="bookmark" class="w-5 h-5"></i> <span id="bookmark-text">收藏</span>
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="th-footer"></div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script>
+    TH.init({ nav: 'public', active: 'market', footer: 'dark' });
+
+    var id = new URLSearchParams(location.search).get('id') || '1';
+
+    function renderDetail(m) {
+      document.title = m.name + ' - 沃土之环';
+      document.getElementById('main-img').src = m.img;
+      document.getElementById('m-title').textContent = m.name;
+      document.getElementById('m-supplier').textContent = m.supplier;
+      document.getElementById('m-supplier-loc').textContent = m.supplierLoc;
+      document.getElementById('m-price').textContent = '¥' + m.price;
+      document.getElementById('m-desc').textContent = m.desc;
+
+      // 状态徽标
+      var statusEl = document.getElementById('m-status');
+      if (m.status !== 'pending') {
+        statusEl.textContent = '已匹配';
+        statusEl.style.background = 'color-mix(in srgb, var(--th-brown-100) 70%, transparent)';
+        statusEl.style.color = 'var(--th-brown-600)';
+      } else {
+        statusEl.textContent = '待收购';
+        statusEl.style.background = 'var(--th-state-success-surface)';
+        statusEl.style.color = 'var(--th-state-success)';
+      }
+
+      // 信息网格
+      document.getElementById('m-info').innerHTML =
+        '<div class="flex flex-col gap-0.5"><span class="th-body-sm" style="color:var(--th-muted-foreground);">品类</span><span class="th-body font-medium truncate">' + TH.esc(m.cat) + '</span></div>' +
+        '<div class="flex flex-col gap-0.5"><span class="th-body-sm" style="color:var(--th-muted-foreground);">重量</span><span class="th-body font-medium th-mono truncate">' + m.weight + ' ' + m.weightUnit + '</span></div>' +
+        '<div class="flex flex-col gap-0.5"><span class="th-body-sm" style="color:var(--th-muted-foreground);">地点</span><span class="th-body font-medium truncate">' + TH.esc(m.location) + '</span></div>' +
+        '<div class="flex flex-col gap-0.5"><span class="th-body-sm" style="color:var(--th-muted-foreground);">发布时间</span><span class="th-body font-medium th-mono truncate">' + TH.esc(m.publishDate) + '</span></div>';
+
+      // 联系农户
+      var contactBtn = document.getElementById('cta-contact');
+      if (contactBtn) {
+        contactBtn.onclick = function () {
+          if (!TH.Auth.current()) { TH.toast('请先登录后再联系农户', 'error'); setTimeout(function () { location.href = 'login.html'; }, 800); return; }
+          TH.toast('已向「' + m.supplier + '」发送联系请求', 'success');
+        };
+      }
+
+      TH.refreshIcons();
+    }
+
+    function load() {
+      TH_API.materials.detail(id).then(function (raw) {
+        if (!raw) throw new Error('原料不存在');
+        var unit = raw.weight_unit === 'kg' ? 'kg' : '吨';
+        var m = {
+          id: raw.id,
+          name: raw.type || '原料',
+          price: raw.price,
+          weight: raw.quantity || raw.estimated_weight || 0,
+          weightUnit: unit,
+          location: raw.location || raw.city || '',
+          publishDate: (raw.created_at || '').slice(0, 10),
+          status: raw.audit_status === 'approved' ? 'pending' : 'other',
+          cat: raw.category_name || '',
+          supplier: raw.supplier_name || '平台供应商',
+          supplierLoc: raw.location || raw.city || '',
+          desc: raw.description || '暂无描述',
+          img: (raw.images && raw.images.length && raw.images[0].url) || 'assets/img/image_1_yi19x4.jpg'
+        };
+        renderDetail(m);
+      }).catch(function (err) {
+        TH.toast(err.message || '原料详情加载失败', 'error');
+        renderDetail({ name: '加载失败', img: 'assets/img/image_1_yi19x4.jpg', supplier: '-', supplierLoc: '-', price: 0, desc: '', weight: 0, weightUnit: '吨', location: '-', publishDate: '-', status: 'other', cat: '-' });
+      });
+    }
+
+    // 轮播点
+    var dots = document.getElementById('carousel-dots');
+    for (var i = 0; i < 4; i++) {
+      dots.innerHTML += '<span class="carousel-dot block w-2.5 h-2.5 rounded-full shrink-0" data-i="' + i + '" style="background:' + (i === 0 ? 'var(--th-primary)' : 'var(--th-border)') + '; cursor:pointer;"></span>';
+    }
+    dots.addEventListener('click', function (e) {
+      var dot = e.target.closest('.carousel-dot');
+      if (!dot) return;
+      document.querySelectorAll('.carousel-dot').forEach(function (d) { d.style.background = 'var(--th-border)'; });
+      dot.style.background = 'var(--th-primary)';
+    });
+
+    // 收藏切换
+    var bookmarked = false;
+    var bm = document.getElementById('cta-bookmark');
+    if (bm) bm.addEventListener('click', function () {
+      bookmarked = !bookmarked;
+      document.getElementById('bookmark-text').textContent = bookmarked ? '已收藏' : '收藏';
+      document.getElementById('cta-bookmark').style.borderColor = bookmarked ? 'var(--th-primary)' : 'var(--th-border)';
+      document.getElementById('cta-bookmark').style.color = bookmarked ? 'var(--th-primary)' : 'var(--th-foreground)';
+      TH.toast(bookmarked ? '已加入收藏' : '已取消收藏', 'success');
+    });
+
+    load();
+  </script>
+</body>
+</html>

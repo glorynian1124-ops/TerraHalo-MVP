@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>沃土之环 - 首页</title>
+    <style id="theme-vars">
+/* ===== TerraHalo Brand CSS ===== */
+/* Apple-inspired typography + spacing system with brown/green earth palette */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;700&display=swap');
+
+/* ----- Primitive Palette ----- */
+:root {
+  /* Brown (earth) - brand primary */
+  --th-brown-50: #fef9ed;
+  --th-brown-100: #fdf3d6;
+  --th-brown-200: #fae5a4;
+  --th-brown-300: #f5d06a;
+  --th-brown-400: #e8b830;
+  --th-brown-500: #8B6914;
+  --th-brown-600: #7a5c11;
+  --th-brown-700: #6B4F10;
+  --th-brown-800: #5a3f0a;
+  --th-brown-900: #3d2807;
+
+  /* Green (crop) - accent / state success */
+  --th-green-50: #eef5ec;
+  --th-green-100: #d9ebd5;
+  --th-green-200: #b5d6ab;
+  --th-green-300: #8abd79;
+  --th-green-400: #5f9a4a;
+  --th-green-500: #2D5A27;
+  --th-green-600: #264e21;
+  --th-green-700: #1B3D18;
+  --th-green-800: #143012;
+  --th-green-900: #0d200c;
+
+  /* Background - warm earth */
+  --th-background-50: #ffffff;
+  --th-background-100: #faf8f2;
+  --th-background-200: #f5f1e7;
+  --th-background-300: #ede6d5;
+  --th-background-400: #ddd2ba;
+  --th-background-500: #b8ac94;
+  --th-background-600: #8c8070;
+  --th-background-700: #5c5448;
+  --th-background-800: #2b2416;
+  --th-background-900: #1c1814;
+
+  /* Text */
+  --th-text-50: #f5f3ef;
+  --th-text-100: #e5e0d8;
+  --th-text-200: #c4bcae;
+  --th-text-300: #a39887;
+  --th-text-400: #8c8070;
+  --th-text-500: #6e6456;
+  --th-text-600: #5c5448;
+  --th-text-700: #3d362e;
+  --th-text-800: #2b2416;
+  --th-text-900: #1c1814;
+
+  /* State colors */
+  --th-state-success: #2D5A27;
+  --th-state-success-surface: #eef5ec;
+  --th-state-warning: #d97706;
+  --th-state-warning-surface: #fffbeb;
+  --th-state-error: #dc2626;
+  --th-state-error-surface: #fef2f2;
+  --th-state-info: #2563eb;
+  --th-state-info-surface: #eff6ff;
+
+  /* ----- Semantic Roles ----- */
+  --th-background: var(--th-background-100);
+  --th-foreground: var(--th-text-800);
+  --th-primary: var(--th-brown-500);
+  --th-primary-foreground: #ffffff;
+  --th-secondary: var(--th-background-200);
+  --th-secondary-foreground: var(--th-text-700);
+  --th-muted: var(--th-background-200);
+  --th-muted-foreground: var(--th-text-500);
+  --th-accent: var(--th-green-500);
+  --th-accent-foreground: #ffffff;
+  --th-card: var(--th-background-50);
+  --th-card-foreground: var(--th-text-800);
+  --th-border: var(--th-background-300);
+  --th-input: var(--th-background-400);
+  --th-ring: var(--th-brown-500);
+
+  /* ----- Typography ----- */
+  --th-font-sans: 'DM Sans', ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
+  --th-font-mono: 'JetBrains Mono', monospace;
+  --th-font-size-hero: clamp(3rem, 6vw, 5rem);
+  --th-font-size-h1: clamp(2rem, 4vw, 3rem);
+  --th-font-size-h2: clamp(1.5rem, 3vw, 2.25rem);
+  --th-font-size-h3: 1.25rem;
+  --th-font-size-body: 1rem;
+  --th-font-size-sm: 0.875rem;
+  --th-font-size-xs: 0.75rem;
+  --th-font-size-eyebrow: 0.6875rem;
+  --th-line-height-tight: 0.92;
+  --th-line-height-snug: 1.15;
+  --th-line-height-body: 1.55;
+  --th-letter-spacing-hero: -0.04em;
+  --th-letter-spacing-eyebrow: 0.08em;
+
+  /* ----- Spacing ----- */
+  --th-spacing: 0.24rem;
+
+  /* ----- Radius ----- */
+  --th-radius: 1.2rem;
+  --th-radius-sm: 0.5rem;
+  --th-radius-full: 9999px;
+
+  /* ----- Shadow (whisper-light) ----- */
+  --th-shadow-xs: 0 1px 2px 0 rgba(0,0,0,0.04);
+  --th-shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05), 0 1px 3px -1px rgba(0,0,0,0.05);
+  --th-shadow: 0 2px 4px -1px rgba(0,0,0,0.06), 0 1px 2px -1px rgba(0,0,0,0.05);
+  --th-shadow-md: 0 4px 8px -2px rgba(0,0,0,0.06), 0 2px 4px -2px rgba(0,0,0,0.05);
+  --th-shadow-lg: 0 8px 24px -8px rgba(0,0,0,0.08), 0 4px 8px -4px rgba(0,0,0,0.05);
+  --th-shadow-xl: 0 16px 40px -10px rgba(0,0,0,0.10), 0 8px 16px -8px rgba(0,0,0,0.06);
+  --th-shadow-2xl: 0 24px 64px -12px rgba(0,0,0,0.12);
+
+  /* ----- Hero Gradient ----- */
+  --th-hero-gradient: linear-gradient(135deg, var(--th-brown-700) 0%, var(--th-green-500) 60%, var(--th-green-700) 100%);
+
+  /* ----- Motion ----- */
+  --th-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --th-duration-fast: 150ms;
+  --th-duration-base: 250ms;
+  --th-duration-slow: 350ms;
+}
+
+/* ----- Typography Utility Classes ----- */
+.th-h1 { font-family: var(--th-font-sans); font-size: var(--th-font-size-h1); font-weight: 600; line-height: var(--th-line-height-tight); letter-spacing: -0.03em; color: var(--th-foreground); }
+.th-h2 { font-family: var(--th-font-sans); font-size: var(--th-font-size-h2); font-weight: 600; line-height: var(--th-line-height-snug); letter-spacing: -0.02em; color: var(--th-foreground); }
+.th-h3 { font-family: var(--th-font-sans); font-size: var(--th-font-size-h3); font-weight: 600; line-height: var(--th-line-height-snug); color: var(--th-foreground); }
+.th-body { font-family: var(--th-font-sans); font-size: var(--th-font-size-body); font-weight: 400; line-height: var(--th-line-height-body); color: var(--th-foreground); }
+.th-body-sm { font-family: var(--th-font-sans); font-size: var(--th-font-size-sm); font-weight: 400; line-height: var(--th-line-height-body); color: var(--th-muted-foreground); }
+.th-eyebrow { font-family: var(--th-font-sans); font-size: var(--th-font-size-eyebrow); font-weight: 700; line-height: 1; letter-spacing: var(--th-letter-spacing-eyebrow); text-transform: uppercase; color: var(--th-muted-foreground); }
+.th-mono { font-family: var(--th-font-mono); }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--th-background);
+    --color-foreground: var(--th-foreground);
+    --color-card: var(--th-card);
+    --color-card-foreground: var(--th-card-foreground);
+    --color-primary: var(--th-primary);
+    --color-primary-foreground: var(--th-primary-foreground);
+    --color-secondary: var(--th-secondary);
+    --color-secondary-foreground: var(--th-secondary-foreground);
+    --color-muted: var(--th-muted);
+    --color-muted-foreground: var(--th-muted-foreground);
+    --color-accent: var(--th-accent);
+    --color-accent-foreground: var(--th-accent-foreground);
+    --color-border: var(--th-border);
+    --color-input: var(--th-input);
+    --color-ring: var(--th-ring);
+  }
+  @layer base {
+    body { background: var(--th-background); color: var(--th-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="overflow-hidden">
+        <!-- ===== Navigation Bar ===== -->
+        <nav class="sticky top-0 z-50 w-full border-b" style="border-color: var(--th-border); background: color-mix(in srgb, var(--th-background) 80%, transparent); backdrop-filter: blur(16px) saturate(1.2); -webkit-backdrop-filter: blur(16px) saturate(1.2);">
+            <div class="mx-auto flex h-11 max-w-[1184px] items-center justify-between px-6 lg:px-8">
+                <a href="#" class="flex items-center gap-2 no-underline" style="color: var(--th-foreground);">
+                    <span class="text-xl leading-none" aria-hidden="true">🌱</span>
+                    <span class="th-h3" style="font-size: 1.125rem; color: var(--th-foreground);">沃土之环</span>
+                </a>
+                <div class="flex items-center gap-6">
+                    <a href="#" data-dom-id="nav-market" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-foreground);">原料市场</a>
+                    <a href="#" data-dom-id="nav-fertilizer" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-foreground);">有机肥商城</a>
+                    <a href="#" data-dom-id="nav-about" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-foreground);">关于我们</a>
+                    <a href="#" data-dom-id="cta-login" class="inline-flex items-center justify-center whitespace-nowrap rounded-full px-5 py-1.5 text-sm font-semibold no-underline transition-all hover:opacity-90 active:scale-[0.98]" style="background: var(--th-primary); color: var(--th-primary-foreground); font-family: var(--th-font-sans);">登录</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- ===== Hero Section ===== -->
+        <section class="relative flex min-h-screen items-center overflow-hidden" style="background: var(--th-hero-gradient);">
+            <div class="mx-auto grid w-full max-w-[1184px] grid-cols-1 items-center gap-12 px-6 py-24 lg:grid-cols-12 lg:gap-16 lg:px-8 lg:py-32">
+                <div class="flex flex-col gap-6 lg:col-span-7">
+                    <p class="th-eyebrow tracking-widest" style="color: rgba(255,255,255,0.55);">绿色农业 · 循环经济</p>
+                    <h1 class="th-h1" style="font-size: var(--th-font-size-hero); letter-spacing: var(--th-letter-spacing-hero); line-height: 0.95; color: var(--th-background-50); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">让每一寸沃土<br>生生不息</h1>
+                    <p class="th-body" style="color: rgba(255,255,255,0.8); max-width: 32rem; line-height: 1.6;">连接农户、企业与司机的农业废弃物资源化利用一站式平台</p>
+                    <div class="flex flex-wrap items-center gap-4 pt-2">
+                        <a href="#" data-dom-id="cta-hero-primary" class="hero-cta inline-flex items-center justify-center whitespace-nowrap rounded-full px-6 py-3 text-base font-semibold no-underline transition-all hover:translate-y-[-1px] hover:opacity-90 active:scale-[0.98]" style="background: var(--th-background-50); color: var(--th-primary); font-family: var(--th-font-sans);">立即体验</a>
+                        <a href="#" data-dom-id="cta-hero-secondary" class="hero-link inline-flex items-center gap-1 whitespace-nowrap rounded-full px-4 py-2.5 text-base font-medium no-underline transition-all hover:gap-2" style="color: rgba(255,255,255,0.9); font-family: var(--th-font-sans);">了解更多 <span style="transition: transform var(--th-duration-fast) var(--th-ease);">→</span></a>
+                    </div>
+                </div>
+                <div class="lg:col-span-5">
+                    <img src="../assets/image_0_yi19x4.jpg" alt="沃土之环农田景观" class="w-full rounded-[var(--th-radius)] object-cover" style="box-shadow: var(--th-shadow-lg); aspect-ratio: 4/3;" loading="eager">
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Value Proposition Section ===== -->
+        <section class="py-20 lg:py-28" style="background: var(--th-background);">
+            <div class="mx-auto max-w-[1184px] px-6 lg:px-8">
+                <h2 class="th-h2 mb-3" style="text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">平台核心能力</h2>
+                <p class="th-body mb-12 max-w-xl" style="color: var(--th-muted-foreground);">以循环经济理念驱动农业废弃物资源化，构建连接农户、企业与司机的全链条服务平台</p>
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+                    <!-- Card 1: 原料回收 -->
+                    <div class="capability-card flex flex-col gap-4 rounded-[var(--th-radius)] border p-6" style="border-color: var(--th-border); background: var(--th-card);">
+                        <span class="text-3xl leading-none" aria-hidden="true">♻️</span>
+                        <h3 class="th-h3 truncate">原料回收</h3>
+                        <p class="th-body-sm line-clamp-3">农户一键发布秸秆、畜禽粪污等废弃物信息，平台智能审核并快速匹配需求方</p>
+                    </div>
+                    <!-- Card 2: 智能调度 -->
+                    <div class="capability-card flex flex-col gap-4 rounded-[var(--th-radius)] border p-6" style="border-color: var(--th-border); background: var(--th-card);">
+                        <span class="text-3xl leading-none" aria-hidden="true">🚛</span>
+                        <h3 class="th-h3 truncate">智能调度</h3>
+                        <p class="th-body-sm line-clamp-3">基于地理位置与运力数据的智能匹配算法，优化司机收运路线，降低物流成本</p>
+                    </div>
+                    <!-- Card 3: 有机肥商城 -->
+                    <div class="capability-card flex flex-col gap-4 rounded-[var(--th-radius)] border p-6" style="border-color: var(--th-border); background: var(--th-card);">
+                        <span class="text-3xl leading-none" aria-hidden="true">🛒</span>
+                        <h3 class="th-h3 truncate">有机肥商城</h3>
+                        <p class="th-body-sm line-clamp-3">废弃物资源化加工为高品质有机肥，在线交易直达用户，实现经济价值闭环</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Platform Data Highlights ===== -->
+        <section class="py-20 lg:py-28" style="background: var(--th-secondary);">
+            <div class="mx-auto max-w-[1184px] px-6 lg:px-8">
+                <div class="grid grid-cols-2 gap-8 md:grid-cols-4">
+                    <div class="flex flex-col gap-2">
+                        <span class="th-mono whitespace-nowrap" style="font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 700; color: var(--th-primary); line-height: 1.1;">5,000+</span>
+                        <span class="th-body-sm truncate">注册农户</span>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <span class="th-mono whitespace-nowrap" style="font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 700; color: var(--th-primary); line-height: 1.1;">200+</span>
+                        <span class="th-body-sm truncate">合作企业</span>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <span class="th-mono whitespace-nowrap" style="font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 700; color: var(--th-primary); line-height: 1.1;">30万吨</span>
+                        <span class="th-body-sm truncate">年处理废弃物</span>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <span class="th-mono whitespace-nowrap" style="font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 700; color: var(--th-primary); line-height: 1.1;">98%</span>
+                        <span class="th-body-sm truncate">匹配成功率</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== How It Works ===== -->
+        <section class="py-20 lg:py-28" style="background: var(--th-background);">
+            <div class="mx-auto max-w-[1184px] px-6 lg:px-8">
+                <h2 class="th-h2 mb-3 text-center" style="text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">四步完成循环</h2>
+                <p class="th-body mb-14 text-center" style="color: var(--th-muted-foreground);">从原料发布到资源再生，平台贯穿全过程，让循环经济触手可及</p>
+                <div class="grid grid-cols-1 gap-8 md:grid-cols-4">
+                    <!-- Step 1 -->
+                    <div class="flex flex-col items-center gap-3 text-center">
+                        <span class="inline-flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold" style="background: var(--th-primary); color: var(--th-primary-foreground); font-family: var(--th-font-sans);">1</span>
+                        <h3 class="th-h3 truncate">发布原料</h3>
+                        <p class="th-body-sm line-clamp-2">农户或企业发布秸秆、粪污等废弃物供应信息</p>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="flex flex-col items-center gap-3 text-center">
+                        <span class="inline-flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold" style="background: var(--th-primary); color: var(--th-primary-foreground); font-family: var(--th-font-sans);">2</span>
+                        <h3 class="th-h3 truncate">智能匹配</h3>
+                        <p class="th-body-sm line-clamp-2">平台根据需求与位置自动匹配最优处理方案</p>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="flex flex-col items-center gap-3 text-center">
+                        <span class="inline-flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold" style="background: var(--th-primary); color: var(--th-primary-foreground); font-family: var(--th-font-sans);">3</span>
+                        <h3 class="th-h3 truncate">收运调度</h3>
+                        <p class="th-body-sm line-clamp-2">司机接单并按路线完成废弃物收运任务</p>
+                    </div>
+                    <!-- Step 4 -->
+                    <div class="flex flex-col items-center gap-3 text-center">
+                        <span class="inline-flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold" style="background: var(--th-primary); color: var(--th-primary-foreground); font-family: var(--th-font-sans);">4</span>
+                        <h3 class="th-h3 truncate">资源再生</h3>
+                        <p class="th-body-sm line-clamp-2">废弃物加工为有机肥，返回农田完成循环</p>
+                    </div>
+                </div>
+                <!-- Connecting lines (desktop only) -->
+                <div class="mt-8 hidden items-center justify-center md:flex">
+                    <div class="flex w-full max-w-[700px] items-center justify-between px-16">
+                        <span style="color: var(--th-border); font-size: 1.5rem;">→</span>
+                        <span style="color: var(--th-border); font-size: 1.5rem;">→</span>
+                        <span style="color: var(--th-border); font-size: 1.5rem;">→</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Footer ===== -->
+        <footer class="py-16 lg:py-20" style="background: var(--th-background-800);">
+            <div class="mx-auto max-w-[1184px] px-6 lg:px-8">
+                <div class="grid grid-cols-1 gap-10 md:grid-cols-3">
+                    <!-- Column 1: Platform -->
+                    <div class="flex flex-col gap-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl leading-none" aria-hidden="true">🌱</span>
+                            <span class="th-h3" style="color: var(--th-text-100);">沃土之环</span>
+                        </div>
+                        <p class="th-body-sm" style="color: var(--th-text-300);">绿色农业 · 循环经济<br>连接农户、企业与司机的一站式平台</p>
+                    </div>
+                    <!-- Column 2: Quick Links -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-sm font-semibold" style="color: var(--th-text-100); font-family: var(--th-font-sans);">快速链接</span>
+                        <a href="#" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-text-300);">原料市场</a>
+                        <a href="#" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-text-300);">有机肥商城</a>
+                        <a href="#" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-text-300);">司机收运</a>
+                        <a href="#" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-text-300);">关于我们</a>
+                    </div>
+                    <!-- Column 3: Contact -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-sm font-semibold" style="color: var(--th-text-100); font-family: var(--th-font-sans);">联系我们</span>
+                        <p class="th-body-sm" style="color: var(--th-text-300);">客服热线：400-888-9999</p>
+                        <p class="th-body-sm" style="color: var(--th-text-300);">邮箱：contact@terrahalo.com</p>
+                        <p class="th-body-sm" style="color: var(--th-text-300);">地址：北京市海淀区中关村科技园</p>
+                    </div>
+                </div>
+                <div class="mt-12 border-t pt-8" style="border-color: var(--th-background-700);">
+                    <p class="th-body-sm text-center" style="color: var(--th-text-400);">© 2026 沃土之环. 绿色农业 · 循环经济</p>
+                </div>
+            </div>
+        </footer>
+    </main>
+    <style>
+        /* Capability card hover — CSS-first with reduced-motion */
+        .capability-card {
+            transition: transform var(--th-duration-base) var(--th-ease), box-shadow var(--th-duration-base) var(--th-ease);
+            will-change: transform;
+        }
+        .capability-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--th-shadow-md);
+        }
+        /* Nav links — unified left-edge alignment within nav group */
+        nav a { vertical-align: baseline; }
+        /* Step numbers — ensure vertical centering on text */
+        .step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 9999px;
+            font-size: 1.125rem;
+            font-weight: 700;
+            font-family: var(--th-font-sans);
+            background: var(--th-primary);
+            color: var(--th-primary-foreground);
+        }
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            .capability-card,
+            nav a,
+            .hero-cta,
+            .hero-link {
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
+            }
+            .capability-card:hover { transform: none; }
+        }
+    </style>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

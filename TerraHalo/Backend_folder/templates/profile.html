@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}个人中心 - 沃土之环有机肥原料交易平台{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4"><i class="fas fa-user"></i> 个人中心</h2>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <img src="{{ current_user.avatar }}" class="rounded-circle mb-3" style="width: 100px; height: 100px;">
+                    <h5 class="mb-2">{{ current_user.username }}</h5>
+                    <p class="mb-1">
+                        <span class="badge bg-{{ 'success' if current_user.role_type == 'admin' else 'primary' if current_user.role_type == 'supplier' else 'info' }}">
+                            {% if current_user.role_type == 'admin' %}
+                                管理员
+                            {% elif current_user.role_type == 'supplier' %}
+                                供应商
+                            {% else %}
+                                买家
+                            {% endif %}
+                        </span>
+                    </p>
+                    <p class="mb-1 text-muted small">信用分: <strong>{{ current_user.credit_score }}</strong></p>
+                    <hr>
+                    {% if current_user.company %}
+                    <p class="mb-1"><i class="fas fa-building"></i> {{ current_user.company }}</p>
+                    {% endif %}
+                    <p class="mb-1"><i class="fas fa-envelope"></i> {{ current_user.email }}</p>
+                    <p class="mb-1"><i class="fas fa-phone"></i> {{ current_user.phone }}</p>
+                    {% if current_user.address %}
+                    <p class="mb-1"><i class="fas fa-map-marker-alt"></i> {{ current_user.address }}</p>
+                    {% endif %}
+                    {% if current_user.role_type == 'buyer' %}
+                    <hr>
+                    <p class="mb-1"><i class="fas fa-wallet"></i> 账户余额: <strong class="text-success">¥{{ current_user.balance }}0</strong></p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">统计概览</h6>
+                </div>
+                <div class="card-body">
+                    {% if current_user.role_type == 'supplier' %}
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <div class="p-3">
+                                <h3 class="text-success">{{ user_materials|length }}</h3>
+                                <p class="text-muted mb-0">已发布原料</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3">
+                                <h3 class="text-primary">{{ user_orders|length }}</h3>
+                                <p class="text-muted mb-0">订单数</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3">
+                                <h3 class="text-warning">¥{{ user_orders|sum(attribute='total_amount') }}0</h3>
+                                <p class="text-muted mb-0">总交易额</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% elif current_user.role_type == 'buyer' %}
+                    <div class="row text-center">
+                        <div class="col-md-6">
+                            <div class="p-3">
+                                <h3 class="text-primary">{{ user_orders|length }}</h3>
+                                <p class="text-muted mb-0">我的订单</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3">
+                                <h3 class="text-warning">¥{{ user_orders|sum(attribute='total_amount') }}0</h3>
+                                <p class="text-muted mb-0">总支出</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">最近订单</h6>
+                    <a href="{{ url_for('orders.orders_page') }}" class="btn btn-sm btn-outline-secondary">查看全部</a>
+                </div>
+                <div class="card-body">
+                    {% if user_orders %}
+                    <ul class="list-group list-group-flush">
+                        {% for order in user_orders[:5] %}
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>订单 #{{ order.id }}</strong>
+                                    <small class="text-muted ms-2">
+                                        {{ order.created_at.strftime('%Y-%m-%d') if order.created_at else '' }}
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="text-success fw-bold">¥{{ order.goods_amount }}0</span>
+                                    <span class="badge ms-2 {{ 'bg-warning' if order.status == 'pending' else 'bg-info' if order.status == 'paid' else 'bg-success' }}">
+                                        {{ order.status }}
+                                    </span>
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-center py-4 text-muted">暂无订单</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

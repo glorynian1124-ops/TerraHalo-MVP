@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>司机任务中心 - 沃土之环</title>
+    <style id="theme-vars">
+/* ===== TerraHalo Brand CSS ===== */
+/* Apple-inspired typography + spacing system with brown/green earth palette */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;700&display=swap');
+
+/* ----- Primitive Palette ----- */
+:root {
+  /* Brown (earth) - brand primary */
+  --th-brown-50: #fef9ed;
+  --th-brown-100: #fdf3d6;
+  --th-brown-200: #fae5a4;
+  --th-brown-300: #f5d06a;
+  --th-brown-400: #e8b830;
+  --th-brown-500: #8B6914;
+  --th-brown-600: #7a5c11;
+  --th-brown-700: #6B4F10;
+  --th-brown-800: #5a3f0a;
+  --th-brown-900: #3d2807;
+
+  /* Green (crop) - accent / state success */
+  --th-green-50: #eef5ec;
+  --th-green-100: #d9ebd5;
+  --th-green-200: #b5d6ab;
+  --th-green-300: #8abd79;
+  --th-green-400: #5f9a4a;
+  --th-green-500: #2D5A27;
+  --th-green-600: #264e21;
+  --th-green-700: #1B3D18;
+  --th-green-800: #143012;
+  --th-green-900: #0d200c;
+
+  /* Background - warm earth */
+  --th-background-50: #ffffff;
+  --th-background-100: #faf8f2;
+  --th-background-200: #f5f1e7;
+  --th-background-300: #ede6d5;
+  --th-background-400: #ddd2ba;
+  --th-background-500: #b8ac94;
+  --th-background-600: #8c8070;
+  --th-background-700: #5c5448;
+  --th-background-800: #2b2416;
+  --th-background-900: #1c1814;
+
+  /* Text */
+  --th-text-50: #f5f3ef;
+  --th-text-100: #e5e0d8;
+  --th-text-200: #c4bcae;
+  --th-text-300: #a39887;
+  --th-text-400: #8c8070;
+  --th-text-500: #6e6456;
+  --th-text-600: #5c5448;
+  --th-text-700: #3d362e;
+  --th-text-800: #2b2416;
+  --th-text-900: #1c1814;
+
+  /* State colors */
+  --th-state-success: #2D5A27;
+  --th-state-success-surface: #eef5ec;
+  --th-state-warning: #d97706;
+  --th-state-warning-surface: #fffbeb;
+  --th-state-error: #dc2626;
+  --th-state-error-surface: #fef2f2;
+  --th-state-info: #2563eb;
+  --th-state-info-surface: #eff6ff;
+
+  /* ----- Semantic Roles ----- */
+  --th-background: var(--th-background-100);
+  --th-foreground: var(--th-text-800);
+  --th-primary: var(--th-brown-500);
+  --th-primary-foreground: #ffffff;
+  --th-secondary: var(--th-background-200);
+  --th-secondary-foreground: var(--th-text-700);
+  --th-muted: var(--th-background-200);
+  --th-muted-foreground: var(--th-text-500);
+  --th-accent: var(--th-green-500);
+  --th-accent-foreground: #ffffff;
+  --th-card: var(--th-background-50);
+  --th-card-foreground: var(--th-text-800);
+  --th-border: var(--th-background-300);
+  --th-input: var(--th-background-400);
+  --th-ring: var(--th-brown-500);
+
+  /* ----- Typography ----- */
+  --th-font-sans: 'DM Sans', ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
+  --th-font-mono: 'JetBrains Mono', monospace;
+  --th-font-size-hero: clamp(3rem, 6vw, 5rem);
+  --th-font-size-h1: clamp(2rem, 4vw, 3rem);
+  --th-font-size-h2: clamp(1.5rem, 3vw, 2.25rem);
+  --th-font-size-h3: 1.25rem;
+  --th-font-size-body: 1rem;
+  --th-font-size-sm: 0.875rem;
+  --th-font-size-xs: 0.75rem;
+  --th-font-size-eyebrow: 0.6875rem;
+  --th-line-height-tight: 0.92;
+  --th-line-height-snug: 1.15;
+  --th-line-height-body: 1.55;
+  --th-letter-spacing-hero: -0.04em;
+  --th-letter-spacing-eyebrow: 0.08em;
+
+  /* ----- Spacing ----- */
+  --th-spacing: 0.24rem;
+
+  /* ----- Radius ----- */
+  --th-radius: 1.2rem;
+  --th-radius-sm: 0.5rem;
+  --th-radius-full: 9999px;
+
+  /* ----- Shadow (whisper-light) ----- */
+  --th-shadow-xs: 0 1px 2px 0 rgba(0,0,0,0.04);
+  --th-shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05), 0 1px 3px -1px rgba(0,0,0,0.05);
+  --th-shadow: 0 2px 4px -1px rgba(0,0,0,0.06), 0 1px 2px -1px rgba(0,0,0,0.05);
+  --th-shadow-md: 0 4px 8px -2px rgba(0,0,0,0.06), 0 2px 4px -2px rgba(0,0,0,0.05);
+  --th-shadow-lg: 0 8px 24px -8px rgba(0,0,0,0.08), 0 4px 8px -4px rgba(0,0,0,0.05);
+  --th-shadow-xl: 0 16px 40px -10px rgba(0,0,0,0.10), 0 8px 16px -8px rgba(0,0,0,0.06);
+  --th-shadow-2xl: 0 24px 64px -12px rgba(0,0,0,0.12);
+
+  /* ----- Hero Gradient ----- */
+  --th-hero-gradient: linear-gradient(135deg, var(--th-brown-700) 0%, var(--th-green-500) 60%, var(--th-green-700) 100%);
+
+  /* ----- Motion ----- */
+  --th-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --th-duration-fast: 150ms;
+  --th-duration-base: 250ms;
+  --th-duration-slow: 350ms;
+}
+
+/* ----- Typography Utility Classes ----- */
+.th-h1 { font-family: var(--th-font-sans); font-size: var(--th-font-size-h1); font-weight: 600; line-height: var(--th-line-height-tight); letter-spacing: -0.03em; color: var(--th-foreground); }
+.th-h2 { font-family: var(--th-font-sans); font-size: var(--th-font-size-h2); font-weight: 600; line-height: var(--th-line-height-snug); letter-spacing: -0.02em; color: var(--th-foreground); }
+.th-h3 { font-family: var(--th-font-sans); font-size: var(--th-font-size-h3); font-weight: 600; line-height: var(--th-line-height-snug); color: var(--th-foreground); }
+.th-body { font-family: var(--th-font-sans); font-size: var(--th-font-size-body); font-weight: 400; line-height: var(--th-line-height-body); color: var(--th-foreground); }
+.th-body-sm { font-family: var(--th-font-sans); font-size: var(--th-font-size-sm); font-weight: 400; line-height: var(--th-line-height-body); color: var(--th-muted-foreground); }
+.th-eyebrow { font-family: var(--th-font-sans); font-size: var(--th-font-size-eyebrow); font-weight: 700; line-height: 1; letter-spacing: var(--th-letter-spacing-eyebrow); text-transform: uppercase; color: var(--th-muted-foreground); }
+.th-mono { font-family: var(--th-font-mono); }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--th-background);
+    --color-foreground: var(--th-foreground);
+    --color-card: var(--th-card);
+    --color-card-foreground: var(--th-card-foreground);
+    --color-primary: var(--th-primary);
+    --color-primary-foreground: var(--th-primary-foreground);
+    --color-secondary: var(--th-secondary);
+    --color-secondary-foreground: var(--th-secondary-foreground);
+    --color-muted: var(--th-muted);
+    --color-muted-foreground: var(--th-muted-foreground);
+    --color-accent: var(--th-accent);
+    --color-accent-foreground: var(--th-accent-foreground);
+    --color-border: var(--th-border);
+    --color-input: var(--th-input);
+    --color-ring: var(--th-ring);
+  }
+  @layer base {
+    body { background: var(--th-background); color: var(--th-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen antialiased" style="font-family: var(--th-font-sans); background: var(--th-background); color: var(--th-foreground);">
+  <main class="overflow-hidden">
+    <!-- ===== Navigation Bar ===== -->
+    <nav class="sticky top-0 z-50 w-full border-b" style="border-color: var(--th-border); background: color-mix(in srgb, var(--th-background) 80%, transparent); backdrop-filter: blur(16px) saturate(1.2); -webkit-backdrop-filter: blur(16px) saturate(1.2);">
+      <div class="mx-auto flex h-11 max-w-[1184px] items-center justify-between px-6 lg:px-8">
+        <a href="#" class="flex items-center gap-2 no-underline" style="color: var(--th-foreground);">
+          <span class="text-xl leading-none" aria-hidden="true">🌱</span>
+          <span class="th-h3" style="font-size: 1.125rem; color: var(--th-foreground);">沃土之环</span>
+        </a>
+        <div class="flex items-center gap-6">
+          <a href="#" data-dom-id="nav-home" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-foreground);">首页</a>
+          <a href="#" data-dom-id="nav-tasks" class="th-body-sm no-underline transition-opacity" style="color: var(--th-primary); font-weight: 600;">任务中心</a>
+          <a href="#" data-dom-id="nav-dashboard" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-foreground);">数据看板</a>
+          <a href="#" data-dom-id="nav-vehicle" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-foreground);">车辆管理</a>
+          <a href="#" data-dom-id="cta-login" class="inline-flex items-center justify-center whitespace-nowrap rounded-full px-5 py-1.5 text-sm font-semibold no-underline transition-all hover:opacity-90 active:scale-[0.98]" style="background: var(--th-primary); color: var(--th-primary-foreground); font-family: var(--th-font-sans);">登录</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ===== Driver Identity Header ===== -->
+    <section class="w-full border-b" style="border-color: var(--th-border); background: var(--th-card);">
+      <div class="mx-auto flex max-w-[1184px] items-center justify-between px-6 py-5 lg:px-8">
+        <div class="flex items-center gap-4">
+          <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full" style="background: var(--th-primary); color: var(--th-primary-foreground); font-family: var(--th-font-sans); font-weight: 600; font-size: var(--th-font-size-sm);" aria-label="司机小李">小</div>
+          <div class="flex flex-col gap-0.5">
+            <span class="th-h3 truncate" style="font-size: 1.125rem;">司机小李</span>
+            <span class="th-body-sm truncate flex items-center gap-1.5">
+              <span class="inline-flex items-center gap-1"><i data-lucide="truck" class="h-3.5 w-3.5"></i> 苏A12345</span>
+              <span style="color: var(--th-border);">·</span>
+              <span>厢式货车</span>
+              <span style="color: var(--th-border);">·</span>
+              <span>5吨</span>
+            </span>
+          </div>
+        </div>
+        <button data-dom-id="btn-notification" class="relative inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:opacity-80" style="background: var(--th-secondary); color: var(--th-muted-foreground);" aria-label="消息通知">
+          <i data-lucide="bell" class="h-5 w-5"></i>
+          <span class="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold" style="background: var(--th-state-error); color: var(--th-background-50);">3</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===== Status Tabs ===== -->
+    <section class="w-full border-b" style="border-color: var(--th-border); background: var(--th-background);">
+      <div class="mx-auto max-w-[1184px] px-6 py-3 lg:px-8">
+        <div class="flex flex-nowrap gap-2 overflow-x-auto">
+          <button data-dom-id="tab-pending" class="tab-btn tab-active inline-flex items-center justify-center whitespace-nowrap rounded-full px-5 py-2 text-sm font-semibold transition-all hover:opacity-90 shrink-0" style="background: var(--th-primary); color: var(--th-primary-foreground); font-family: var(--th-font-sans);" data-tab="pending" onclick="switchTab('pending')">待接单 (3)</button>
+          <button data-dom-id="tab-active" class="tab-btn inline-flex items-center justify-center whitespace-nowrap rounded-full px-5 py-2 text-sm font-medium transition-all hover:opacity-80 shrink-0" style="background: transparent; color: var(--th-muted-foreground); font-family: var(--th-font-sans); border: 1px solid var(--th-border);" data-tab="active" onclick="switchTab('active')">进行中 (1)</button>
+          <button data-dom-id="tab-done" class="tab-btn inline-flex items-center justify-center whitespace-nowrap rounded-full px-5 py-2 text-sm font-medium transition-all hover:opacity-80 shrink-0" style="background: transparent; color: var(--th-muted-foreground); font-family: var(--th-font-sans); border: 1px solid var(--th-border);" data-tab="done" onclick="switchTab('done')">已完成 (28)</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Tab Content: Pending Tasks ===== -->
+    <section class="tab-content mx-auto max-w-[1184px] px-6 py-8 lg:px-8" id="tab-pending-content">
+      <div class="flex flex-col gap-4">
+        <!-- Task Card 1 -->
+        <div class="flex flex-col gap-4 rounded-[var(--th-radius)] border p-5 transition-shadow" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-xs);">
+          <div class="flex flex-col gap-2">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex flex-col gap-1 min-w-0 flex-1">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="map-pin" class="h-4 w-4 shrink-0" style="color: var(--th-primary);"></i>
+                  <span class="th-h3 truncate">建邺区 → 江宁区</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-3 th-body-sm">
+                  <span class="inline-flex items-center whitespace-nowrap rounded-[var(--th-radius-sm)] px-2 py-0.5 text-xs" style="background: var(--th-secondary); color: var(--th-secondary-foreground);">餐厨垃圾</span>
+                  <span style="color: var(--th-muted-foreground);">2 吨</span>
+                  <span style="color: var(--th-border);">|</span>
+                  <span class="th-mono font-semibold" style="color: var(--th-primary);">¥180</span>
+                  <span style="color: var(--th-border);">|</span>
+                  <span class="inline-flex items-center gap-1" style="color: var(--th-muted-foreground);"><i data-lucide="clock" class="h-3.5 w-3.5"></i> 截止 14:30</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <button data-dom-id="cta-accept-1" class="inline-flex items-center justify-center whitespace-nowrap rounded-full px-5 py-2 text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.98]" style="background: var(--th-primary); color: var(--th-primary-foreground); font-family: var(--th-font-sans);">接单</button>
+                <button data-dom-id="btn-reject-1" class="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors bg-transparent hover:opacity-70" style="color: var(--th-muted-foreground); font-family: var(--th-font-sans);">拒绝</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Task Card 2 -->
+        <div class="flex flex-col gap-4 rounded-[var(--th-radius)] border p-5 transition-shadow" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-xs);">
+          <div class="flex flex-col gap-2">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex flex-col gap-1 min-w-0 flex-1">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="map-pin" class="h-4 w-4 shrink-0" style="color: var(--th-primary);"></i>
+                  <span class="th-h3 truncate">鼓楼区 → 栖霞区</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-3 th-body-sm">
+                  <span class="inline-flex items-center whitespace-nowrap rounded-[var(--th-radius-sm)] px-2 py-0.5 text-xs" style="background: var(--th-secondary); color: var(--th-secondary-foreground);">园林垃圾</span>
+                  <span style="color: var(--th-muted-foreground);">3 吨</span>
+                  <span style="color: var(--th-border);">|</span>
+                  <span class="th-mono font-semibold" style="color: var(--th-primary);">¥240</span>
+                  <span style="color: var(--th-border);">|</span>
+                  <span class="inline-flex items-center gap-1" style="color: var(--th-muted-foreground);"><i data-lucide="clock" class="h-3.5 w-3.5"></i> 截止 16:00</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <button data-dom-id="cta-accept-2" class="inline-flex items-center justify-center whitespace-nowrap rounded-full px-5 py-2 text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.98]" style="background: var(--th-primary); color: var(--th-primary-foreground); font-family: var(--th-font-sans);">接单</button>
+                <button data-dom-id="btn-reject-2" class="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors bg-transparent hover:opacity-70" style="color: var(--th-muted-foreground); font-family: var(--th-font-sans);">拒绝</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Task Card 3 -->
+        <div class="flex flex-col gap-4 rounded-[var(--th-radius)] border p-5 transition-shadow" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-xs);">
+          <div class="flex flex-col gap-2">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex flex-col gap-1 min-w-0 flex-1">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="map-pin" class="h-4 w-4 shrink-0" style="color: var(--th-primary);"></i>
+                  <span class="th-h3 truncate">玄武区 → 浦口区</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-3 th-body-sm">
+                  <span class="inline-flex items-center whitespace-nowrap rounded-[var(--th-radius-sm)] px-2 py-0.5 text-xs" style="background: var(--th-secondary); color: var(--th-secondary-foreground);">生活垃圾</span>
+                  <span style="color: var(--th-muted-foreground);">1.5 吨</span>
+                  <span style="color: var(--th-border);">|</span>
+                  <span class="th-mono font-semibold" style="color: var(--th-primary);">¥150</span>
+                  <span style="color: var(--th-border);">|</span>
+                  <span class="inline-flex items-center gap-1" style="color: var(--th-muted-foreground);"><i data-lucide="clock" class="h-3.5 w-3.5"></i> 截止 17:30</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <button data-dom-id="cta-accept-3" class="inline-flex items-center justify-center whitespace-nowrap rounded-full px-5 py-2 text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.98]" style="background: var(--th-primary); color: var(--th-primary-foreground); font-family: var(--th-font-sans);">接单</button>
+                <button data-dom-id="btn-reject-3" class="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors bg-transparent hover:opacity-70" style="color: var(--th-muted-foreground); font-family: var(--th-font-sans);">拒绝</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Tab Content: Active (In Progress) Tasks ===== -->
+    <section class="tab-content mx-auto max-w-[1184px] px-6 py-8 lg:px-8 hidden" id="tab-active-content">
+      <div class="flex flex-col gap-4">
+        <!-- Active Task Card: Expanded -->
+        <div class="flex flex-col gap-5 rounded-[var(--th-radius)] border p-5" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-xs);">
+          <!-- Task Info Header -->
+          <div class="flex flex-col gap-2">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex flex-col gap-1 min-w-0 flex-1">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="map-pin" class="h-4 w-4 shrink-0" style="color: var(--th-primary);"></i>
+                  <span class="th-h3 truncate">秦淮区 → 雨花台区</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-3 th-body-sm">
+                  <span class="inline-flex items-center whitespace-nowrap rounded-[var(--th-radius-sm)] px-2 py-0.5 text-xs" style="background: var(--th-secondary); color: var(--th-secondary-foreground);">餐厨垃圾</span>
+                  <span style="color: var(--th-muted-foreground);">4 吨</span>
+                  <span style="color: var(--th-border);">|</span>
+                  <span class="th-mono font-semibold" style="color: var(--th-primary);">¥320</span>
+                </div>
+              </div>
+              <span class="inline-flex items-center whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold shrink-0" style="background: var(--th-state-warning-surface); color: var(--th-state-warning);">进行中</span>
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div style="border-top: 1px solid var(--th-border);"></div>
+
+          <!-- Progress Steps -->
+          <div class="flex flex-col gap-3">
+            <span class="th-body-sm" style="font-weight: 600; color: var(--th-muted-foreground);">任务进度</span>
+            <div class="flex items-start justify-between gap-2">
+              <!-- Step 1: Done -->
+              <div class="flex flex-col items-center gap-1.5 flex-1 min-w-0">
+                <div class="flex h-8 w-8 items-center justify-center rounded-full" style="background: var(--th-accent); color: var(--th-accent-foreground);">
+                  <i data-lucide="check" class="h-4 w-4"></i>
+                </div>
+                <span class="text-xs font-medium truncate" style="color: var(--th-accent);">已到场</span>
+              </div>
+              <!-- Connector -->
+              <div class="mt-4 h-0.5 flex-1 min-w-[20px]" style="background: var(--th-accent);"></div>
+              <!-- Step 2: In Progress -->
+              <div class="flex flex-col items-center gap-1.5 flex-1 min-w-0">
+                <div class="flex h-8 w-8 items-center justify-center rounded-full" style="background: var(--th-primary); color: var(--th-primary-foreground);">
+                  <i data-lucide="truck" class="h-4 w-4"></i>
+                </div>
+                <span class="text-xs font-semibold truncate" style="color: var(--th-primary);">装货中</span>
+              </div>
+              <!-- Connector -->
+              <div class="mt-4 h-0.5 flex-1 min-w-[20px]" style="background: var(--th-border);"></div>
+              <!-- Step 3: Pending -->
+              <div class="flex flex-col items-center gap-1.5 flex-1 min-w-0">
+                <div class="flex h-8 w-8 items-center justify-center rounded-full" style="background: var(--th-muted); color: var(--th-muted-foreground);">
+                  <i data-lucide="circle" class="h-4 w-4"></i>
+                </div>
+                <span class="text-xs truncate" style="color: var(--th-muted-foreground);">运输中</span>
+              </div>
+              <!-- Connector -->
+              <div class="mt-4 h-0.5 flex-1 min-w-[20px]" style="background: var(--th-border);"></div>
+              <!-- Step 4: Pending -->
+              <div class="flex flex-col items-center gap-1.5 flex-1 min-w-0">
+                <div class="flex h-8 w-8 items-center justify-center rounded-full" style="background: var(--th-muted); color: var(--th-muted-foreground);">
+                  <i data-lucide="circle" class="h-4 w-4"></i>
+                </div>
+                <span class="text-xs truncate" style="color: var(--th-muted-foreground);">签收</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div style="border-top: 1px solid var(--th-border);"></div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-wrap items-center gap-3">
+            <button data-dom-id="cta-load" class="inline-flex items-center justify-center whitespace-nowrap rounded-full px-5 py-2 text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.98]" style="background: var(--th-primary); color: var(--th-primary-foreground); font-family: var(--th-font-sans);">确认装货</button>
+            <button data-dom-id="cta-deliver" class="inline-flex items-center justify-center whitespace-nowrap rounded-full px-5 py-2 text-sm font-semibold transition-all border hover:opacity-80 active:scale-[0.98]" style="border-color: var(--th-primary); color: var(--th-primary); font-family: var(--th-font-sans); background: transparent;">确认送达</button>
+            <button data-dom-id="btn-report" class="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors bg-transparent hover:opacity-70" style="color: var(--th-state-error); font-family: var(--th-font-sans);">上报异常</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Tab Content: Completed Tasks ===== -->
+    <section class="tab-content mx-auto max-w-[1184px] px-6 py-8 lg:px-8 hidden" id="tab-done-content">
+      <div class="flex flex-col gap-3">
+        <!-- Completed Item 1 -->
+        <div class="flex items-center gap-4 rounded-[var(--th-radius)] border p-4 transition-shadow" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-xs);">
+          <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full" style="background: var(--th-state-success-surface);">
+            <i data-lucide="check-circle" class="h-5 w-5" style="color: var(--th-state-success);"></i>
+          </div>
+          <div class="flex flex-col gap-0.5 min-w-0 flex-1">
+            <span class="th-body truncate" style="font-weight: 500;">江宁区 · 餐厨垃圾 · 2 吨</span>
+            <span class="th-body-sm truncate" style="color: var(--th-muted-foreground);">2026-06-25 · 苏A12345</span>
+          </div>
+          <span class="th-mono font-semibold whitespace-nowrap shrink-0" style="color: var(--th-accent); font-size: var(--th-font-size-sm);">+¥180</span>
+        </div>
+
+        <!-- Completed Item 2 -->
+        <div class="flex items-center gap-4 rounded-[var(--th-radius)] border p-4 transition-shadow" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-xs);">
+          <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full" style="background: var(--th-state-success-surface);">
+            <i data-lucide="check-circle" class="h-5 w-5" style="color: var(--th-state-success);"></i>
+          </div>
+          <div class="flex flex-col gap-0.5 min-w-0 flex-1">
+            <span class="th-body truncate" style="font-weight: 500;">栖霞区 · 园林垃圾 · 3 吨</span>
+            <span class="th-body-sm truncate" style="color: var(--th-muted-foreground);">2026-06-24 · 苏A12345</span>
+          </div>
+          <span class="th-mono font-semibold whitespace-nowrap shrink-0" style="color: var(--th-accent); font-size: var(--th-font-size-sm);">+¥240</span>
+        </div>
+
+        <!-- Completed Item 3 -->
+        <div class="flex items-center gap-4 rounded-[var(--th-radius)] border p-4 transition-shadow" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-xs);">
+          <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full" style="background: var(--th-state-success-surface);">
+            <i data-lucide="check-circle" class="h-5 w-5" style="color: var(--th-state-success);"></i>
+          </div>
+          <div class="flex flex-col gap-0.5 min-w-0 flex-1">
+            <span class="th-body truncate" style="font-weight: 500;">浦口区 · 生活垃圾 · 1.5 吨</span>
+            <span class="th-body-sm truncate" style="color: var(--th-muted-foreground);">2026-06-24 · 苏A12345</span>
+          </div>
+          <span class="th-mono font-semibold whitespace-nowrap shrink-0" style="color: var(--th-accent); font-size: var(--th-font-size-sm);">+¥150</span>
+        </div>
+
+        <!-- Completed Item 4 -->
+        <div class="flex items-center gap-4 rounded-[var(--th-radius)] border p-4 transition-shadow" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-xs);">
+          <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full" style="background: var(--th-state-success-surface);">
+            <i data-lucide="check-circle" class="h-5 w-5" style="color: var(--th-state-success);"></i>
+          </div>
+          <div class="flex flex-col gap-0.5 min-w-0 flex-1">
+            <span class="th-body truncate" style="font-weight: 500;">建邺区 · 餐厨垃圾 · 2.5 吨</span>
+            <span class="th-body-sm truncate" style="color: var(--th-muted-foreground);">2026-06-23 · 苏A12345</span>
+          </div>
+          <span class="th-mono font-semibold whitespace-nowrap shrink-0" style="color: var(--th-accent); font-size: var(--th-font-size-sm);">+¥200</span>
+        </div>
+
+        <!-- Completed Item 5 -->
+        <div class="flex items-center gap-4 rounded-[var(--th-radius)] border p-4 transition-shadow" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-xs);">
+          <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full" style="background: var(--th-state-success-surface);">
+            <i data-lucide="check-circle" class="h-5 w-5" style="color: var(--th-state-success);"></i>
+          </div>
+          <div class="flex flex-col gap-0.5 min-w-0 flex-1">
+            <span class="th-body truncate" style="font-weight: 500;">鼓楼区 · 园林垃圾 · 2 吨</span>
+            <span class="th-body-sm truncate" style="color: var(--th-muted-foreground);">2026-06-22 · 苏A12345</span>
+          </div>
+          <span class="th-mono font-semibold whitespace-nowrap shrink-0" style="color: var(--th-accent); font-size: var(--th-font-size-sm);">+¥180</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    function switchTab(tab) {
+      // Update tab buttons
+      document.querySelectorAll('.tab-btn').forEach(function(btn) {
+        var isActive = btn.getAttribute('data-tab') === tab;
+        btn.classList.toggle('tab-active', isActive);
+        if (isActive) {
+          btn.style.background = 'var(--th-primary)';
+          btn.style.color = 'var(--th-primary-foreground)';
+          btn.style.fontWeight = '600';
+          btn.style.border = 'none';
+        } else {
+          btn.style.background = 'transparent';
+          btn.style.color = 'var(--th-muted-foreground)';
+          btn.style.fontWeight = '500';
+          btn.style.border = '1px solid var(--th-border)';
+        }
+      });
+      // Update content panels
+      document.querySelectorAll('.tab-content').forEach(function(content) {
+        content.classList.add('hidden');
+      });
+      var target = document.getElementById('tab-' + tab + '-content');
+      if (target) {
+        target.classList.remove('hidden');
+      }
+    }
+  </script>
+
+  <style>
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+    .tab-btn:focus-visible {
+      outline: 2px solid var(--th-ring);
+      outline-offset: 2px;
+    }
+  </style>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>

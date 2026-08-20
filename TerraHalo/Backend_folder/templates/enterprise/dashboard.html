@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}企业工作台 - 沃土之环{% endblock %}
+
+{% block content %}
+<main class="overflow-hidden">
+    <div class="mx-auto max-w-[1184px] px-6 lg:px-8 py-8">
+        <!-- 欢迎区 -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="th-h2 mb-1">欢迎回来，{{ current_user.company or current_user.username }}</h1>
+                <p class="th-body-sm" style="color: var(--th-muted-foreground);">管理您的采购需求、收运任务与商品</p>
+            </div>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="grid grid-cols-2 gap-4 lg:grid-cols-4 mb-8">
+            <div class="flex flex-col gap-2 rounded-[var(--th-radius)] border p-5" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-xs);">
+                <span class="th-mono" style="font-size: 1.75rem; font-weight: 700; color: var(--th-primary);">{{ stats.demand_count if stats else 0 }}</span>
+                <span class="th-body-sm" style="color: var(--th-muted-foreground);">采购需求总数</span>
+            </div>
+            <div class="flex flex-col gap-2 rounded-[var(--th-radius)] border p-5" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-xs);">
+                <span class="th-mono" style="font-size: 1.75rem; font-weight: 700; color: var(--th-accent);">{{ stats.active_demand_count if stats else 0 }}</span>
+                <span class="th-body-sm" style="color: var(--th-muted-foreground);">进行中需求</span>
+            </div>
+            <div class="flex flex-col gap-2 rounded-[var(--th-radius)] border p-5" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-xs);">
+                <span class="th-mono" style="font-size: 1.75rem; font-weight: 700; color: var(--th-primary);">{{ stats.task_count if stats else 0 }}</span>
+                <span class="th-body-sm" style="color: var(--th-muted-foreground);">收运任务</span>
+            </div>
+            <div class="flex flex-col gap-2 rounded-[var(--th-radius)] border p-5" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-xs);">
+                <span class="th-mono" style="font-size: 1.75rem; font-weight: 700; color: var(--th-accent);">{{ stats.product_count if stats else 0 }}</span>
+                <span class="th-body-sm" style="color: var(--th-muted-foreground);">在售商品</span>
+            </div>
+        </div>
+
+        <!-- 快捷入口 -->
+        <div class="mb-8">
+            <h2 class="th-h3 mb-4">快捷入口</h2>
+            <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+                <a href="{{ url_for('enterprise.demands_page') }}" class="flex flex-col items-center gap-3 rounded-[var(--th-radius)] border p-6 no-underline transition-all hover:-translate-y-0.5" style="border-color: var(--th-border); background: var(--th-card);">
+                    <i data-lucide="clipboard-list" class="w-7 h-7" style="color: var(--th-primary);"></i>
+                    <span class="th-body font-medium">采购需求</span>
+                </a>
+                <a href="{{ url_for('enterprise.matches_page') }}" class="flex flex-col items-center gap-3 rounded-[var(--th-radius)] border p-6 no-underline transition-all hover:-translate-y-0.5" style="border-color: var(--th-border); background: var(--th-card);">
+                    <i data-lucide="git-merge" class="w-7 h-7" style="color: var(--th-primary);"></i>
+                    <span class="th-body font-medium">匹配结果</span>
+                </a>
+                <a href="{{ url_for('enterprise.tasks_page') }}" class="flex flex-col items-center gap-3 rounded-[var(--th-radius)] border p-6 no-underline transition-all hover:-translate-y-0.5" style="border-color: var(--th-border); background: var(--th-card);">
+                    <i data-lucide="truck" class="w-7 h-7" style="color: var(--th-primary);"></i>
+                    <span class="th-body font-medium">收运任务</span>
+                </a>
+                <a href="{{ url_for('enterprise.products_page') }}" class="flex flex-col items-center gap-3 rounded-[var(--th-radius)] border p-6 no-underline transition-all hover:-translate-y-0.5" style="border-color: var(--th-border); background: var(--th-card);">
+                    <i data-lucide="package" class="w-7 h-7" style="color: var(--th-primary);"></i>
+                    <span class="th-body font-medium">商品管理</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 近期收运任务 -->
+        <div>
+            <h2 class="th-h3 mb-4">近期收运任务</h2>
+            <div id="task-list" class="flex flex-col gap-3">
+                <div class="th-body-sm text-center py-8" style="color: var(--th-muted-foreground);">加载中...</div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function loadTasks() {
+        var list = document.getElementById('task-list');
+        fetch('{{ url_for("enterprise.get_tasks_api") }}')
+            .then(function(r) { return r.json(); })
+            .then(function(tasks) {
+                if (!tasks || !tasks.length) {
+                    list.innerHTML = '<div class="rounded-[var(--th-radius)] border p-6 text-center th-body-sm" style="border-color: var(--th-border); background: var(--th-card); color: var(--th-muted-foreground);">暂无收运任务</div>';
+                    return;
+                }
+                var statusMap = { pending_assign: '待派单', pending_accept: '待接单', accepted: '进行中', completed: '已完成' };
+                list.innerHTML = tasks.slice(0, 5).map(function(t) {
+                    var s = statusMap[t.status] || t.status;
+                    return '<div class="flex items-center justify-between rounded-[var(--th-radius)] border p-4" style="border-color: var(--th-border); background: var(--th-card);">' +
+                        '<div class="flex items-center gap-3 min-w-0">' +
+                            '<i data-lucide="truck" class="w-5 h-5 shrink-0" style="color: var(--th-primary);"></i>' +
+                            '<div class="flex flex-col gap-0.5 min-w-0">' +
+                                '<span class="th-body font-medium truncate">' + (t.task_no || ('任务#' + t.id)) + '</span>' +
+                                '<span class="th-body-sm truncate" style="color: var(--th-muted-foreground);">' + (t.pickup_address || '') + ' → ' + (t.delivery_address || '') + '</span>' +
+                            '</div>' +
+                        '</div>' +
+                        '<span class="inline-flex items-center whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold shrink-0" style="background: var(--th-secondary); color: var(--th-secondary-foreground);">' + s + '</span>' +
+                    '</div>';
+                }).join('');
+                lucide.createIcons();
+            })
+            .catch(function() { list.innerHTML = '<div class="th-body-sm text-center py-8" style="color: var(--th-state-error);">加载失败</div>'; });
+    }
+    loadTasks();
+</script>
+{% endblock %}

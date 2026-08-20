@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}我的订单 - 沃土之环有机肥原料交易平台{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4"><i class="fas fa-file-invoice"></i> 我的订单</h2>
+
+    {% if not user_orders %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-file-invoice fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">暂无订单</h4>
+            {% if current_user.role_type == 'buyer' %}
+            <p class="text-muted">快去原料市场下单吧</p>
+            <a href="{{ url_for('materials.materials_page') }}" class="btn btn-success">前往原料市场</a>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        {% for order in user_orders|sort(attribute='created_at', reverse=True) %}
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><small>订单号：{{ order['id'][:16] }}...</small></span>
+                    <span class="badge {{ 'bg-warning' if order['status'] == 'pending' else 'bg-info' if order['status'] == 'paid' else 'bg-success' if order['status'] == 'completed' else 'bg-secondary' }}">
+                        {% if order['status'] == 'pending' %}待付款{% elif order['status'] == 'paid' %}已付款{% elif order['status'] == 'completed' %}已完成{% else %}{{ order['status'] }}{% endif %}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <p><small class="text-muted">创建时间：{{ order['created_at'][:10] }}</small></p>
+                    <p><strong>总计：¥{{ order['total_amount'] }}0</strong></p>
+                    <hr>
+                    <h6>商品列表</h6>
+                    <ul class="list-group list-group-sm mb-3">
+                        {% for item in order['items'] %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>{{ item['type'] }} × {{ item['quantity'] }}吨</span>
+                            <span class="text-success">¥{{ item['total_price'] }}0</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button class="btn btn-sm btn-outline-primary" onclick="showOrderDetail('{{ order['id'] }}')">查看详情</button>
+                        {% if order['status'] == 'pending' and current_user['role'] == 'buyer' %}
+                        <button class="btn btn-sm btn-success" onclick="payOrder('{{ order['id'] }}')">立即付款</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function payOrder(orderId) {
+    if (confirm('确认支付该订单？')) {
+        fetch('/api/order/pay', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({order_id: orderId})
+        }).then(response => response.json())
+          .then(data => {
+              if (data.message) {
+                  alert('付款成功！');
+                  location.reload();
+              } else {
+                  alert(data.error || '付款失败');
+              }
+          }).catch(err => {
+              alert('网络错误，请稍后重试');
+          });
+    }
+}
+
+function showOrderDetail(orderId) {
+    alert('订单详情功能开发中，ID: ' + orderId);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>有机肥商城 - 沃土之环</title>
+    <style id="theme-vars">
+/* ===== TerraHalo Brand CSS ===== */
+/* Apple-inspired typography + spacing system with brown/green earth palette */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;700&display=swap');
+
+/* ----- Primitive Palette ----- */
+:root {
+  /* Brown (earth) - brand primary */
+  --th-brown-50: #fef9ed;
+  --th-brown-100: #fdf3d6;
+  --th-brown-200: #fae5a4;
+  --th-brown-300: #f5d06a;
+  --th-brown-400: #e8b830;
+  --th-brown-500: #8B6914;
+  --th-brown-600: #7a5c11;
+  --th-brown-700: #6B4F10;
+  --th-brown-800: #5a3f0a;
+  --th-brown-900: #3d2807;
+
+  /* Green (crop) - accent / state success */
+  --th-green-50: #eef5ec;
+  --th-green-100: #d9ebd5;
+  --th-green-200: #b5d6ab;
+  --th-green-300: #8abd79;
+  --th-green-400: #5f9a4a;
+  --th-green-500: #2D5A27;
+  --th-green-600: #264e21;
+  --th-green-700: #1B3D18;
+  --th-green-800: #143012;
+  --th-green-900: #0d200c;
+
+  /* Background - warm earth */
+  --th-background-50: #ffffff;
+  --th-background-100: #faf8f2;
+  --th-background-200: #f5f1e7;
+  --th-background-300: #ede6d5;
+  --th-background-400: #ddd2ba;
+  --th-background-500: #b8ac94;
+  --th-background-600: #8c8070;
+  --th-background-700: #5c5448;
+  --th-background-800: #2b2416;
+  --th-background-900: #1c1814;
+
+  /* Text */
+  --th-text-50: #f5f3ef;
+  --th-text-100: #e5e0d8;
+  --th-text-200: #c4bcae;
+  --th-text-300: #a39887;
+  --th-text-400: #8c8070;
+  --th-text-500: #6e6456;
+  --th-text-600: #5c5448;
+  --th-text-700: #3d362e;
+  --th-text-800: #2b2416;
+  --th-text-900: #1c1814;
+
+  /* State colors */
+  --th-state-success: #2D5A27;
+  --th-state-success-surface: #eef5ec;
+  --th-state-warning: #d97706;
+  --th-state-warning-surface: #fffbeb;
+  --th-state-error: #dc2626;
+  --th-state-error-surface: #fef2f2;
+  --th-state-info: #2563eb;
+  --th-state-info-surface: #eff6ff;
+
+  /* ----- Semantic Roles ----- */
+  --th-background: var(--th-background-100);
+  --th-foreground: var(--th-text-800);
+  --th-primary: var(--th-brown-500);
+  --th-primary-foreground: #ffffff;
+  --th-secondary: var(--th-background-200);
+  --th-secondary-foreground: var(--th-text-700);
+  --th-muted: var(--th-background-200);
+  --th-muted-foreground: var(--th-text-500);
+  --th-accent: var(--th-green-500);
+  --th-accent-foreground: #ffffff;
+  --th-card: var(--th-background-50);
+  --th-card-foreground: var(--th-text-800);
+  --th-border: var(--th-background-300);
+  --th-input: var(--th-background-400);
+  --th-ring: var(--th-brown-500);
+
+  /* ----- Typography ----- */
+  --th-font-sans: 'DM Sans', ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
+  --th-font-mono: 'JetBrains Mono', monospace;
+  --th-font-size-hero: clamp(3rem, 6vw, 5rem);
+  --th-font-size-h1: clamp(2rem, 4vw, 3rem);
+  --th-font-size-h2: clamp(1.5rem, 3vw, 2.25rem);
+  --th-font-size-h3: 1.25rem;
+  --th-font-size-body: 1rem;
+  --th-font-size-sm: 0.875rem;
+  --th-font-size-xs: 0.75rem;
+  --th-font-size-eyebrow: 0.6875rem;
+  --th-line-height-tight: 0.92;
+  --th-line-height-snug: 1.15;
+  --th-line-height-body: 1.55;
+  --th-letter-spacing-hero: -0.04em;
+  --th-letter-spacing-eyebrow: 0.08em;
+
+  /* ----- Spacing ----- */
+  --th-spacing: 0.24rem;
+
+  /* ----- Radius ----- */
+  --th-radius: 1.2rem;
+  --th-radius-sm: 0.5rem;
+  --th-radius-full: 9999px;
+
+  /* ----- Shadow (whisper-light) ----- */
+  --th-shadow-xs: 0 1px 2px 0 rgba(0,0,0,0.04);
+  --th-shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05), 0 1px 3px -1px rgba(0,0,0,0.05);
+  --th-shadow: 0 2px 4px -1px rgba(0,0,0,0.06), 0 1px 2px -1px rgba(0,0,0,0.05);
+  --th-shadow-md: 0 4px 8px -2px rgba(0,0,0,0.06), 0 2px 4px -2px rgba(0,0,0,0.05);
+  --th-shadow-lg: 0 8px 24px -8px rgba(0,0,0,0.08), 0 4px 8px -4px rgba(0,0,0,0.05);
+  --th-shadow-xl: 0 16px 40px -10px rgba(0,0,0,0.10), 0 8px 16px -8px rgba(0,0,0,0.06);
+  --th-shadow-2xl: 0 24px 64px -12px rgba(0,0,0,0.12);
+
+  /* ----- Hero Gradient ----- */
+  --th-hero-gradient: linear-gradient(135deg, var(--th-brown-700) 0%, var(--th-green-500) 60%, var(--th-green-700) 100%);
+
+  /* ----- Motion ----- */
+  --th-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --th-duration-fast: 150ms;
+  --th-duration-base: 250ms;
+  --th-duration-slow: 350ms;
+}
+
+/* ----- Typography Utility Classes ----- */
+.th-h1 { font-family: var(--th-font-sans); font-size: var(--th-font-size-h1); font-weight: 600; line-height: var(--th-line-height-tight); letter-spacing: -0.03em; color: var(--th-foreground); }
+.th-h2 { font-family: var(--th-font-sans); font-size: var(--th-font-size-h2); font-weight: 600; line-height: var(--th-line-height-snug); letter-spacing: -0.02em; color: var(--th-foreground); }
+.th-h3 { font-family: var(--th-font-sans); font-size: var(--th-font-size-h3); font-weight: 600; line-height: var(--th-line-height-snug); color: var(--th-foreground); }
+.th-body { font-family: var(--th-font-sans); font-size: var(--th-font-size-body); font-weight: 400; line-height: var(--th-line-height-body); color: var(--th-foreground); }
+.th-body-sm { font-family: var(--th-font-sans); font-size: var(--th-font-size-sm); font-weight: 400; line-height: var(--th-line-height-body); color: var(--th-muted-foreground); }
+.th-eyebrow { font-family: var(--th-font-sans); font-size: var(--th-font-size-eyebrow); font-weight: 700; line-height: 1; letter-spacing: var(--th-letter-spacing-eyebrow); text-transform: uppercase; color: var(--th-muted-foreground); }
+.th-mono { font-family: var(--th-font-mono); }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--th-background);
+    --color-foreground: var(--th-foreground);
+    --color-card: var(--th-card);
+    --color-card-foreground: var(--th-card-foreground);
+    --color-primary: var(--th-primary);
+    --color-primary-foreground: var(--th-primary-foreground);
+    --color-secondary: var(--th-secondary);
+    --color-secondary-foreground: var(--th-secondary-foreground);
+    --color-muted: var(--th-muted);
+    --color-muted-foreground: var(--th-muted-foreground);
+    --color-accent: var(--th-accent);
+    --color-accent-foreground: var(--th-accent-foreground);
+    --color-border: var(--th-border);
+    --color-input: var(--th-input);
+    --color-ring: var(--th-ring);
+  }
+  @layer base {
+    body { background: var(--th-background); color: var(--th-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body style="background: var(--th-background); font-family: var(--th-font-sans); color: var(--th-foreground); min-height: 100vh;">
+
+    <!-- ===== Top Navigation Bar ===== -->
+    <nav class="sticky top-0 z-50 w-full border-b" style="border-color: var(--th-border); background: color-mix(in srgb, var(--th-background) 80%, transparent); backdrop-filter: blur(16px) saturate(1.2); -webkit-backdrop-filter: blur(16px) saturate(1.2);">
+        <div class="mx-auto flex h-11 max-w-[1184px] items-center justify-between px-6 lg:px-8">
+            <a href="index.html" class="flex items-center gap-2 no-underline" style="color: var(--th-foreground);">
+                <span class="text-xl leading-none" aria-hidden="true">🌱</span>
+                <span class="th-h3" style="font-size: 1.125rem; color: var(--th-foreground);">沃土之环</span>
+            </a>
+            <div class="flex items-center gap-6">
+                <a href="#" data-dom-id="nav-market" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-foreground);">原料市场</a>
+                <a href="#" data-dom-id="nav-fertilizer" class="th-body-sm no-underline font-semibold" style="color: var(--th-primary);">有机肥商城</a>
+                <a href="#" data-dom-id="nav-about" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-foreground);">关于我们</a>
+                <a href="#" data-dom-id="cta-login" class="inline-flex items-center justify-center whitespace-nowrap rounded-full px-5 py-1.5 text-sm font-semibold no-underline transition-all hover:opacity-90 active:scale-[0.98]" style="background: var(--th-primary); color: var(--th-primary-foreground); font-family: var(--th-font-sans);">登录</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== Hero Banner ===== -->
+    <section class="relative flex min-h-[360px] items-center justify-center overflow-hidden lg:min-h-[440px]">
+        <img src="../assets/image_2_yi19x4.jpg" alt="有机肥产品展示" class="absolute inset-0 w-full h-full object-cover">
+        <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(28,24,20,0.65) 0%, rgba(28,24,20,0.45) 100%);"></div>
+        <div class="relative z-10 mx-auto w-full max-w-[1184px] px-6 text-center lg:px-8">
+            <h1 class="th-h1" style="color: var(--th-background-50); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">有机肥商城</h1>
+            <p class="th-body mt-4 mx-auto max-w-lg" style="color: rgba(255,255,255,0.75); line-height: var(--th-line-height-body);">优质有机肥，滋养每一寸土地</p>
+        </div>
+    </section>
+
+    <!-- ===== Main Content ===== -->
+    <main class="mx-auto max-w-[1184px] px-6 py-8 lg:px-8 lg:py-12">
+
+        <!-- Category Filter + Search/Sort Row -->
+        <div class="flex flex-col gap-6 mb-8">
+
+            <!-- Category Filter Pills -->
+            <div class="flex flex-nowrap overflow-x-auto items-center gap-2 pb-1">
+                <button data-dom-id="filter-all" class="shrink-0 inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-semibold no-underline transition-all hover:opacity-90 active:scale-[0.98]" style="background: var(--th-primary); color: var(--th-primary-foreground); font-family: var(--th-font-sans);">全部</button>
+                <button data-dom-id="filter-bio" class="shrink-0 inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-medium no-underline transition-all hover:opacity-80 active:scale-[0.98]" style="background: var(--th-secondary); color: var(--th-secondary-foreground); font-family: var(--th-font-sans);">生物有机肥</button>
+                <button data-dom-id="filter-compound" class="shrink-0 inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-medium no-underline transition-all hover:opacity-80 active:scale-[0.98]" style="background: var(--th-secondary); color: var(--th-secondary-foreground); font-family: var(--th-font-sans);">复合微生物肥</button>
+                <button data-dom-id="filter-soil" class="shrink-0 inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-medium no-underline transition-all hover:opacity-80 active:scale-[0.98]" style="background: var(--th-secondary); color: var(--th-secondary-foreground); font-family: var(--th-font-sans);">土壤调理剂</button>
+            </div>
+
+            <!-- Search + Sort Row -->
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div class="relative flex-1 max-w-md">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="width: 18px; height: 18px; color: var(--th-muted-foreground);"></i>
+                    <input type="text" placeholder="搜索有机肥产品..." class="w-full rounded-lg border py-2 pl-10 pr-4 text-sm outline-none transition-colors focus:ring-2" style="border-color: var(--th-border); background: var(--th-card); color: var(--th-foreground); font-family: var(--th-font-sans); font-size: var(--th-font-size-sm); --tw-ring-color: var(--th-ring);" data-dom-id="search-input">
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="th-body-sm whitespace-nowrap" style="color: var(--th-muted-foreground);">排序：</span>
+                    <select data-dom-id="sort-select" class="rounded-lg border py-2 px-3 text-sm outline-none cursor-pointer transition-colors focus:ring-2" style="border-color: var(--th-border); background: var(--th-card); color: var(--th-foreground); font-family: var(--th-font-sans); font-size: var(--th-font-size-sm); --tw-ring-color: var(--th-ring);">
+                        <option value="default">默认排序</option>
+                        <option value="price-asc">价格从低到高</option>
+                        <option value="price-desc">价格从高到低</option>
+                        <option value="sales">销量优先</option>
+                        <option value="rating">评分优先</option>
+                    </select>
+                    <span class="th-body-sm" style="color: var(--th-muted-foreground);"><span class="font-semibold" style="color: var(--th-foreground);">12</span> 件商品</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+
+            <!-- Product Card 1 -->
+            <a href="#" data-dom-id="card-product-1" class="group block rounded-[var(--th-radius)] border no-underline overflow-hidden transition-all cursor-pointer" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-sm);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--th-shadow-md)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--th-shadow-sm)';">
+                <div class="relative w-full overflow-hidden" style="aspect-ratio: 4/3;">
+                    <img src="../assets/image_2_yi19x4.jpg" alt="微生物菌剂有机肥" class="w-full h-full object-cover transition-transform group-hover:scale-105" loading="lazy" style="transition-duration: 350ms; transition-timing-function: cubic-bezier(0.32,0.72,0,1);">
+                </div>
+                <div class="flex flex-col gap-2 p-4">
+                    <h3 class="th-h3 truncate" style="font-size: var(--th-font-size-h3); line-height: 1.3;">微生物菌剂有机肥</h3>
+                    <p class="th-body-sm truncate" style="color: var(--th-muted-foreground);">40kg/袋</p>
+                    <div class="flex items-center gap-1 mt-1">
+                        <span class="th-mono" style="font-size: 1.5rem; font-weight: 600; color: var(--th-primary); line-height: 1;">&yen;89</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <div class="flex items-center" style="color: var(--th-brown-400);">
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                        </div>
+                        <span class="th-body-sm" style="font-size: 0.75rem; color: var(--th-muted-foreground);">4.9 · 已售 2,386</span>
+                    </div>
+                    <button data-dom-id="cta-cart-1" class="mt-2 inline-flex items-center justify-center whitespace-nowrap rounded-lg w-full py-2 text-sm font-semibold no-underline transition-all hover:opacity-90 active:scale-[0.98]" style="border: 1px solid var(--th-border); background: transparent; color: var(--th-foreground); font-family: var(--th-font-sans);" onclick="event.preventDefault(); event.stopPropagation();">加入购物车</button>
+                </div>
+            </a>
+
+            <!-- Product Card 2 -->
+            <a href="#" data-dom-id="card-product-2" class="group block rounded-[var(--th-radius)] border no-underline overflow-hidden transition-all cursor-pointer" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-sm);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--th-shadow-md)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--th-shadow-sm)';">
+                <div class="relative w-full overflow-hidden" style="aspect-ratio: 4/3;">
+                    <img src="../assets/image_2_yi19x4.jpg" alt="复合微生物肥料" class="w-full h-full object-cover transition-transform group-hover:scale-105" loading="lazy" style="transition-duration: 350ms; transition-timing-function: cubic-bezier(0.32,0.72,0,1);">
+                </div>
+                <div class="flex flex-col gap-2 p-4">
+                    <h3 class="th-h3 truncate" style="font-size: var(--th-font-size-h3); line-height: 1.3;">复合微生物肥料</h3>
+                    <p class="th-body-sm truncate" style="color: var(--th-muted-foreground);">25kg/袋</p>
+                    <div class="flex items-center gap-1 mt-1">
+                        <span class="th-mono" style="font-size: 1.5rem; font-weight: 600; color: var(--th-primary); line-height: 1;">&yen;128</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <div class="flex items-center" style="color: var(--th-brown-400);">
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="star-half" class="fill-current" style="width: 14px; height: 14px;"></i>
+                        </div>
+                        <span class="th-body-sm" style="font-size: 0.75rem; color: var(--th-muted-foreground);">4.6 · 已售 1,852</span>
+                    </div>
+                    <button data-dom-id="cta-cart-2" class="mt-2 inline-flex items-center justify-center whitespace-nowrap rounded-lg w-full py-2 text-sm font-semibold no-underline transition-all hover:opacity-90 active:scale-[0.98]" style="border: 1px solid var(--th-border); background: transparent; color: var(--th-foreground); font-family: var(--th-font-sans);" onclick="event.preventDefault(); event.stopPropagation();">加入购物车</button>
+                </div>
+            </a>
+
+            <!-- Product Card 3 -->
+            <a href="#" data-dom-id="card-product-3" class="group block rounded-[var(--th-radius)] border no-underline overflow-hidden transition-all cursor-pointer" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-sm);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--th-shadow-md)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--th-shadow-sm)';">
+                <div class="relative w-full overflow-hidden" style="aspect-ratio: 4/3;">
+                    <img src="../assets/image_2_yi19x4.jpg" alt="生物有机肥" class="w-full h-full object-cover transition-transform group-hover:scale-105" loading="lazy" style="transition-duration: 350ms; transition-timing-function: cubic-bezier(0.32,0.72,0,1);">
+                </div>
+                <div class="flex flex-col gap-2 p-4">
+                    <h3 class="th-h3 truncate" style="font-size: var(--th-font-size-h3); line-height: 1.3;">生物有机肥</h3>
+                    <p class="th-body-sm truncate" style="color: var(--th-muted-foreground);">50kg/袋</p>
+                    <div class="flex items-center gap-1 mt-1">
+                        <span class="th-mono" style="font-size: 1.5rem; font-weight: 600; color: var(--th-primary); line-height: 1;">&yen;76</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <div class="flex items-center" style="color: var(--th-brown-400);">
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                        </div>
+                        <span class="th-body-sm" style="font-size: 0.75rem; color: var(--th-muted-foreground);">4.8 · 已售 3,210</span>
+                    </div>
+                    <button data-dom-id="cta-cart-3" class="mt-2 inline-flex items-center justify-center whitespace-nowrap rounded-lg w-full py-2 text-sm font-semibold no-underline transition-all hover:opacity-90 active:scale-[0.98]" style="border: 1px solid var(--th-border); background: transparent; color: var(--th-foreground); font-family: var(--th-font-sans);" onclick="event.preventDefault(); event.stopPropagation();">加入购物车</button>
+                </div>
+            </a>
+
+            <!-- Product Card 4 -->
+            <a href="#" data-dom-id="card-product-4" class="group block rounded-[var(--th-radius)] border no-underline overflow-hidden transition-all cursor-pointer" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-sm);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--th-shadow-md)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--th-shadow-sm)';">
+                <div class="relative w-full overflow-hidden" style="aspect-ratio: 4/3;">
+                    <img src="../assets/image_2_yi19x4.jpg" alt="土壤调理剂" class="w-full h-full object-cover transition-transform group-hover:scale-105" loading="lazy" style="transition-duration: 350ms; transition-timing-function: cubic-bezier(0.32,0.72,0,1);">
+                </div>
+                <div class="flex flex-col gap-2 p-4">
+                    <h3 class="th-h3 truncate" style="font-size: var(--th-font-size-h3); line-height: 1.3;">土壤调理剂</h3>
+                    <p class="th-body-sm truncate" style="color: var(--th-muted-foreground);">20kg/袋</p>
+                    <div class="flex items-center gap-1 mt-1">
+                        <span class="th-mono" style="font-size: 1.5rem; font-weight: 600; color: var(--th-primary); line-height: 1;">&yen;156</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <div class="flex items-center" style="color: var(--th-brown-400);">
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="star-half" class="fill-current" style="width: 14px; height: 14px;"></i>
+                        </div>
+                        <span class="th-body-sm" style="font-size: 0.75rem; color: var(--th-muted-foreground);">4.7 · 已售 1,045</span>
+                    </div>
+                    <button data-dom-id="cta-cart-4" class="mt-2 inline-flex items-center justify-center whitespace-nowrap rounded-lg w-full py-2 text-sm font-semibold no-underline transition-all hover:opacity-90 active:scale-[0.98]" style="border: 1px solid var(--th-border); background: transparent; color: var(--th-foreground); font-family: var(--th-font-sans);" onclick="event.preventDefault(); event.stopPropagation();">加入购物车</button>
+                </div>
+            </a>
+
+            <!-- Product Card 5 -->
+            <a href="#" data-dom-id="card-product-5" class="group block rounded-[var(--th-radius)] border no-underline overflow-hidden transition-all cursor-pointer" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-sm);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--th-shadow-md)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--th-shadow-sm)';">
+                <div class="relative w-full overflow-hidden" style="aspect-ratio: 4/3;">
+                    <img src="../assets/image_2_yi19x4.jpg" alt="腐殖酸有机肥" class="w-full h-full object-cover transition-transform group-hover:scale-105" loading="lazy" style="transition-duration: 350ms; transition-timing-function: cubic-bezier(0.32,0.72,0,1);">
+                </div>
+                <div class="flex flex-col gap-2 p-4">
+                    <h3 class="th-h3 truncate" style="font-size: var(--th-font-size-h3); line-height: 1.3;">腐殖酸有机肥</h3>
+                    <p class="th-body-sm truncate" style="color: var(--th-muted-foreground);">40kg/袋</p>
+                    <div class="flex items-center gap-1 mt-1">
+                        <span class="th-mono" style="font-size: 1.5rem; font-weight: 600; color: var(--th-primary); line-height: 1;">&yen;98</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <div class="flex items-center" style="color: var(--th-brown-400);">
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px; color: var(--th-muted-foreground);"></i>
+                        </div>
+                        <span class="th-body-sm" style="font-size: 0.75rem; color: var(--th-muted-foreground);">4.5 · 已售 896</span>
+                    </div>
+                    <button data-dom-id="cta-cart-5" class="mt-2 inline-flex items-center justify-center whitespace-nowrap rounded-lg w-full py-2 text-sm font-semibold no-underline transition-all hover:opacity-90 active:scale-[0.98]" style="border: 1px solid var(--th-border); background: transparent; color: var(--th-foreground); font-family: var(--th-font-sans);" onclick="event.preventDefault(); event.stopPropagation();">加入购物车</button>
+                </div>
+            </a>
+
+            <!-- Product Card 6 -->
+            <a href="#" data-dom-id="card-product-6" class="group block rounded-[var(--th-radius)] border no-underline overflow-hidden transition-all cursor-pointer" style="border-color: var(--th-border); background: var(--th-card); box-shadow: var(--th-shadow-sm);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--th-shadow-md)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--th-shadow-sm)';">
+                <div class="relative w-full overflow-hidden" style="aspect-ratio: 4/3;">
+                    <img src="../assets/image_2_yi19x4.jpg" alt="氨基酸水溶肥" class="w-full h-full object-cover transition-transform group-hover:scale-105" loading="lazy" style="transition-duration: 350ms; transition-timing-function: cubic-bezier(0.32,0.72,0,1);">
+                </div>
+                <div class="flex flex-col gap-2 p-4">
+                    <h3 class="th-h3 truncate" style="font-size: var(--th-font-size-h3); line-height: 1.3;">氨基酸水溶肥</h3>
+                    <p class="th-body-sm truncate" style="color: var(--th-muted-foreground);">10L/桶</p>
+                    <div class="flex items-center gap-1 mt-1">
+                        <span class="th-mono" style="font-size: 1.5rem; font-weight: 600; color: var(--th-primary); line-height: 1;">&yen;135</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <div class="flex items-center" style="color: var(--th-brown-400);">
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="star" class="fill-current" style="width: 14px; height: 14px;"></i>
+                        </div>
+                        <span class="th-body-sm" style="font-size: 0.75rem; color: var(--th-muted-foreground);">4.8 · 已售 1,523</span>
+                    </div>
+                    <button data-dom-id="cta-cart-6" class="mt-2 inline-flex items-center justify-center whitespace-nowrap rounded-lg w-full py-2 text-sm font-semibold no-underline transition-all hover:opacity-90 active:scale-[0.98]" style="border: 1px solid var(--th-border); background: transparent; color: var(--th-foreground); font-family: var(--th-font-sans);" onclick="event.preventDefault(); event.stopPropagation();">加入购物车</button>
+                </div>
+            </a>
+
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex items-center justify-center gap-1 mt-12">
+            <button data-dom-id="pagination-prev" class="inline-flex items-center justify-center whitespace-nowrap rounded-lg h-9 w-9 text-sm font-medium no-underline transition-all hover:opacity-80 active:scale-[0.98] disabled:opacity-40" style="border: 1px solid var(--th-border); background: transparent; color: var(--th-muted-foreground); font-family: var(--th-font-sans);" disabled>
+                <i data-lucide="chevron-left" style="width: 16px; height: 16px;"></i>
+            </button>
+            <button data-dom-id="pagination-1" class="inline-flex items-center justify-center whitespace-nowrap rounded-lg h-9 w-9 text-sm font-semibold no-underline transition-all hover:opacity-90 active:scale-[0.98]" style="background: var(--th-primary); color: var(--th-primary-foreground); font-family: var(--th-font-sans);">1</button>
+            <button data-dom-id="pagination-2" class="inline-flex items-center justify-center whitespace-nowrap rounded-lg h-9 w-9 text-sm font-medium no-underline transition-all hover:opacity-80 active:scale-[0.98]" style="border: 1px solid var(--th-border); background: transparent; color: var(--th-foreground); font-family: var(--th-font-sans);">2</button>
+            <button data-dom-id="pagination-3" class="inline-flex items-center justify-center whitespace-nowrap rounded-lg h-9 w-9 text-sm font-medium no-underline transition-all hover:opacity-80 active:scale-[0.98]" style="border: 1px solid var(--th-border); background: transparent; color: var(--th-foreground); font-family: var(--th-font-sans);">3</button>
+            <span class="inline-flex items-center justify-center h-9 w-9 text-sm" style="color: var(--th-muted-foreground);">...</span>
+            <button data-dom-id="pagination-6" class="inline-flex items-center justify-center whitespace-nowrap rounded-lg h-9 w-9 text-sm font-medium no-underline transition-all hover:opacity-80 active:scale-[0.98]" style="border: 1px solid var(--th-border); background: transparent; color: var(--th-foreground); font-family: var(--th-font-sans);">6</button>
+            <button data-dom-id="pagination-next" class="inline-flex items-center justify-center whitespace-nowrap rounded-lg h-9 w-9 text-sm font-medium no-underline transition-all hover:opacity-80 active:scale-[0.98]" style="border: 1px solid var(--th-border); background: transparent; color: var(--th-foreground); font-family: var(--th-font-sans);">
+                <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
+            </button>
+        </div>
+
+    </main>
+
+    <!-- ===== Footer ===== -->
+    <footer class="py-16 lg:py-20" style="background: var(--th-background-800);">
+        <div class="mx-auto max-w-[1184px] px-6 lg:px-8">
+            <div class="grid grid-cols-1 gap-10 md:grid-cols-3">
+                <div class="flex flex-col gap-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl leading-none" aria-hidden="true">🌱</span>
+                        <span class="th-h3" style="color: var(--th-text-100);">沃土之环</span>
+                    </div>
+                    <p class="th-body-sm" style="color: var(--th-text-300);">绿色农业 · 循环经济<br>连接农户、企业与司机的一站式平台</p>
+                </div>
+                <div class="flex flex-col gap-3">
+                    <span class="text-sm font-semibold" style="color: var(--th-text-100); font-family: var(--th-font-sans);">快速链接</span>
+                    <a href="#" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-text-300);">原料市场</a>
+                    <a href="#" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-text-300);">有机肥商城</a>
+                    <a href="#" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-text-300);">司机收运</a>
+                    <a href="#" class="th-body-sm no-underline transition-opacity hover:opacity-70" style="color: var(--th-text-300);">关于我们</a>
+                </div>
+                <div class="flex flex-col gap-3">
+                    <span class="text-sm font-semibold" style="color: var(--th-text-100); font-family: var(--th-font-sans);">联系我们</span>
+                    <p class="th-body-sm" style="color: var(--th-text-300);">客服热线：400-888-9999</p>
+                    <p class="th-body-sm" style="color: var(--th-text-300);">邮箱：contact@terrahalo.com</p>
+                    <p class="th-body-sm" style="color: var(--th-text-300);">地址：北京市海淀区中关村科技园</p>
+                </div>
+            </div>
+            <div class="mt-12 border-t pt-8" style="border-color: var(--th-background-700);">
+                <p class="th-body-sm text-center" style="color: var(--th-text-400);">&copy; 2026 沃土之环. 绿色农业 · 循环经济</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@1.7.0/dist/umd/lucide.js"></script>
+    <script>lucide.createIcons();</script>
+
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>原料市场 - 沃土之环</title>
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <script src="assets/vendor/tailwind.js"></script>
+  <script src="assets/vendor/lucide.js"></script>
+  <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--th-background);
+    --color-foreground: var(--th-foreground);
+    --color-card: var(--th-card);
+    --color-card-foreground: var(--th-card-foreground);
+    --color-primary: var(--th-primary);
+    --color-primary-foreground: var(--th-primary-foreground);
+    --color-secondary: var(--th-secondary);
+    --color-secondary-foreground: var(--th-secondary-foreground);
+    --color-muted: var(--th-muted);
+    --color-muted-foreground: var(--th-muted-foreground);
+    --color-accent: var(--th-accent);
+    --color-accent-foreground: var(--th-accent-foreground);
+    --color-border: var(--th-border);
+    --color-input: var(--th-input);
+    --color-ring: var(--th-ring);
+  }
+  </style>
+</head>
+<body class="min-h-screen font-sans antialiased" style="font-family: var(--th-font-sans);">
+  <div id="th-nav"></div>
+
+  <main class="overflow-hidden">
+    <!-- 页面标题 -->
+    <section class="w-full" style="background: var(--th-background);">
+      <div class="mx-auto max-w-[1184px] px-6 lg:px-8 pt-10 pb-4">
+        <div class="flex flex-col gap-3">
+          <h1 class="th-h1">原料市场</h1>
+          <p class="th-body-sm">浏览全国优质农业废弃物原料供给，找到适合您的有机循环资源</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 搜索与筛选 -->
+    <section class="w-full" style="background: var(--th-background);">
+      <div class="mx-auto max-w-[1184px] px-6 lg:px-8 pb-6">
+        <div class="relative mb-5">
+          <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+            <i data-lucide="search" class="w-5 h-5" style="color: var(--th-muted-foreground);"></i>
+          </div>
+          <input id="search-input" type="text" placeholder="搜索原料名称、产地或品类..." class="w-full pl-11 pr-4 py-3 th-body-sm focus:outline-none transition-all" style="background: var(--th-card); border: 1px solid var(--th-border); border-radius: var(--th-radius); color: var(--th-foreground);">
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-nowrap items-center gap-2 overflow-x-auto no-scrollbar" id="category-pills">
+            <button data-cat="all" class="cat-pill inline-flex items-center justify-center whitespace-nowrap px-4 py-2 th-body-sm font-medium transition-all cursor-pointer" style="border-radius: var(--th-radius-full);">全部</button>
+            <button data-cat="chicken" class="cat-pill inline-flex items-center justify-center whitespace-nowrap px-4 py-2 th-body-sm font-medium transition-all cursor-pointer" style="border-radius: var(--th-radius-full);">鸡粪</button>
+            <button data-cat="cattle" class="cat-pill inline-flex items-center justify-center whitespace-nowrap px-4 py-2 th-body-sm font-medium transition-all cursor-pointer" style="border-radius: var(--th-radius-full);">牛粪</button>
+            <button data-cat="straw" class="cat-pill inline-flex items-center justify-center whitespace-nowrap px-4 py-2 th-body-sm font-medium transition-all cursor-pointer" style="border-radius: var(--th-radius-full);">秸秆</button>
+            <button data-cat="other" class="cat-pill inline-flex items-center justify-center whitespace-nowrap px-4 py-2 th-body-sm font-medium transition-all cursor-pointer" style="border-radius: var(--th-radius-full);">其他</button>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="th-body-sm" style="color: var(--th-muted-foreground);">排序</span>
+            <select id="sort-select" class="th-body-sm py-2 pl-3 pr-8 cursor-pointer appearance-none" style="background: var(--th-card); color: var(--th-foreground); border: 1px solid var(--th-border); border-radius: var(--th-radius);">
+              <option value="latest">最新发布</option>
+              <option value="price-asc">价格从低到高</option>
+              <option value="price-desc">价格从高到低</option>
+              <option value="weight-desc">重量从高到低</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 原料卡片网格 -->
+    <section class="w-full" style="background: var(--th-background);">
+      <div class="mx-auto max-w-[1184px] px-6 lg:px-8 pb-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="material-grid"></div>
+        <div id="empty-state" class="hidden flex-col items-center gap-3 py-20 text-center">
+          <span class="text-4xl" aria-hidden="true">🔍</span>
+          <p class="th-body" style="color: var(--th-muted-foreground);">没有找到匹配的原料，换个关键词试试</p>
+        </div>
+        <nav class="flex items-center justify-center gap-2 pt-10" id="pagination" aria-label="分页导航"></nav>
+      </div>
+    </section>
+  </main>
+
+  <div id="th-footer"></div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script>
+    TH.init({ nav: 'public', active: 'market', footer: 'light' });
+
+    var all = [];
+    var state = { cat: 'all', kw: '', sort: 'latest', page: 1 };
+    var PER_PAGE = 6;
+
+    /* 后端数据 → 前端展示字段 归一化 */
+    function fmtTime(iso) {
+      if (!iso) return '';
+      var d = new Date(iso);
+      if (isNaN(d.getTime())) return '';
+      var diff = (Date.now() - d.getTime()) / 1000;
+      if (diff < 3600) return Math.max(1, Math.floor(diff / 60)) + '分钟前';
+      if (diff < 86400) return Math.floor(diff / 3600) + '小时前';
+      if (diff < 86400 * 7) return Math.floor(diff / 86400) + '天前';
+      return (d.getMonth() + 1) + '-' + d.getDate();
+    }
+    function normalize(m) {
+      var unit = m.weight_unit === 'kg' ? 'kg' : '吨';
+      return {
+        id: m.id,
+        name: m.type || '原料',
+        price: m.price,
+        weight: m.quantity || m.estimated_weight || 0,
+        weightUnit: unit,
+        location: m.city || m.location || '',
+        time: fmtTime(m.created_at),
+        status: m.audit_status === 'approved' ? 'pending' : (m.audit_status || 'pending'),
+        cat: (m.type || '') + '|' + (m.category_name || ''),
+        img: (m.images && m.images.length && m.images[0].url) || 'assets/img/image_1_yi19x4.jpg'
+      };
+    }
+    function load() {
+      TH_API.materials.list().then(function (list) {
+        all = (list || []).map(normalize);
+        render();
+      }).catch(function (err) {
+        document.getElementById('empty-state').classList.remove('hidden');
+        document.getElementById('empty-state').classList.add('flex');
+        TH.toast(err.message || '原料数据加载失败', 'error');
+      });
+    }
+
+    function statusBadge(m) {
+      if (m.status !== 'pending') {
+        return '<span class="inline-flex items-center justify-center whitespace-nowrap shrink-0 px-3 py-1 th-body-sm" style="border-radius:var(--th-radius-full); background: color-mix(in srgb, var(--th-brown-100) 70%, transparent); color: var(--th-brown-600);">' + TH.esc(m.statusText || '已匹配') + '</span>';
+      }
+      return '<span class="inline-flex items-center justify-center whitespace-nowrap shrink-0 px-3 py-1 th-body-sm" style="border-radius:var(--th-radius-full); background: var(--th-state-success-surface); color: var(--th-state-success);">待收购</span>';
+    }
+
+    function cardHtml(m) {
+      return '<article class="mat-card flex flex-col overflow-hidden cursor-pointer transition-all" style="border:1px solid var(--th-border); border-radius:var(--th-radius); background:var(--th-card);" data-id="' + m.id + '">' +
+        '<div class="relative w-full overflow-hidden" style="aspect-ratio:16/10; background: linear-gradient(135deg, color-mix(in srgb, var(--th-brown-100) 60%, transparent), color-mix(in srgb, var(--th-brown-200) 40%, transparent));">' +
+          '<img src="' + m.img + '" alt="' + TH.esc(m.name) + '" class="absolute inset-0 w-full h-full object-cover">' +
+        '</div>' +
+        '<div class="flex flex-col gap-3 p-5">' +
+          '<div class="flex items-start justify-between gap-3"><h3 class="th-h3 truncate">' + TH.esc(m.name) + '</h3>' + statusBadge(m) + '</div>' +
+          '<div class="flex items-center gap-4 th-body-sm" style="color:var(--th-muted-foreground);">' +
+            '<span>' + m.weight + m.weightUnit + '</span><span class="w-px h-3" style="background:var(--th-border);"></span>' +
+            '<span>' + TH.esc(m.location) + '</span><span class="w-px h-3" style="background:var(--th-border);"></span>' +
+            '<span class="th-mono" style="color:var(--th-primary); font-weight:600;">¥' + m.price + '/吨</span>' +
+          '</div>' +
+          '<div class="flex items-center justify-between pt-2" style="border-top:1px solid var(--th-border);">' +
+            '<span class="th-body-sm" style="color:var(--th-muted-foreground);">' + TH.esc(m.time) + '</span>' +
+            '<span class="th-body-sm font-medium no-underline inline-flex items-center gap-1" style="color:var(--th-primary);">查看详情 <i data-lucide="arrow-right" class="w-4 h-4"></i></span>' +
+          '</div>' +
+        '</div></article>';
+    }
+
+    function filtered() {
+      var list = all.slice();
+      if (state.cat !== 'all') {
+        var kw = ({ chicken: '鸡粪', cattle: '牛粪', straw: '秸秆' })[state.cat] || '其他';
+        if (kw === '其他') {
+          list = list.filter(function (m) { return m.cat.indexOf('鸡粪') < 0 && m.cat.indexOf('牛粪') < 0 && m.cat.indexOf('秸秆') < 0; });
+        } else {
+          list = list.filter(function (m) { return m.cat.indexOf(kw) !== -1; });
+        }
+      }
+      if (state.kw) {
+        var kw = state.kw.toLowerCase();
+        list = list.filter(function (m) {
+          return (m.name + m.location + m.cat).toLowerCase().indexOf(kw) !== -1;
+        });
+      }
+      if (state.sort === 'price-asc') list.sort(function (a, b) { return a.price - b.price; });
+      else if (state.sort === 'price-desc') list.sort(function (a, b) { return b.price - a.price; });
+      else if (state.sort === 'weight-desc') list.sort(function (a, b) { return b.weight - a.weight; });
+      return list;
+    }
+
+    function renderPills() {
+      document.querySelectorAll('.cat-pill').forEach(function (btn) {
+        var on = btn.getAttribute('data-cat') === state.cat;
+        btn.style.background = on ? 'var(--th-primary)' : 'transparent';
+        btn.style.color = on ? 'var(--th-primary-foreground)' : 'var(--th-muted-foreground)';
+        btn.style.border = on ? 'none' : '1px solid var(--th-border)';
+      });
+    }
+
+    function renderPagination(total) {
+      var pages = Math.max(1, Math.ceil(total / PER_PAGE));
+      var box = document.getElementById('pagination');
+      if (pages <= 1) { box.innerHTML = ''; return; }
+      var html = '<button data-page="prev" class="inline-flex items-center justify-center w-9 h-9 th-body-sm cursor-pointer" style="border-radius:var(--th-radius); background:transparent; color:var(--th-muted-foreground); border:1px solid var(--th-border);' + (state.page <= 1 ? 'opacity:0.5; cursor:not-allowed;' : '') + '"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>';
+      for (var i = 1; i <= pages; i++) {
+        var on = i === state.page;
+        html += '<button data-page="' + i + '" class="inline-flex items-center justify-center w-9 h-9 th-body-sm font-medium cursor-pointer" style="border-radius:var(--th-radius); ' + (on ? 'background:var(--th-primary); color:var(--th-primary-foreground); border:none;' : 'background:transparent; color:var(--th-muted-foreground); border:1px solid var(--th-border);') + '">' + i + '</button>';
+      }
+      html += '<button data-page="next" class="inline-flex items-center justify-center w-9 h-9 th-body-sm cursor-pointer" style="border-radius:var(--th-radius); background:transparent; color:var(--th-muted-foreground); border:1px solid var(--th-border);' + (state.page >= pages ? 'opacity:0.5; cursor:not-allowed;' : '') + '"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>';
+      box.innerHTML = html;
+    }
+
+    function render() {
+      var list = filtered();
+      var total = list.length;
+      var pages = Math.max(1, Math.ceil(total / PER_PAGE));
+      if (state.page > pages) state.page = pages;
+      var start = (state.page - 1) * PER_PAGE;
+      var pageItems = list.slice(start, start + PER_PAGE);
+      var grid = document.getElementById('material-grid');
+      grid.innerHTML = pageItems.map(cardHtml).join('');
+      document.getElementById('empty-state').classList.toggle('hidden', total !== 0);
+      document.getElementById('empty-state').classList.toggle('flex', total === 0);
+      renderPills();
+      renderPagination(total);
+      TH.refreshIcons();
+    }
+
+    document.getElementById('search-input').addEventListener('input', function (e) {
+      state.kw = e.target.value.trim();
+      state.page = 1;
+      render();
+    });
+    document.getElementById('sort-select').addEventListener('change', function (e) {
+      state.sort = e.target.value;
+      state.page = 1;
+      render();
+    });
+    document.getElementById('category-pills').addEventListener('click', function (e) {
+      var btn = e.target.closest('.cat-pill');
+      if (!btn) return;
+      state.cat = btn.getAttribute('data-cat');
+      state.page = 1;
+      render();
+    });
+    document.getElementById('pagination').addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-page]');
+      if (!btn) return;
+      var p = btn.getAttribute('data-page');
+      if (p === 'prev') state.page = Math.max(1, state.page - 1);
+      else if (p === 'next') state.page = state.page + 1;
+      else state.page = parseInt(p, 10);
+      render();
+    });
+    document.getElementById('material-grid').addEventListener('click', function (e) {
+      var card = e.target.closest('.mat-card');
+      if (card) location.href = 'material-detail.html?id=' + card.getAttribute('data-id');
+    });
+
+    load();
+  </script>
+</body>
+</html>

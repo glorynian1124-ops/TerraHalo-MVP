@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>企业工作台 - 沃土之环</title>
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <script src="assets/vendor/tailwind.js"></script>
+  <script src="assets/vendor/lucide.js"></script>
+  <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--th-background);
+    --color-foreground: var(--th-foreground);
+    --color-card: var(--th-card);
+    --color-card-foreground: var(--th-card-foreground);
+    --color-primary: var(--th-primary);
+    --color-primary-foreground: var(--th-primary-foreground);
+    --color-secondary: var(--th-secondary);
+    --color-secondary-foreground: var(--th-secondary-foreground);
+    --color-muted: var(--th-muted);
+    --color-muted-foreground: var(--th-muted-foreground);
+    --color-accent: var(--th-accent);
+    --color-accent-foreground: var(--th-accent-foreground);
+    --color-border: var(--th-border);
+    --color-input: var(--th-input);
+    --color-ring: var(--th-ring);
+  }
+  </style>
+</head>
+<body style="font-family: var(--th-font-sans); margin: 0; background: var(--th-background); color: var(--th-foreground); min-height: 100vh;">
+
+  <!-- 顶部导航 -->
+  <header style="position: fixed; top: 0; left: 0; right: 0; z-index: 50; height: 56px; background: var(--th-card); border-bottom: 1px solid var(--th-border); display: flex; align-items: center; padding: 0 16px;">
+    <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+      <button id="sidebar-toggle" class="lg:hidden" style="background:none;border:none;cursor:pointer;color:var(--th-foreground);padding:4px;display:flex;align-items:center;"><i data-lucide="menu" style="width:20px;height:20px;"></i></button>
+      <span style="font-size: 20px; line-height: 1;">🌱</span>
+      <span class="th-h3" style="font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0;">有机肥厂</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 16px; flex-shrink: 0;">
+      <button id="bell" style="background: none; border: none; cursor: pointer; padding: 4px; color: var(--th-muted-foreground); position: relative; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: var(--th-radius-full);">
+        <i data-lucide="bell" style="width: 20px; height: 20px;"></i>
+        <span style="position: absolute; top: 4px; right: 6px; width: 7px; height: 7px; border-radius: var(--th-radius-full); background: var(--th-state-error);"></span>
+      </button>
+      <button id="user-menu" style="background: none; border: none; cursor: pointer; padding: 0; display: flex; align-items: center; gap: 8px; color: var(--th-foreground); font-size: var(--th-font-size-sm);">
+        <span style="width: 32px; height: 32px; border-radius: var(--th-radius-full); background: var(--th-primary); color: var(--th-primary-foreground); display: flex; align-items: center; justify-content: center; font-size: var(--th-font-size-xs); font-weight: 600;">厂</span>
+        <span class="hidden sm:inline" style="white-space: nowrap;">张厂长</span>
+        <i data-lucide="chevron-down" style="width: 14px; height: 14px; color: var(--th-muted-foreground);"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- 移动端侧栏抽屉 -->
+  <div class="th-drawer" id="sidebar-drawer">
+    <div class="th-drawer-panel" style="right:auto; left:0; transform: translateX(-100%);">
+      <div class="flex items-center justify-between mb-4">
+        <span class="th-h3" style="font-size:1.1rem;">功能导航</span>
+        <button id="sidebar-close" style="background:var(--th-secondary);border:none;width:36px;height:36px;border-radius:var(--th-radius-full);cursor:pointer;color:var(--th-muted-foreground);display:inline-flex;align-items:center;justify-content:center;"><i data-lucide="x" style="width:18px;height:18px;"></i></button>
+      </div>
+      <nav id="sidebar-nav-mobile" class="flex flex-col"></nav>
+    </div>
+  </div>
+
+  <!-- 侧栏 + 主内容 -->
+  <div style="display: flex; padding-top: 56px; min-height: calc(100vh - 56px);">
+    <!-- 桌面侧栏 -->
+    <aside class="hidden lg:flex" style="width: 240px; flex-shrink: 0; background: var(--th-secondary); border-right: 1px solid var(--th-border); padding: 20px 0; flex-direction: column; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto;">
+      <nav id="sidebar-nav" class="flex flex-col"></nav>
+    </aside>
+
+    <!-- 主内容 -->
+    <main style="flex: 1; min-width: 0; padding: 24px 16px;" class="sm:p-6 lg:p-8">
+      <section style="margin-bottom: 24px;">
+        <h1 style="font-size: var(--th-font-size-h2); font-weight: 600; line-height: var(--th-line-height-snug); color: var(--th-foreground); margin: 0 0 4px 0;">欢迎回来，有机肥厂</h1>
+        <p class="th-body-sm" style="margin: 0; color: var(--th-muted-foreground);" id="today-text"></p>
+      </section>
+
+      <!-- KPI -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4" style="margin-bottom: 24px;" id="kpi-cards"></section>
+
+      <!-- 待办 + 收运任务 -->
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-6" style="margin-bottom: 24px;">
+        <div style="min-width: 0;">
+          <h2 class="th-h3" style="margin: 0 0 16px 0;">待办事项</h2>
+          <div class="flex flex-col gap-3" id="todo-list"></div>
+        </div>
+        <div class="lg:col-span-2" style="min-width: 0;">
+          <h2 class="th-h3" style="margin: 0 0 16px 0;">近期收运任务</h2>
+          <div style="border: 1px solid var(--th-border); border-radius: var(--th-radius); background: var(--th-card); box-shadow: var(--th-shadow-xs); overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: var(--th-font-size-sm); min-width: 560px;">
+              <thead>
+                <tr style="border-bottom: 1px solid var(--th-border);">
+                  <th style="padding: 12px 16px; text-align: left; color: var(--th-muted-foreground); font-weight: 500; white-space: nowrap;">任务编号</th>
+                  <th style="padding: 12px 16px; text-align: left; color: var(--th-muted-foreground); font-weight: 500; white-space: nowrap;">原料类型</th>
+                  <th style="padding: 12px 16px; text-align: left; color: var(--th-muted-foreground); font-weight: 500; white-space: nowrap;">司机</th>
+                  <th style="padding: 12px 16px; text-align: left; color: var(--th-muted-foreground); font-weight: 500; white-space: nowrap;">状态</th>
+                  <th style="padding: 12px 16px; text-align: left; color: var(--th-muted-foreground); font-weight: 500; white-space: nowrap;">日期</th>
+                </tr>
+              </thead>
+              <tbody id="task-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 快捷入口 -->
+      <section>
+        <h2 class="th-h3" style="margin: 0 0 16px 0;">快捷入口</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="quick-links"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    var data = TH_DATA.enterprise;
+
+    // 日期
+    var now = new Date();
+    var week = ['日', '一', '二', '三', '四', '五', '六'][now.getDay()];
+    document.getElementById('today-text').textContent = now.getFullYear() + '年' + (now.getMonth() + 1) + '月' + now.getDate() + '日 · 周' + week;
+
+    // 侧栏导航
+    var navItems = [
+      { key: 'dashboard', icon: 'layout-dashboard', label: '工作台' },
+      { key: 'purchase', icon: 'shopping-cart', label: '采购需求' },
+      { key: 'market', icon: 'leaf', label: '原料市场' },
+      { key: 'dispatch', icon: 'truck', label: '收运任务' },
+      { key: 'products', icon: 'package', label: '商品管理' },
+      { key: 'orders', icon: 'clipboard-list', label: '订单管理' },
+      { key: 'settle', icon: 'calculator', label: '结算中心' },
+      { key: 'settings', icon: 'settings', label: '设置' }
+    ];
+    var activeNav = 'dashboard';
+
+    function navItemHtml(item, active) {
+      return '<a href="#" class="nav-item" data-key="' + item.key + '" style="display:flex; align-items:center; gap:12px; padding:10px 20px; text-decoration:none; font-size:var(--th-font-size-sm); border-left:3px solid ' + (active ? 'var(--th-primary)' : 'transparent') + '; color:' + (active ? 'var(--th-foreground)' : 'var(--th-secondary-foreground)') + '; background:' + (active ? 'color-mix(in srgb, var(--th-primary) 5%, transparent)' : 'transparent') + '; font-weight:' + (active ? '600' : '400') + ';">' +
+        '<i data-lucide="' + item.icon + '" style="width:18px; height:18px; color:' + (active ? 'var(--th-primary)' : 'var(--th-muted-foreground)') + ';"></i><span>' + item.label + '</span></a>';
+    }
+
+    function renderNav() {
+      var html = navItems.map(function (i) { return navItemHtml(i, i.key === activeNav); }).join('');
+      document.getElementById('sidebar-nav').innerHTML = html;
+      document.getElementById('sidebar-nav-mobile').innerHTML = navItems.map(function (i) {
+        return '<a href="#" class="th-drawer-link nav-item' + (i.key === activeNav ? ' th-drawer-link-active' : '') + '" data-key="' + i.key + '"><i data-lucide="' + i.icon + '" style="width:18px;height:18px;"></i>' + i.label + '</a>';
+      }).join('');
+      TH.refreshIcons();
+    }
+
+    function handleNavClick(key) {
+      activeNav = key;
+      renderNav();
+      document.getElementById('sidebar-drawer').classList.remove('th-drawer-open');
+      if (key === 'market') { location.href = 'materials.html'; return; }
+      if (key === 'dashboard') { TH.toast('已切换到工作台', 'info'); return; }
+      TH.toast('「' + navItems.find(function (n) { return n.key === key; }).label + '」模块为演示', 'info');
+    }
+
+    document.addEventListener('click', function (e) {
+      var item = e.target.closest('.nav-item');
+      if (item) { e.preventDefault(); handleNavClick(item.getAttribute('data-key')); }
+    });
+
+    // KPI
+    document.getElementById('kpi-cards').innerHTML = data.kpi.map(function (k) {
+      var badge = k.badge ? '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--th-radius-full); background:' + (k.badgeType === 'success' ? 'var(--th-state-success-surface)' : 'var(--th-secondary)') + '; color:' + (k.badgeType === 'success' ? 'var(--th-state-success)' : 'var(--th-secondary-foreground)') + '; font-size:var(--th-font-size-xs); font-weight:600; white-space:nowrap;">' + k.badge + '</span>' : '';
+      return '<div class="kpi-card" style="border:1px solid var(--th-border); border-radius:var(--th-radius); background:var(--th-card); padding:20px; box-shadow:var(--th-shadow-xs); min-width:0;">' +
+        '<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;"><p class="th-body-sm" style="margin:0; color:var(--th-muted-foreground);">' + k.label + '</p>' + badge + '</div>' +
+        '<p class="th-mono" style="margin:0; font-size:var(--th-font-size-h1); font-weight:700; color:var(--th-primary); line-height:var(--th-line-height-tight); white-space:nowrap;">' + k.value + '</p></div>';
+    }).join('');
+
+    // 待办
+    document.getElementById('todo-list').innerHTML = data.todos.map(function (t) {
+      return '<div class="todo-card" style="border:1px solid var(--th-border); border-radius:var(--th-radius); background:var(--th-card); padding:14px 16px; box-shadow:var(--th-shadow-xs); display:flex; align-items:center; justify-content:space-between; gap:12px; min-width:0;">' +
+        '<div style="flex:1; min-width:0;"><p style="margin:0; font-size:var(--th-font-size-sm); font-weight:500; color:var(--th-foreground); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + t.title + '</p>' +
+        '<p class="th-body-sm" style="margin:2px 0 0 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + t.sub + '</p></div>' +
+        '<a href="#" data-todo="' + t.title + '" style="flex-shrink:0; font-size:var(--th-font-size-sm); color:var(--th-primary); text-decoration:none; font-weight:500; white-space:nowrap;">去处理</a></div>';
+    }).join('');
+
+    // 收运任务表
+    document.getElementById('task-tbody').innerHTML = data.tasks.map(function (t) {
+      var statusStyle = t.statusType === 'success' ? 'background:var(--th-state-success-surface); color:var(--th-state-success);' : 'background:var(--th-secondary); color:var(--th-secondary-foreground);';
+      return '<tr style="border-bottom:1px solid var(--th-border);">' +
+        '<td style="padding:12px 16px; white-space:nowrap; font-family:var(--th-font-mono); font-size:var(--th-font-size-xs); color:var(--th-muted-foreground);">' + t.code + '</td>' +
+        '<td style="padding:12px 16px; white-space:nowrap;">' + t.type + '</td>' +
+        '<td style="padding:12px 16px; white-space:nowrap;">' + t.driver + '</td>' +
+        '<td style="padding:12px 16px; white-space:nowrap;"><span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--th-radius-full); font-size:var(--th-font-size-xs); font-weight:600; ' + statusStyle + '">' + t.status + '</span></td>' +
+        '<td style="padding:12px 16px; white-space:nowrap; color:var(--th-muted-foreground);">' + t.date + '</td></tr>';
+    }).join('');
+
+    // 快捷入口
+    var quick = [
+      { icon: 'plus-circle', label: '发布需求', color: 'var(--th-primary)' },
+      { icon: 'search', label: '查看匹配', color: 'var(--th-accent)' },
+      { icon: 'package', label: '管理商品', color: 'var(--th-primary)' }
+    ];
+    document.getElementById('quick-links').innerHTML = quick.map(function (q) {
+      return '<a href="#" class="quick-link" style="border:1px solid var(--th-border); border-radius:var(--th-radius); background:var(--th-card); padding:20px; box-shadow:var(--th-shadow-xs); text-decoration:none; display:flex; align-items:center; justify-content:space-between; min-width:0;">' +
+        '<div style="display:flex; align-items:center; gap:12px; min-width:0;"><span style="width:36px; height:36px; border-radius:var(--th-radius); background:color-mix(in srgb, ' + q.color + ' 10%, transparent); color:' + q.color + '; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><i data-lucide="' + q.icon + '" style="width:20px;height:20px;"></i></span>' +
+        '<span style="font-size:var(--th-font-size-body); font-weight:600; color:var(--th-foreground); white-space:nowrap;">' + q.label + '</span></div>' +
+        '<i data-lucide="arrow-right" style="width:18px;height:18px; color:var(--th-muted-foreground); flex-shrink:0;"></i></a>';
+    }).join('');
+
+    // 交互
+    document.getElementById('bell').addEventListener('click', function () { TH.toast('您有新的系统通知', 'info'); });
+    document.getElementById('user-menu').addEventListener('click', function () { TH.toast('账号：张厂长（企业）', 'info'); });
+    document.getElementById('sidebar-toggle').addEventListener('click', function () { document.getElementById('sidebar-drawer').classList.add('th-drawer-open'); });
+    document.getElementById('sidebar-close').addEventListener('click', function () { document.getElementById('sidebar-drawer').classList.remove('th-drawer-open'); });
+    document.getElementById('sidebar-drawer').addEventListener('click', function (e) { if (e.target === this) this.classList.remove('th-drawer-open'); });
+
+    document.addEventListener('click', function (e) {
+      var todo = e.target.closest('[data-todo]');
+      if (todo) { e.preventDefault(); TH.toast('正在处理「' + todo.getAttribute('data-todo') + '」（演示）', 'info'); }
+      var ql = e.target.closest('.quick-link');
+      if (ql) { e.preventDefault(); TH.toast('「' + ql.textContent.trim() + '」模块为演示', 'info'); }
+    });
+
+    renderNav();
+    TH.refreshIcons();
+  </script>
+
+  <style>
+    .kpi-card, .todo-card, .quick-link { transition: box-shadow var(--th-duration-fast) var(--th-ease), transform var(--th-duration-fast) var(--th-ease); }
+    .kpi-card:hover, .todo-card:hover, .quick-link:hover { box-shadow: var(--th-shadow-md); }
+    .quick-link:hover { transform: translateY(-1px); }
+    tbody tr { transition: background var(--th-duration-fast) var(--th-ease); }
+    tbody tr:hover { background: color-mix(in srgb, var(--th-secondary) 60%, transparent); }
+    #sidebar-drawer .th-drawer-panel { left: 0; right: auto; transform: translateX(-100%); }
+    #sidebar-drawer.th-drawer-open .th-drawer-panel { transform: translateX(0); }
+  </style>
+</body>
+</html>

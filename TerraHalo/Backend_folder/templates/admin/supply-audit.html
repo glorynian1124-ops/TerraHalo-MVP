@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}供给审核 - 沃土之环{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+  <h3 class="mb-3">原料供给审核</h3>
+  <div class="btn-group mb-3">
+    <a href="?status=pending" class="btn btn-outline-warning">待审核</a>
+    <a href="?status=approved" class="btn btn-outline-success">已通过</a>
+    <a href="?status=rejected" class="btn btn-outline-danger">已驳回</a>
+  </div>
+  <table class="table table-striped">
+    <thead><tr><th>编号</th><th>品类</th><th>供应商</th><th>重量</th><th>价格</th><th>产地</th><th>状态</th><th>操作</th></tr></thead>
+    <tbody id="supply-table"><tr><td colspan="8" class="text-center">加载中...</td></tr></tbody>
+  </table>
+</div>
+<script>
+const status = new URLSearchParams(location.search).get('status') || 'pending'
+fetch('/admin/api/audit/supplies?status='+status)
+  .then(r=>r.json()).then(data=>{
+    const tb = document.getElementById('supply-table')
+    if(!data.length){ tb.innerHTML='<tr><td colspan="8" class="text-center">暂无数据</td></tr>'; return }
+    tb.innerHTML = data.map(m=>`
+      <tr>
+        <td>${m.supply_no||'-'}</td><td>${m.type||'-'}</td><td>${m.supplier_name||'-'}</td>
+        <td>${m.estimated_weight||m.quantity||'-'}</td><td>¥${m.price||'-'}</td><td>${m.city||m.location||'-'}</td>
+        <td><span class="badge bg-${m.audit_status==='approved'?'success':m.audit_status==='rejected'?'danger':'warning'}">${m.audit_status}</span></td>
+        <td>${m.audit_status==='pending'?`
+          <button class="btn btn-sm btn-success me-1" onclick="audit(${m.id},'approve')">通过</button>
+          <button class="btn btn-sm btn-danger" onclick="audit(${m.id},'reject')">驳回</button>`:'-'}</td>
+      </tr>`).join('')
+  })
+function audit(id,action){
+  fetch('/api/materials/'+id+'/audit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action})})
+    .then(r=>r.json()).then(d=>{alert(d.message);location.reload()})
+}
+</script>
+{% endblock %}
