@@ -57,9 +57,6 @@ start_dev.bat        # 一键启动 后端(:5000) + 网页端(:8000)，并自动
     │   ├── static/                # 静态资源
     │   ├── utils/                 # 工具函数（认证/加密/装饰器）
     │   └── database/              # 数据库设计文档与 SQL 脚本
-    ├── Frontend_folder/           # 前端占位页（待替换为小程序/React）
-    │   ├── Admin_folder/          # 管理端（Desktop/Mobile/Web）
-    │   └── User_folder/           # 用户端（农户/企业/司机）
 ```
 
 ## 快速启动

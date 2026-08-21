@@ -62,7 +62,6 @@ TerraHalo/
 │   ├── store/               # Pinia state management
 │   └── uni_modules/         # uni-ui components library
 ├── miniapp/                 # uni-app miniapp variant (mirrors TerraHalo/ structure)
-├── Frontend_folder/         # Static HTML placeholders (Admin + User ends)
 └── 01_设计文档/             # Design docs: MVP feature list, wireframes, DB schema
 ```
 
