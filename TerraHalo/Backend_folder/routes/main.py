@@ -11,17 +11,22 @@ main_bp = Blueprint('main', __name__)
 
 @main_bp.route('/')
 def home():
-    """首页"""
-    current_user = get_current_user()
-    materials_list = MaterialSupply.query.filter_by(is_available=True, is_deleted=False)\
-                                         .filter(MaterialSupply.audit_status == 'approved')\
-                                         .order_by(MaterialSupply.created_at.desc())\
-                                         .limit(8).all()
-
-    categories = MaterialCategory.query.filter_by(status='active').order_by(MaterialCategory.sort_no).all()
-
-    return render_template('index.html', current_user=current_user,
-                           materials=materials_list, categories=categories)
+    """后端根路径：提示网页端主界面入口（本服务为 API，前端页面在 TerraHalo-Web）"""
+    return (
+        '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8">'
+        '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
+        '<title>沃土之环 - 后端 API 服务</title>'
+        '<style>body{margin:0;font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;'
+        'background:linear-gradient(135deg,#155724,#1e7e34);color:#fff;min-height:100vh;'
+        'display:flex;align-items:center;justify-content:center;text-align:center}'
+        '.b{max-width:580px;padding:40px 24px}h1{font-size:1.6rem;margin:0 0 12px}'
+        'p{opacity:.9;line-height:1.7}a{color:#fff;font-weight:700}code{background:rgba(255,255,255,.15);'
+        'padding:2px 8px;border-radius:6px}</style></head><body>'
+        '<div class="b"><h1>🌱 沃土之环 · 后端 API 服务</h1>'
+        '<p>本地址（<code>:5000</code>）是后端 API 接口服务，不提供前端界面。</p>'
+        '<p>🎯 网页端主界面请访问：<a href="http://localhost:8000">http://localhost:8000</a><br>'
+        '（请先运行根目录 <code>start_dev.bat</code> 一键启动）</p></div></body></html>'
+    )
 
 
 @main_bp.route('/shop')
