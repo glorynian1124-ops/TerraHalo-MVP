@@ -4,189 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>沃土之环 - 项目入口</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            background: linear-gradient(135deg, #155724 0%, #1e7e34 100%);
-            min-height: 100vh;
-            color: white;
-        }
-        .hero-section { padding: 60px 0 40px; text-align: center; }
-        .card { transition: transform 0.3s; color: #333; }
-        .card:hover { transform: translateY(-5px); }
-        .backend-card { border-left: 5px solid #0d6efd; }
-        .user-card { border-left: 5px solid #198754; }
-        .admin-card { border-left: 5px solid #fd7e14; }
-        .doc-card { border-left: 5px solid #6f42c1; }
-        .badge-pulse { animation: pulse 2s infinite; }
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { opacity: 1; }
-        }
+        body { margin:0; font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif; background:linear-gradient(135deg,#155724 0%,#1e7e34 100%); min-height:100vh; color:#fff; display:flex; align-items:center; justify-content:center; }
+        .box { text-align:center; max-width:680px; padding:40px 24px; }
+        h1 { font-size:2.2rem; margin:0 0 8px; }
+        .lead { opacity:.85; margin:0 0 28px; font-size:1.05rem; }
+        .btn-main { display:inline-block; background:#fff; color:#155724; font-weight:700; text-decoration:none; padding:14px 34px; border-radius:999px; font-size:1.1rem; box-shadow:0 6px 18px rgba(0,0,0,.2); }
+        .note { margin-top:18px; font-size:.85rem; opacity:.75; }
+        .links { margin-top:26px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+        .links a { color:#d9ebd5; font-size:.9rem; }
     </style>
 </head>
 <body>
-    <div class="hero-section">
-        <div class="container">
-            <h1 class="display-3">🌱 沃土之环</h1>
-            <p class="lead mt-3">农业废弃物资源化利用 · 有机肥交易数字化服务平台</p>
-            <hr class="my-4" style="border-color: rgba(255,255,255,0.3);">
-            <p class="mb-0">请选择要访问的模块</p>
+    <div class="box">
+        <h1>🌱 沃土之环</h1>
+        <p class="lead">农业废弃物资源化利用 · 有机肥交易数字化服务平台</p>
+        <a class="btn-main" href="http://localhost:8000/">进入网页端主界面 →</a>
+        <p class="note">提示：请先运行根目录 <code>start_dev.bat</code> 一键启动（后端 :5000 + 网页端 :8000），再访问上方地址。</p>
+        <div class="links">
+            <a href="http://localhost:8000/login.html">登录/注册</a>
+            <a href="http://localhost:8000/materials.html">原料市场</a>
+            <a href="http://localhost:8000/shop.html">有机肥商城</a>
+            <a href="http://localhost:8000/admin.html">管理总控室</a>
+            <a href="README.md">项目文档</a>
         </div>
     </div>
-
-    <div class="container pb-5">
-        <!-- 后端 -->
-        <h2 class="mb-3 text-center">🚀 后端服务</h2>
-        <div class="row mb-4">
-            <div class="col-md-12 mb-3">
-                <div class="card shadow backend-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center flex-wrap">
-                            <div>
-                                <h5 class="card-title">Flask API 服务</h5>
-                                <p class="card-text mb-0">启动命令: <code>cd TerraHalo/Backend_folder && python app.py</code></p>
-                            </div>
-                            <div class="text-end">
-                                <span class="badge bg-secondary">端口 5000</span>
-                                <a href="http://127.0.0.1:5000/" class="btn btn-primary btn-sm ms-2" target="_blank">访问后端</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 用户端 -->
-        <h2 class="mb-3 text-center">👥 用户端</h2>
-        <div class="row mb-4">
-            <div class="col-md-4 mb-3">
-                <div class="card shadow user-card h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">🌾 农户端</h5>
-                        <p class="card-text small">发布原料供给 · 购买有机肥 · 订单管理</p>
-                        <a href="TerraHalo/Frontend_folder/User_folder/Farmar_folder/index.html" class="btn btn-outline-success btn-sm" target="_blank">进入农户端</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <div class="card shadow user-card h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">🏭 企业端</h5>
-                        <p class="card-text small">发布采购需求 · 原料采购 · 商品管理</p>
-                        <a href="TerraHalo/Frontend_folder/User_folder/Enterprise_folder/index.html" class="btn btn-outline-success btn-sm" target="_blank">进入企业端</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <div class="card shadow user-card h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">🚚 司机端</h5>
-                        <p class="card-text small">接单 · 到场打卡 · 运输签收</p>
-                        <a href="TerraHalo/Frontend_folder/User_folder/Driver_folder/index.html" class="btn btn-outline-success btn-sm" target="_blank">进入司机端</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 管理端 -->
-        <h2 class="mb-3 text-center">🔧 管理端</h2>
-        <div class="row mb-4">
-            <div class="col-md-4 mb-3">
-                <div class="card shadow admin-card h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">💻 桌面管理后台</h5>
-                        <p class="card-text small">完整运营管理功能</p>
-                        <a href="TerraHalo/Frontend_folder/Admin_folder/Desktop_folder/index.html" class="btn btn-outline-warning btn-sm" target="_blank">进入</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <div class="card shadow admin-card h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">📱 移动管理</h5>
-                        <p class="card-text small">随时随地运营管理</p>
-                        <a href="TerraHalo/Frontend_folder/Admin_folder/Mobile_folder/index.html" class="btn btn-outline-warning btn-sm" target="_blank">进入</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <div class="card shadow admin-card h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">🌐 Web 管理</h5>
-                        <p class="card-text small">浏览器端管理面板</p>
-                        <a href="TerraHalo/Frontend_folder/Admin_folder/Web_folder/index.html" class="btn btn-outline-warning btn-sm" target="_blank">进入</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 文档 -->
-        <h2 class="mb-3 text-center">📋 项目文档</h2>
-        <div class="row">
-            <div class="col-md-3 mb-3">
-                <div class="card shadow doc-card h-100">
-                    <div class="card-body text-center">
-                        <h6 class="card-title">MVP 功能清单</h6>
-                        <p class="card-text small">功能优先级 + 数据库设计</p>
-                        <a href="TerraHalo/01_设计文档/沃土之环_MVP功能清单_页面结构图_数据库核心表设计.md" class="btn btn-outline-purple btn-sm" target="_blank">查看</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 mb-3">
-                <div class="card shadow doc-card h-100">
-                    <div class="card-body text-center">
-                        <h6 class="card-title">页面原型说明书</h6>
-                        <p class="card-text small">页面框架结构图</p>
-                        <a href="TerraHalo/01_设计文档/沃土之环_页面原型说明书_框架结构图.md" class="btn btn-outline-purple btn-sm" target="_blank">查看</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 mb-3">
-                <div class="card shadow doc-card h-100">
-                    <div class="card-body text-center">
-                        <h6 class="card-title">低保真线框图</h6>
-                        <p class="card-text small">全部页面线框说明</p>
-                        <a href="TerraHalo/01_设计文档/沃土之环_低保真线框图说明.md" class="btn btn-outline-purple btn-sm" target="_blank">查看</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 mb-3">
-                <div class="card shadow doc-card h-100">
-                    <div class="card-body text-center">
-                        <h6 class="card-title">数据库 Schema</h6>
-                        <p class="card-text small">MySQL 建表脚本</p>
-                        <a href="TerraHalo/Backend_folder/database/schema.sql" class="btn btn-outline-purple btn-sm" target="_blank">查看</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 测试账号 -->
-        <div class="row mt-4">
-            <div class="col-md-12">
-                <div class="card shadow" style="color: #333;">
-                    <div class="card-body">
-                        <h5 class="card-title">🧪 测试账号</h5>
-                        <table class="table table-sm mb-0">
-                            <thead><tr><th>角色</th><th>用户名</th><th>密码</th></tr></thead>
-                            <tbody>
-                                <tr><td>🔧 管理员</td><td><code>admin</code></td><td><code>admin123</code></td></tr>
-                                <tr><td>📦 供应商</td><td><code>绿色农场</code></td><td><code>123456</code></td></tr>
-                                <tr><td>🛒 买家</td><td><code>有机肥厂</code></td><td><code>123456</code></td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <footer class="text-center py-3">
-        <p class="mb-0 small">&copy; 2025 沃土之环 · TerraHalo</p>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

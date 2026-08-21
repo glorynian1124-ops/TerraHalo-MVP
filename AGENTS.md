@@ -1,35 +1,52 @@
 # TerraHalo (沃土之环) — AGENTS.md
 
-> Agricultural waste recycling & organic fertilizer trading platform — Flask backend + uni-app frontend, MVP ~15-20%.
+> 农业废弃物资源化利用与商品有机肥交易平台 — Flask 后端 + **TerraHalo-Web 网页端（主界面）** + uni-app（移动端后续）
+> ⚠️ **项目主界面 = TerraHalo-Web 网页端（http://localhost:8000）**，通过根目录 `start_dev.bat` 一键启动。后端 `:5000` 的 Jinja 模板为旧界面，非主入口。
 
 ## Project
 
 - **What**: Digital platform connecting farmers, fertilizer producers, drivers, and operators for agricultural waste recycling and organic fertilizer commerce.
 - **Stack**: Flask 2.3 + SQLAlchemy + bcrypt + Jinja2 (backend); Vue 2/3 + uview-plus + pinia + uni-app (mobile/miniapp); SQLite (dev) → MySQL 8.0 (prod).
-- **Entry points**: `TerraHalo/Backend_folder/app.py` (Flask API), `TerraHalo/TerraHalo/main.js` (uni-app), `TerraHalo/miniapp/main.js` (miniapp variant).
+- **Entry points**:
+  - 🎯 **网页端主界面（推荐）**: `TerraHalo-Web/` → 运行 `start_dev.bat` 后访问 **http://localhost:8000**
+  - 后端 API: `TerraHalo/Backend_folder/app.py`（端口 5000，供网页端调用；其 Jinja 模板为旧界面）
+  - 移动端（后续）: `TerraHalo/TerraHalo/main.js` (uni-app)
 
-## Commands
+## Commands（快速启动）
 
 ```bash
-# Backend
-cd TerraHalo/Backend_folder
-pip install -r requirements.txt   # install deps
-python app.py                     # start dev server on :5000
-flask db upgrade                  # run Alembic migrations (via Flask-Migrate)
+# 🎯 一键启动（推荐）—— 打开网页端主界面
+start_dev.bat
+# 自动启动 后端(:5000) + 网页端(:8000)，并在浏览器打开 http://localhost:8000
 
-# uni-app (requires HBuilderX or uni-app CLI)
-cd TerraHalo/TerraHalo
-npm install                       # install deps
-# Build/distribute via HBuilderX IDE or uni-app CLI
+# 手动启动
+cd TerraHalo-Web
+python -m http.server 8000        # 网页端 → http://localhost:8000
+cd ../TerraHalo/Backend_folder
+pip install -r requirements.txt
+python app.py                     # 后端 API → :5000
+
+# 测试账号
+# 管理员 admin/admin123 | 企业 有机肥厂/123456 | 供应商 绿色农场/123456 | 司机 司机小李/123456
 ```
 
-No test suite exists yet.
+测试：`cd TerraHalo/Backend_folder && python -m pytest tests`（26 项通过）
 
 ## Architecture
 
 ```
+TerraHalo-Web/              # 🎯 网页端主界面（Tailwind + 原生 JS，对接后端 API）
+│   ├── index.html          # 首页
+│   ├── login.html          # 登录/注册
+│   ├── materials.html      # 原料市场
+│   ├── shop.html           # 有机肥商城
+│   ├── enterprise.html     # 企业工作台（企业登录后）
+│   ├── driver.html         # 司机任务中心
+│   ├── admin.html          # 管理总控室（admin 角色）
+│   ├── enterprises.html    # 企业情况总览（admin 角色）
+│   └── assets/js/api.js    # 统一 API 客户端
 TerraHalo/
-├── Backend_folder/          # Flask API + SSR (Jinja2 templates)
+├── Backend_folder/          # Flask API（网页端数据源）
 │   ├── app.py               # create_app(), seed_data(), __main__
 │   ├── config.py            # Config classes (dev/prod/test), env vars
 │   ├── models/              # SQLAlchemy ORM: user, supply, order, product, logistics, system

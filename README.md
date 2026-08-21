@@ -17,6 +17,23 @@
 
 **架构定位**：一套后端 + 多端前端。Flask 后端是唯一数据源（REST API + SQLAlchemy + MySQL），网页端 / APP / 小程序均为客户端，共享同一套后端 API。
 
+## 🚀 快速进入（网页端主界面）
+
+```bash
+start_dev.bat        # 一键启动 后端(:5000) + 网页端(:8000)，并自动打开浏览器
+```
+
+**浏览器访问 http://localhost:8000** ← 项目主界面（`TerraHalo-Web` 网页端）
+
+| 入口 | 地址 | 说明 |
+| --- | --- | --- |
+| 🎯 网页端主界面 | http://localhost:8000 | TerraHalo-Web（推荐） |
+| 🔧 管理总控室 | http://localhost:8000/admin.html | admin 角色 |
+| 🏭 企业情况 | http://localhost:8000/enterprises.html | admin 角色 |
+| ⚙️ 后端 API | http://localhost:5000 | Flask API（其 Jinja 模板为旧界面） |
+
+> ⚠️ 提示：`TerraHalo/Backend_folder/templates` 下的 Jinja 页面为**旧版界面**，不是项目主入口。
+
 ## 目录结构
 
 ```
