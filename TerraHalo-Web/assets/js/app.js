@@ -90,6 +90,36 @@
     }
   };
 
+  /* ---------- 原料采购车（厂商购买原料） ---------- */
+  var MaterialCart = {
+    LS: 'th_mat_cart',
+    list: function () { return read(this.LS, []); },
+    _save: function (list) { write(this.LS, list); },
+    count: function () { return this.list().reduce(function (a, c) { return a + c.qty; }, 0); },
+    totalWeight: function () { return this.list().reduce(function (a, c) { return a + c.qty; }, 0); },
+    total: function () { return this.list().reduce(function (a, c) { return a + c.qty * c.price; }, 0); },
+    add: function (item) {
+      var list = this.list();
+      var found = list.find(function (c) { return c.id === item.id; });
+      if (found) { found.qty += item.qty || 1; }
+      else { list.push(Object.assign({}, item, { qty: item.qty || 1 })); }
+      this._save(list);
+    },
+    setQty: function (id, qty) {
+      var list = this.list();
+      var found = list.find(function (c) { return String(c.id) === String(id); });
+      if (found) {
+        found.qty = qty;
+        if (found.qty <= 0) list = list.filter(function (c) { return String(c.id) !== String(id); });
+      }
+      this._save(list);
+    },
+    remove: function (id) {
+      this._save(this.list().filter(function (c) { return String(c.id) !== String(id); }));
+    },
+    clear: function () { write(this.LS, []); }
+  };
+
   /* ---------- 登录态 ---------- */
   var Auth = {
     current: function () { return read(LS_USER, null); },
@@ -250,7 +280,7 @@
           '<a href="index.html" class="flex items-center gap-2 no-underline" style="color:var(--th-foreground);">' +
             '<span class="text-xl leading-none" aria-hidden="true">🌱</span>' +
             '<span class="th-h3" style="font-size:1.125rem; color:var(--th-foreground);">沃土之环</span></a>' +
-          '<div class="hidden md:flex items-center gap-6">' + linkHtml + '</div>' +
+          '<div class="hidden md:flex items-center gap-6 th-nav-links">' + linkHtml + '</div>' +
           '<div class="flex items-center gap-2 sm:gap-3">' + cartHtml + authHtml +
             '<button data-nav-toggle class="md:hidden inline-flex items-center justify-center w-10 h-10" style="color:var(--th-foreground);background:transparent;border:none;cursor:pointer;border-radius:var(--th-radius-sm);" aria-label="菜单"><span data-lucide="menu" style="width:20px;height:20px;"></span></button>' +
           '</div>' +
@@ -371,6 +401,18 @@
     renderCartPanel();
   }
 
+  /* ---------- 退出登录（右上角统一按钮） ---------- */
+  function bindLogout() {
+    var btn = document.getElementById('logout-btn');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      Auth.logout();
+      toast('已退出登录', 'info');
+      setTimeout(function () { location.href = 'index.html'; }, 400);
+    });
+  }
+  bindLogout();
+
   /* ---------- 初始化入口 ---------- */
   function init(options) {
     options = options || {};
@@ -390,6 +432,7 @@
     refreshIcons: refreshIcons,
     Cart: Cart,
     Auth: Auth,
+    MaterialCart: MaterialCart,
     updateCartBadge: updateCartBadge,
     renderCartPanel: renderCartPanel
   };

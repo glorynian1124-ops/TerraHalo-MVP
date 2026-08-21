@@ -26,6 +26,10 @@
     --color-ring: var(--th-ring);
   }
   </style>
+  <style>
+    /* 隐藏顶部导航中的小标题链接（首页/原料市场/有机肥商城/关于我们），保持整洁 */
+    #th-nav .th-nav-links { display: none !important; }
+  </style>
 </head>
 <body class="min-h-screen font-sans antialiased" style="font-family: var(--th-font-sans);">
   <div id="th-nav"></div>
@@ -153,9 +157,9 @@
             '<span>' + TH.esc(m.location) + '</span><span class="w-px h-3" style="background:var(--th-border);"></span>' +
             '<span class="th-mono" style="color:var(--th-primary); font-weight:600;">¥' + m.price + '/吨</span>' +
           '</div>' +
-          '<div class="flex items-center justify-between pt-2" style="border-top:1px solid var(--th-border);">' +
+          '<div class="flex items-center justify-between gap-2 pt-2" style="border-top:1px solid var(--th-border);">' +
             '<span class="th-body-sm" style="color:var(--th-muted-foreground);">' + TH.esc(m.time) + '</span>' +
-            '<span class="th-body-sm font-medium no-underline inline-flex items-center gap-1" style="color:var(--th-primary);">查看详情 <i data-lucide="arrow-right" class="w-4 h-4"></i></span>' +
+            '<button data-add-mat="' + m.id + '" title="加入原料采购车" style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--th-radius-full);border:none;background:var(--th-primary);color:var(--th-primary-foreground);font-size:var(--th-font-size-xs);font-weight:600;cursor:pointer;white-space:nowrap;"><i data-lucide="shopping-cart" style="width:14px;height:14px;"></i>加入采购车</button>' +
           '</div>' +
         '</div></article>';
     }
@@ -247,11 +251,57 @@
       render();
     });
     document.getElementById('material-grid').addEventListener('click', function (e) {
+      var addBtn = e.target.closest('[data-add-mat]');
+      if (addBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        var id = addBtn.getAttribute('data-add-mat');
+        var m = all.find(function (x) { return String(x.id) === String(id); });
+        if (m) {
+          TH.MaterialCart.add({ id: m.id, name: m.name, price: m.price, unit: '吨', img: m.img, supplier: m.supplier, location: m.location, weight: m.weight });
+          updateMatCartBadge();
+          TH.toast('已加入原料采购车：' + m.name, 'success');
+        }
+        return;
+      }
       var card = e.target.closest('.mat-card');
       if (card) location.href = 'material-detail.html?id=' + card.getAttribute('data-id');
     });
 
+    // 厂商购买原料：顶部购物车图标 → 原料采购车页面
+    var matCartBtn = document.querySelector('[data-cart-toggle]');
+    if (matCartBtn) {
+      var nc = matCartBtn.cloneNode(true);
+      nc.removeAttribute('data-cart-toggle');
+      var badgeEl = nc.querySelector('[data-cart-count]');
+      if (badgeEl) { badgeEl.setAttribute('data-mat-count', ''); badgeEl.removeAttribute('data-cart-count'); }
+      matCartBtn.parentNode.replaceChild(nc, matCartBtn);
+      nc.addEventListener('click', function (e) { e.stopPropagation(); location.href = 'material-cart.html'; });
+    }
+    function updateMatCartBadge() {
+      var badge = document.querySelector('[data-mat-count]');
+      if (!badge) return;
+      var n = TH.MaterialCart.count();
+      badge.textContent = n;
+      badge.style.display = n > 0 ? 'flex' : 'none';
+    }
+    updateMatCartBadge();
+
     load();
+  </script>
+
+  <!-- 左下角返回按钮 -->
+  <button id="back-float" title="返回上一页" style="position:fixed;left:20px;bottom:20px;z-index:60;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:var(--th-radius-full);border:1px solid var(--th-border);background:var(--th-card);color:var(--th-foreground);box-shadow:var(--th-shadow-lg);cursor:pointer;font-size:var(--th-font-size-sm);font-weight:600;transition:box-shadow var(--th-duration-fast) var(--th-ease),transform var(--th-duration-fast) var(--th-ease);">
+    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 10 4 15 9 20"></polyline><path d="M20 4v7a4 4 0 0 1-4 4H4"></path></svg>
+    返回
+  </button>
+  <script>
+    (function () {
+      var backBtn = document.getElementById('back-float');
+      if (backBtn) backBtn.addEventListener('click', function () {
+        location.href = 'enterprise.html';
+      });
+    })();
   </script>
 </body>
 </html>

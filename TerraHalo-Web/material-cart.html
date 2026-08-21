@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>原料采购车 - 沃土之环</title>
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <script src="assets/vendor/tailwind.js"></script>
+  <script src="assets/vendor/lucide.js"></script>
+  <style>
+    .cart-item { transition: box-shadow var(--th-duration-fast) var(--th-ease); }
+    .cart-item:hover { box-shadow: var(--th-shadow-md); }
+    .mc-qty-btn { width: 28px; height: 28px; border-radius: var(--th-radius-sm); border: 1px solid var(--th-border); background: var(--th-card); color: var(--th-foreground); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
+    .mc-qty-btn:hover { background: var(--th-secondary); }
+  </style>
+</head>
+<body style="font-family: var(--th-font-sans); margin: 0; background: var(--th-background); color: var(--th-foreground); min-height: 100vh;">
+
+  <!-- 简洁顶栏 -->
+  <header style="position: sticky; top: 0; z-index: 40; height: 56px; background: var(--th-card); border-bottom: 1px solid var(--th-border); display: flex; align-items: center; padding: 0 16px;">
+    <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+      <a href="materials.html" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: var(--th-muted-foreground); font-size: var(--th-font-size-sm); padding: 6px 12px; border-radius: var(--th-radius-full); background: var(--th-secondary);">
+        <i data-lucide="arrow-left" style="width: 15px; height: 15px;"></i>原料市场
+      </a>
+      <span style="width: 1px; height: 20px; background: var(--th-border);"></span>
+      <span style="font-size: 20px; line-height: 1;">🌱</span>
+      <span class="th-h3" style="font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0;">原料采购车</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+      <span style="width: 30px; height: 30px; border-radius: var(--th-radius-full); background: var(--th-primary); color: var(--th-primary-foreground); display: flex; align-items: center; justify-content: center; font-size: var(--th-font-size-xs); font-weight: 600;">厂</span>
+      <span style="font-size: var(--th-font-size-sm); white-space: nowrap;">有机肥厂</span>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-[960px] px-4 sm:px-6 py-8" style="min-height: calc(100vh - 56px);">
+    <!-- 标题区 -->
+    <section style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 24px;">
+      <div>
+        <h1 style="font-size: var(--th-font-size-h2); font-weight: 600; line-height: var(--th-line-height-snug); color: var(--th-foreground); margin: 0 0 4px 0;">原料采购车</h1>
+        <p class="th-body-sm" style="margin: 0; color: var(--th-muted-foreground);">面向厂商的批量原料采购清单，按吨计量，一键提交采购订单</p>
+      </div>
+      <button id="clear-cart" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: var(--th-radius-full); border: 1px solid var(--th-border); background: var(--th-card); color: var(--th-muted-foreground); font-size: var(--th-font-size-sm); cursor: pointer;">
+        <i data-lucide="trash-2" style="width: 15px; height: 15px;"></i>清空
+      </button>
+    </section>
+
+    <!-- 空车状态 -->
+    <div id="empty-state" class="hidden flex-col items-center justify-center" style="border: 1px dashed var(--th-border); border-radius: var(--th-radius); background: var(--th-card); padding: 60px 20px; text-align: center;">
+      <span style="width: 64px; height: 64px; border-radius: var(--th-radius-full); background: var(--th-secondary); color: var(--th-muted-foreground); display: flex; align-items: center; justify-content: center; margin-bottom: 16px;"><i data-lucide="shopping-cart" style="width: 30px; height: 30px;"></i></span>
+      <h3 style="margin: 0 0 6px 0; font-size: var(--th-font-size-h3); color: var(--th-foreground);">采购车还是空的</h3>
+      <p class="th-body-sm" style="margin: 0 0 20px 0; color: var(--th-muted-foreground);">去原料市场挑选合适的农业废弃物原料，加入采购车</p>
+      <a href="materials.html" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; border-radius: var(--th-radius-full); background: var(--th-primary); color: var(--th-primary-foreground); text-decoration: none; font-size: var(--th-font-size-sm); font-weight: 600;"><i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>去原料市场</a>
+    </div>
+
+    <!-- 采购车列表 -->
+    <div class="flex flex-col gap-4" id="cart-list" style="margin-bottom: 24px;"></div>
+
+    <!-- 汇总 -->
+    <section id="summary-box" style="border: 1px solid var(--th-border); border-radius: var(--th-radius); background: var(--th-card); padding: 22px 24px; box-shadow: var(--th-shadow-xs);">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6" style="margin-bottom: 20px;">
+        <div>
+          <p class="th-body-sm" style="margin: 0 0 2px 0; color: var(--th-muted-foreground);">采购总量</p>
+          <p class="th-mono" style="margin: 0; font-size: var(--th-font-size-h3); font-weight: 700; color: var(--th-primary);"><span id="sum-tons">0</span> 吨</p>
+        </div>
+        <div>
+          <p class="th-body-sm" style="margin: 0 0 2px 0; color: var(--th-muted-foreground);">供应商</p>
+          <p class="th-mono" style="margin: 0; font-size: var(--th-font-size-h3); font-weight: 700; color: var(--th-foreground);"><span id="sum-suppliers">0</span> 家</p>
+        </div>
+        <div>
+          <p class="th-body-sm" style="margin: 0 0 2px 0; color: var(--th-muted-foreground);">预估金额</p>
+          <p class="th-mono" style="margin: 0; font-size: var(--th-font-size-h3); font-weight: 700; color: var(--th-primary);"><span id="sum-total">¥0</span></p>
+        </div>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--th-border); padding-top: 18px;">
+        <p class="th-body-sm" style="margin: 0; color: var(--th-muted-foreground);">提交后将生成原料采购订单，由平台撮合供应商与物流</p>
+        <button id="submit-order" style="display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; border-radius: var(--th-radius-full); border: none; background: var(--th-primary); color: var(--th-primary-foreground); font-size: var(--th-font-size-sm); font-weight: 600; cursor: pointer; box-shadow: var(--th-shadow-sm);">
+          <i data-lucide="send" style="width: 16px; height: 16px;"></i>提交采购订单
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- 左下角返回按钮 -->
+  <button id="back-float" title="返回原料市场" style="position: fixed; left: 20px; bottom: 20px; z-index: 60; display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: var(--th-radius-full); border: 1px solid var(--th-border); background: var(--th-card); color: var(--th-foreground); box-shadow: var(--th-shadow-lg); cursor: pointer; font-size: var(--th-font-size-sm); font-weight: 600;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 10 4 15 9 20"></polyline><path d="M20 4v7a4 4 0 0 1-4 4H4"></path></svg>
+    返回
+  </button>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+
+    function fmtMoney(n) {
+      return '¥' + Math.round(n).toLocaleString('zh-CN');
+    }
+
+    function render() {
+      var list = TH.MaterialCart.list();
+      var host = document.getElementById('cart-list');
+      var empty = document.getElementById('empty-state');
+      var summary = document.getElementById('summary-box');
+      if (!list.length) {
+        host.innerHTML = '';
+        empty.classList.remove('hidden');
+        empty.classList.add('flex');
+        summary.style.opacity = '0.5';
+        document.getElementById('sum-tons').textContent = '0';
+        document.getElementById('sum-suppliers').textContent = '0';
+        document.getElementById('sum-total').textContent = '¥0';
+        return;
+      }
+      empty.classList.add('hidden');
+      empty.classList.remove('flex');
+      summary.style.opacity = '1';
+      host.innerHTML = list.map(function (c) {
+        var sub = c.qty * c.price;
+        return '<div class="cart-item" style="border:1px solid var(--th-border); border-radius:var(--th-radius); background:var(--th-card); padding:16px; display:flex; align-items:center; gap:16px; box-shadow:var(--th-shadow-xs);">' +
+          '<img src="' + c.img + '" alt="' + esc(c.name) + '" style="width:72px; height:72px; border-radius:var(--th-radius-sm); object-fit:cover; flex-shrink:0; background:var(--th-secondary);">' +
+          '<div style="flex:1; min-width:0;">' +
+            '<div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:4px;">' +
+              '<h3 style="margin:0; font-size:var(--th-font-size-body); font-weight:600; color:var(--th-foreground); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + esc(c.name) + '</h3>' +
+              '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--th-radius-full);background:var(--th-secondary);color:var(--th-secondary-foreground);font-size:var(--th-font-size-xs);font-weight:500;">' + esc(c.supplier || '') + '</span>' +
+            '</div>' +
+            '<p class="th-body-sm" style="margin:0 0 8px 0; color:var(--th-muted-foreground);">' + esc(c.location || '') + ' · <span class="th-mono" style="color:var(--th-primary); font-weight:600;">¥' + c.price + '/吨</span></p>' +
+            '<div style="display:flex; align-items:center; gap:12px;">' +
+              '<div style="display:flex; align-items:center; gap:8px;">' +
+                '<button data-mc="dec" data-id="' + c.id + '" class="mc-qty-btn" style="..."><i data-lucide="minus" style="width:14px;height:14px;"></i></button>' +
+                '<span style="min-width:44px; text-align:center; font-weight:600; color:var(--th-foreground);">' + c.qty + ' 吨</span>' +
+                '<button data-mc="inc" data-id="' + c.id + '" class="mc-qty-btn" style="..."><i data-lucide="plus" style="width:14px;height:14px;"></i></button>' +
+              '</div>' +
+              '<span class="th-mono" style="font-size:var(--th-font-size-sm); font-weight:700; color:var(--th-primary);">' + fmtMoney(sub) + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<button data-mc="remove" data-id="' + c.id + '" title="移除" style="background:none;border:none;color:var(--th-muted-foreground);cursor:pointer;padding:6px;flex-shrink:0;"><i data-lucide="x" style="width:18px;height:18px;"></i></button>' +
+        '</div>';
+      }).join('');
+      renderSummary();
+      TH.refreshIcons();
+    }
+
+    function renderSummary() {
+      var list = TH.MaterialCart.list();
+      var tons = TH.MaterialCart.totalWeight();
+      var total = TH.MaterialCart.total();
+      var suppliers = {};
+      list.forEach(function (c) { suppliers[c.supplier] = true; });
+      document.getElementById('sum-tons').textContent = tons;
+      document.getElementById('sum-suppliers').textContent = Object.keys(suppliers).length;
+      document.getElementById('sum-total').textContent = fmtMoney(total);
+    }
+
+    document.getElementById('cart-list').addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-mc]');
+      if (!btn) return;
+      var id = btn.getAttribute('data-id');
+      var type = btn.getAttribute('data-mc');
+      var cur = TH.MaterialCart.list().find(function (c) { return String(c.id) === String(id); });
+      if (!cur) return;
+      if (type === 'inc') TH.MaterialCart.setQty(id, cur.qty + 1);
+      else if (type === 'dec') TH.MaterialCart.setQty(id, cur.qty - 1);
+      else if (type === 'remove') TH.MaterialCart.remove(id);
+      render();
+    });
+
+    document.getElementById('clear-cart').addEventListener('click', function () {
+      if (!TH.MaterialCart.list().length) { TH.toast('采购车已是空的', 'info'); return; }
+      TH.MaterialCart.clear();
+      render();
+      TH.toast('已清空原料采购车', 'info');
+    });
+
+    document.getElementById('submit-order').addEventListener('click', function () {
+      var list = TH.MaterialCart.list();
+      if (!list.length) { TH.toast('请先加入原料', 'error'); return; }
+      var tons = TH.MaterialCart.totalWeight();
+      var total = TH.MaterialCart.total();
+      TH.MaterialCart.clear();
+      render();
+      TH.toast('原料采购订单已提交：共 ' + tons + ' 吨，约 ' + fmtMoney(total) + '（演示）', 'success');
+    });
+
+    document.getElementById('back-float').addEventListener('click', function () {
+      if (window.history.length > 1) { window.history.back(); } else { location.href = 'materials.html'; }
+    });
+
+    render();
+    TH.refreshIcons();
+  </script>
+</body>
+</html>

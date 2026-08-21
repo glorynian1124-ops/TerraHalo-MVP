@@ -39,15 +39,31 @@
     <div style="display: flex; align-items: center; gap: 16px; flex-shrink: 0;">
       <button id="bell" style="background: none; border: none; cursor: pointer; padding: 4px; color: var(--th-muted-foreground); position: relative; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: var(--th-radius-full);">
         <i data-lucide="bell" style="width: 20px; height: 20px;"></i>
-        <span style="position: absolute; top: 4px; right: 6px; width: 7px; height: 7px; border-radius: var(--th-radius-full); background: var(--th-state-error);"></span>
+        <span id="bell-dot" style="position: absolute; top: 4px; right: 6px; width: 7px; height: 7px; border-radius: var(--th-radius-full); background: var(--th-state-error);"></span>
       </button>
       <button id="user-menu" style="background: none; border: none; cursor: pointer; padding: 0; display: flex; align-items: center; gap: 8px; color: var(--th-foreground); font-size: var(--th-font-size-sm);">
         <span style="width: 32px; height: 32px; border-radius: var(--th-radius-full); background: var(--th-primary); color: var(--th-primary-foreground); display: flex; align-items: center; justify-content: center; font-size: var(--th-font-size-xs); font-weight: 600;">厂</span>
         <span class="hidden sm:inline" style="white-space: nowrap;">张厂长</span>
         <i data-lucide="chevron-down" style="width: 14px; height: 14px; color: var(--th-muted-foreground);"></i>
       </button>
+      <button id="logout-btn" class="inline-flex items-center gap-1.5 rounded-full h-9 px-3.5 text-sm font-medium transition-opacity hover:opacity-80" style="background:var(--th-secondary); color:var(--th-secondary-foreground); border:1px solid var(--th-border); cursor:pointer;" title="退出登录">
+        <i data-lucide="log-out" style="width:16px;height:16px;"></i>
+        <span class="hidden sm:inline">退出</span>
+      </button>
     </div>
   </header>
+
+  <!-- 通知待办面板 -->
+  <div id="bell-panel" style="display:none; position:fixed; top:62px; right:16px; width:330px; max-width:calc(100vw - 32px); background:var(--th-card); border:1px solid var(--th-border); border-radius:var(--th-radius); box-shadow:var(--th-shadow-lg); z-index:60; overflow:hidden;">
+    <div style="padding:14px 16px; border-bottom:1px solid var(--th-border); display:flex; align-items:center; justify-content:space-between; gap:12px;">
+      <span class="th-h3" style="font-size:1rem; margin:0;">待办事项</span>
+      <span id="bell-count" style="display:inline-flex;align-items:center;padding:2px 10px;border-radius:var(--th-radius-full);background:var(--th-state-error);color:#fff;font-size:var(--th-font-size-xs);font-weight:600;">0</span>
+    </div>
+    <div id="bell-list" style="max-height:340px; overflow-y:auto;"></div>
+    <div style="padding:10px 16px; border-top:1px solid var(--th-border); text-align:center;">
+      <a href="#" id="bell-clear" style="font-size:var(--th-font-size-sm); color:var(--th-muted-foreground); text-decoration:none;">全部已读</a>
+    </div>
+  </div>
 
   <!-- 移动端侧栏抽屉 -->
   <div class="th-drawer" id="sidebar-drawer">
@@ -69,6 +85,7 @@
 
     <!-- 主内容 -->
     <main style="flex: 1; min-width: 0; padding: 24px 16px;" class="sm:p-6 lg:p-8">
+      <div id="page-content">
       <section style="margin-bottom: 24px;">
         <h1 style="font-size: var(--th-font-size-h2); font-weight: 600; line-height: var(--th-line-height-snug); color: var(--th-foreground); margin: 0 0 4px 0;">欢迎回来，有机肥厂</h1>
         <p class="th-body-sm" style="margin: 0; color: var(--th-muted-foreground);" id="today-text"></p>
@@ -107,6 +124,7 @@
         <h2 class="th-h3" style="margin: 0 0 16px 0;">快捷入口</h2>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="quick-links"></div>
       </section>
+      </div><!-- /page-content -->
     </main>
   </div>
 
@@ -132,6 +150,7 @@
       { key: 'settings', icon: 'settings', label: '设置' }
     ];
     var activeNav = 'dashboard';
+    var dashboardHtml = null;
 
     function navItemHtml(item, active) {
       return '<a href="#" class="nav-item" data-key="' + item.key + '" style="display:flex; align-items:center; gap:12px; padding:10px 20px; text-decoration:none; font-size:var(--th-font-size-sm); border-left:3px solid ' + (active ? 'var(--th-primary)' : 'transparent') + '; color:' + (active ? 'var(--th-foreground)' : 'var(--th-secondary-foreground)') + '; background:' + (active ? 'color-mix(in srgb, var(--th-primary) 5%, transparent)' : 'transparent') + '; font-weight:' + (active ? '600' : '400') + ';">' +
@@ -152,8 +171,1362 @@
       renderNav();
       document.getElementById('sidebar-drawer').classList.remove('th-drawer-open');
       if (key === 'market') { location.href = 'materials.html'; return; }
-      if (key === 'dashboard') { TH.toast('已切换到工作台', 'info'); return; }
+      if (key === 'dashboard') { showDashboard(); return; }
+      if (key === 'purchase') { showPurchase(); return; }
+      if (key === 'dispatch') { showDispatch(); return; }
+      if (key === 'products') { showProducts(); return; }
+      if (key === 'orders') { showOrders(); return; }
+      if (key === 'settle') { showSettle(); return; }
+      if (key === 'settings') { showSettings(); return; }
       TH.toast('「' + navItems.find(function (n) { return n.key === key; }).label + '」模块为演示', 'info');
+    }
+
+    function showDashboard() {
+      document.getElementById('page-content').innerHTML = dashboardHtml;
+      renderDashboard();
+      TH.refreshIcons();
+    }
+
+    /* =====================================================
+       采购需求视图
+       ===================================================== */
+    // 统计卡片元数据（value 由 purchaseList 动态计算）
+    var purchaseStats = [
+      { label: '采购需求', sub: '全部需求', icon: 'clipboard-list', color: 'var(--th-primary)' },
+      { label: '进行中', sub: '含待匹配', icon: 'loader', color: 'var(--th-state-info)' },
+      { label: '待审核', sub: '等待平台审核', icon: 'clock', color: 'var(--th-state-warning)' },
+      { label: '本月新增', sub: '本月发布的需求', icon: 'trending-up', color: 'var(--th-state-success)' }
+    ];
+
+    // 根据实际列表动态计算统计值：[总数, 进行中, 待审核, 本月新增]
+    function purchaseStatValues() {
+      var cnt = function (t) { return purchaseList.filter(function (p) { return p.statusType === t; }).length; };
+      var now = new Date();
+      var prefix = now.getFullYear() + '-' + (now.getMonth() + 1 < 10 ? '0' : '') + (now.getMonth() + 1);
+      var monthly = purchaseList.filter(function (p) { return p.date.indexOf(prefix) === 0; }).length;
+      return [purchaseList.length, cnt('success'), cnt('warning'), monthly];
+    }
+
+    var purchaseList = [
+      // 进行中（4）
+      { no: 'DMD-2026-0601', category: '鸡粪', weight: '50 吨', priceMin: 150, priceMax: 200, radius: 80, matches: 4, status: '进行中', statusType: 'success', date: '2026-08-01', quality: '含水率≤30%，无沙石杂质' },
+      { no: 'DMD-2026-0603', category: '秸秆', weight: '200 吨', priceMin: 50, priceMax: 80, radius: 100, matches: 6, status: '进行中', statusType: 'success', date: '2026-08-03', quality: '含水率低，颗粒均匀' },
+      { no: 'DMD-2026-0606', category: '牛粪', weight: '100 吨', priceMin: 110, priceMax: 150, radius: 120, matches: 5, status: '进行中', statusType: 'success', date: '2026-08-05', quality: '完全腐熟，无病原菌' },
+      { no: 'DMD-2026-0608', category: '猪粪', weight: '70 吨', priceMin: 90, priceMax: 120, radius: 90, matches: 3, status: '进行中', statusType: 'success', date: '2026-07-28', quality: '固液分离，重金属达标' },
+      // 待审核（3）
+      { no: 'DMD-2026-0602', category: '牛粪', weight: '80 吨', priceMin: 100, priceMax: 140, radius: 120, matches: 0, status: '待审核', statusType: 'warning', date: '2026-08-06', quality: '完全腐熟，无病原菌' },
+      { no: 'DMD-2026-0605', category: '猪粪', weight: '60 吨', priceMin: 90, priceMax: 130, radius: 90, matches: 1, status: '待审核', statusType: 'warning', date: '2026-08-10', quality: '固液分离，重金属达标' },
+      { no: 'DMD-2026-0609', category: '羊粪', weight: '45 吨', priceMin: 130, priceMax: 170, radius: 70, matches: 0, status: '待审核', statusType: 'warning', date: '2026-07-30', quality: '有机质丰富，缓释肥效' },
+      // 已完成（5）
+      { no: 'DMD-2026-0604', category: '羊粪', weight: '40 吨', priceMin: 130, priceMax: 180, radius: 60, matches: 2, status: '已完成', statusType: 'neutral', date: '2026-08-08', quality: '有机质丰富，缓释肥效' },
+      { no: 'DMD-2026-0607', category: '鸡粪', weight: '55 吨', priceMin: 140, priceMax: 190, radius: 80, matches: 3, status: '已完成', statusType: 'neutral', date: '2026-07-20', quality: '含水率≤30%，无沙石杂质' },
+      { no: 'DMD-2026-0610', category: '玉米芯', weight: '120 吨', priceMin: 80, priceMax: 110, radius: 100, matches: 2, status: '已完成', statusType: 'neutral', date: '2026-07-15', quality: '吸水性强，颗粒均匀' },
+      { no: 'DMD-2026-0611', category: '花生壳', weight: '30 吨', priceMin: 120, priceMax: 150, radius: 60, matches: 1, status: '已完成', statusType: 'neutral', date: '2026-07-10', quality: '木质素适中，易发酵' },
+      { no: 'DMD-2026-0612', category: '稻壳', weight: '35 吨', priceMin: 200, priceMax: 240, radius: 50, matches: 1, status: '已完成', statusType: 'neutral', date: '2026-07-05', quality: '孔隙发达，透气保水' }
+    ];
+
+    var purchaseFilter = 'all';
+    var purchaseFilters = [
+      { key: 'all', label: '全部' },
+      { key: 'success', label: '进行中' },
+      { key: 'warning', label: '待审核' },
+      { key: 'neutral', label: '已完成' }
+    ];
+
+    function purchaseStatusBadge(t) {
+      var map = {
+        success: 'background:var(--th-state-success-surface); color:var(--th-state-success);',
+        warning: 'background:var(--th-state-warning-surface); color:var(--th-state-warning);',
+        neutral: 'background:var(--th-secondary); color:var(--th-secondary-foreground);'
+      };
+      return '<span style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:var(--th-radius-full); font-size:var(--th-font-size-xs); font-weight:600; white-space:nowrap;' + (map[t] || map.neutral) + '"><span style="width:6px;height:6px;border-radius:var(--th-radius-full);background:currentColor;"></span>' + (t === 'success' ? '进行中' : t === 'warning' ? '待审核' : '已完成') + '</span>';
+    }
+
+    function purchaseFilterTabsHtml() {
+      return purchaseFilters.map(function (f) {
+        var active = f.key === purchaseFilter;
+        return '<button data-pf="' + f.key + '" style="padding:7px 16px;border-radius:var(--th-radius-full);border:1px solid ' + (active ? 'var(--th-primary)' : 'var(--th-border)') + ';background:' + (active ? 'var(--th-primary)' : 'var(--th-card)') + ';color:' + (active ? 'var(--th-primary-foreground)' : 'var(--th-secondary-foreground)') + ';font-size:var(--th-font-size-sm);font-weight:500;cursor:pointer;white-space:nowrap;">' + f.label + '</button>';
+      }).join('');
+    }
+
+    function purchaseView() {
+      var list = purchaseFilter === 'all' ? purchaseList : purchaseList.filter(function (p) { return p.statusType === purchaseFilter; });
+      var rows = list.map(function (p) {
+        // 已完成仅查看；进行中/待审核：查看 + 编辑(选匹配地) + 撤销
+        var ops = '<button data-pa="view" data-no="' + p.no + '" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:var(--th-radius-sm);border:1px solid var(--th-border);background:var(--th-card);color:var(--th-secondary-foreground);font-size:var(--th-font-size-xs);cursor:pointer;"><i data-lucide="eye" style="width:13px;height:13px;"></i>查看</button>';
+        if (p.statusType === 'success' || p.statusType === 'warning') {
+          ops += '<button data-pa="edit" data-no="' + p.no + '" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:var(--th-radius-sm);border:1px solid var(--th-border);background:var(--th-card);color:var(--th-secondary-foreground);font-size:var(--th-font-size-xs);cursor:pointer;"><i data-lucide="pencil" style="width:13px;height:13px;"></i>编辑</button>';
+          ops += '<button data-pa="revoke" data-no="' + p.no + '" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:var(--th-radius-sm);border:none;background:var(--th-state-error-surface);color:var(--th-state-error);font-size:var(--th-font-size-xs);cursor:pointer;"><i data-lucide="trash-2" style="width:13px;height:13px;"></i>撤销</button>';
+        }
+        return '<tr style="border-bottom:1px solid var(--th-border);">' +
+          '<td style="padding:14px 16px;white-space:nowrap;font-family:var(--th-font-mono);font-size:var(--th-font-size-xs);color:var(--th-muted-foreground);">' + p.no + '</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;font-weight:500;">' + p.category + '</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;">' + p.weight + '</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;">¥' + p.priceMin + ' - ' + p.priceMax + ' <span style="color:var(--th-muted-foreground);font-size:var(--th-font-size-xs);">/吨</span></td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;">' + p.radius + ' km</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;">' + (p.matches > 0 ? '<span style="display:inline-flex;align-items:center;gap:4px;color:var(--th-state-info);font-weight:600;"><i data-lucide="sparkles" style="width:14px;height:14px;"></i>' + p.matches + ' 个匹配</span>' : '<span style="color:var(--th-muted-foreground);">—</span>') + '</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;">' + purchaseStatusBadge(p.statusType) + '</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;color:var(--th-muted-foreground);">' + p.date + '</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;"><div style="display:flex;align-items:center;gap:4px;">' + ops + '</div></td></tr>';
+      }).join('');
+
+      var statVals = purchaseStatValues();
+      var statCards = purchaseStats.map(function (s, i) {
+        return '<div style="border:1px solid var(--th-border);border-radius:var(--th-radius);background:var(--th-card);padding:18px 20px;box-shadow:var(--th-shadow-xs);min-width:0;display:flex;align-items:center;gap:14px;">' +
+          '<span style="width:44px;height:44px;border-radius:var(--th-radius);background:color-mix(in srgb,' + s.color + ' 10%,transparent);color:' + s.color + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="' + s.icon + '" style="width:22px;height:22px;"></i></span>' +
+          '<div style="min-width:0;"><p style="margin:0;font-size:var(--th-font-size-sm);color:var(--th-muted-foreground);white-space:nowrap;">' + s.label + '</p>' +
+          '<p style="margin:2px 0 0 0;font-size:var(--th-font-size-h3);font-weight:700;color:var(--th-foreground);line-height:1.2;white-space:nowrap;">' + statVals[i] + '</p>' +
+          '<p style="margin:0;font-size:var(--th-font-size-xs);color:var(--th-muted-foreground);white-space:nowrap;">' + s.sub + '</p></div></div>';
+      }).join('');
+
+      return '<section style="margin-bottom:24px;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;">' +
+        '<div><h1 style="font-size:var(--th-font-size-h2);font-weight:600;line-height:var(--th-line-height-snug);color:var(--th-foreground);margin:0 0 4px 0;">采购需求</h1>' +
+        '<p class="th-body-sm" style="margin:0;color:var(--th-muted-foreground);">发布原料采购需求，平台自动匹配供给，全程跟踪进度</p></div>' +
+        '<button id="purchase-new" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:var(--th-radius-full);border:none;background:var(--th-primary);color:var(--th-primary-foreground);font-size:var(--th-font-size-sm);font-weight:600;cursor:pointer;box-shadow:var(--th-shadow-sm);"><i data-lucide="plus" style="width:16px;height:16px;"></i>新建需求</button></section>' +
+
+        '<section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4" style="margin-bottom:24px;">' + statCards + '</section>' +
+
+        '<section style="border:1px solid var(--th-border);border-radius:var(--th-radius);background:var(--th-card);box-shadow:var(--th-shadow-xs);overflow:hidden;">' +
+          '<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--th-border);">' +
+            '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;" id="purchase-tabs">' + purchaseFilterTabsHtml() + '</div>' +
+            '<div style="position:relative;"><i data-lucide="search" style="width:15px;height:15px;position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--th-muted-foreground);"></i>' +
+            '<input id="purchase-search" type="text" placeholder="搜索需求编号 / 品类" style="padding:8px 12px 8px 32px;border:1px solid var(--th-border);border-radius:var(--th-radius-full);background:var(--th-background);font-size:var(--th-font-size-sm);color:var(--th-foreground);outline:none;width:200px;"></div>' +
+          '</div>' +
+          '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:var(--th-font-size-sm);min-width:980px;">' +
+            '<thead><tr style="border-bottom:1px solid var(--th-border);background:color-mix(in srgb,var(--th-secondary) 40%,transparent);">' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">需求编号</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">品类</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">目标重量</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">预期单价</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">采购半径</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">匹配</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">状态</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">发布时间</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">操作</th>' +
+            '</tr></thead><tbody>' + rows + '</tbody></table></div>' +
+          '<div style="padding:14px 20px;border-top:1px solid var(--th-border);display:flex;align-items:center;justify-content:space-between;color:var(--th-muted-foreground);font-size:var(--th-font-size-xs);">' +
+            '<span>共 ' + list.length + ' 条需求</span><span>采购半径内智能匹配，覆盖更广供给</span></div>' +
+        '</section>' +
+        purchaseModalHtml();
+    }
+
+    /* ---------- 新建需求模态框 ---------- */
+    var purchaseCategories = ['鸡粪', '牛粪', '猪粪', '羊粪', '秸秆', '其他'];
+
+    function purchaseModalHtml() {
+      var catOptions = purchaseCategories.map(function (c) {
+        return '<option value="' + c + '">' + c + '</option>';
+      }).join('');
+      var fieldBase = 'width:100%;padding:9px 12px;border:1px solid var(--th-border);border-radius:var(--th-radius-sm);background:var(--th-background);font-size:var(--th-font-size-sm);color:var(--th-foreground);outline:none;';
+      var inputCls = fieldBase + 'appearance:auto;';
+      return '<div id="purchase-modal" style="position:fixed;inset:0;z-index:80;background:rgba(24,18,8,0.45);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;">' +
+        '<div style="width:min(620px,100%);background:var(--th-card);border:1px solid var(--th-border);border-radius:var(--th-radius);box-shadow:var(--th-shadow-2xl);padding:24px;margin:auto 0;">' +
+          '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:20px;">' +
+            '<div><h3 style="margin:0;font-size:var(--th-font-size-h3);font-weight:600;color:var(--th-foreground);">新建采购需求</h3>' +
+            '<p class="th-body-sm" style="margin:2px 0 0 0;color:var(--th-muted-foreground);">填写采购信息，提交后进入平台待审核</p></div>' +
+            '<button type="button" id="purchase-modal-close" style="background:var(--th-secondary);border:none;width:34px;height:34px;border-radius:var(--th-radius-full);cursor:pointer;color:var(--th-muted-foreground);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="x" style="width:17px;height:17px;"></i></button>' +
+          '</div>' +
+          '<form id="purchase-form" novalidate>' +
+            '<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">' +
+              '<div><label style="display:block;font-size:var(--th-font-size-sm);font-weight:500;color:var(--th-foreground);margin-bottom:6px;">品类 <span style="color:var(--th-state-error);">*</span></label>' +
+                '<select id="pf-category" style="' + fieldBase + '">' + catOptions + '</select></div>' +
+              '<div><label style="display:block;font-size:var(--th-font-size-sm);font-weight:500;color:var(--th-foreground);margin-bottom:6px;">目标重量 <span style="color:var(--th-state-error);">*</span></label>' +
+                '<div style="display:flex;align-items:center;gap:8px;"><input id="pf-weight" type="number" min="1" step="0.5" placeholder="如 50" style="' + inputCls + '"><span class="th-body-sm" style="color:var(--th-muted-foreground);flex-shrink:0;">吨</span></div></div>' +
+              '<div><label style="display:block;font-size:var(--th-font-size-sm);font-weight:500;color:var(--th-foreground);margin-bottom:6px;">预期单价（最低）<span style="color:var(--th-state-error);">*</span></label>' +
+                '<div style="display:flex;align-items:center;gap:8px;"><input id="pf-price-min" type="number" min="0" step="1" placeholder="如 150" style="' + inputCls + '"><span class="th-body-sm" style="color:var(--th-muted-foreground);flex-shrink:0;">¥/吨</span></div></div>' +
+              '<div><label style="display:block;font-size:var(--th-font-size-sm);font-weight:500;color:var(--th-foreground);margin-bottom:6px;">预期单价（最高）<span style="color:var(--th-state-error);">*</span></label>' +
+                '<div style="display:flex;align-items:center;gap:8px;"><input id="pf-price-max" type="number" min="0" step="1" placeholder="如 200" style="' + inputCls + '"><span class="th-body-sm" style="color:var(--th-muted-foreground);flex-shrink:0;">¥/吨</span></div></div>' +
+              '<div><label style="display:block;font-size:var(--th-font-size-sm);font-weight:500;color:var(--th-foreground);margin-bottom:6px;">采购半径 <span style="color:var(--th-state-error);">*</span></label>' +
+                '<div style="display:flex;align-items:center;gap:8px;"><input id="pf-radius" type="number" min="1" step="1" placeholder="如 80" style="' + inputCls + '"><span class="th-body-sm" style="color:var(--th-muted-foreground);flex-shrink:0;">km</span></div></div>' +
+              '<div><label style="display:block;font-size:var(--th-font-size-sm);font-weight:500;color:var(--th-foreground);margin-bottom:6px;">匹配方式</label>' +
+                '<select id="pf-match" style="' + fieldBase + '"><option value="自动匹配">自动匹配（平台智能撮合）</option><option value="手动匹配">手动匹配（自行联系）</option></select></div>' +
+              '<div class="sm:col-span-2"><label style="display:block;font-size:var(--th-font-size-sm);font-weight:500;color:var(--th-foreground);margin-bottom:6px;">状态</label>' +
+                '<div style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:var(--th-radius-full);background:var(--th-state-warning-surface);color:var(--th-state-warning);font-size:var(--th-font-size-sm);font-weight:600;"><span style="width:7px;height:7px;border-radius:var(--th-radius-full);background:currentColor;"></span>待审核 · 提交后进入平台审核</div></div>' +
+            '</div>' +
+            '<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:24px;">' +
+              '<button type="button" id="purchase-modal-cancel" style="padding:9px 18px;border-radius:var(--th-radius-full);border:1px solid var(--th-border);background:var(--th-card);color:var(--th-secondary-foreground);font-size:var(--th-font-size-sm);font-weight:500;cursor:pointer;">取消</button>' +
+              '<button type="submit" style="display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:var(--th-radius-full);border:none;background:var(--th-primary);color:var(--th-primary-foreground);font-size:var(--th-font-size-sm);font-weight:600;cursor:pointer;box-shadow:var(--th-shadow-sm);"><i data-lucide="send" style="width:15px;height:15px;"></i>提交需求</button>' +
+            '</div>' +
+          '</form>' +
+        '</div></div>';
+    }
+
+    function openPurchaseModal() {
+      var m = document.getElementById('purchase-modal');
+      if (!m) return;
+      m.style.display = 'flex';
+      TH.refreshIcons();
+    }
+
+    function closePurchaseModal() {
+      var m = document.getElementById('purchase-modal');
+      if (m) m.style.display = 'none';
+    }
+
+    function submitPurchase() {
+      var category = document.getElementById('pf-category').value;
+      var weight = parseFloat(document.getElementById('pf-weight').value);
+      var priceMin = parseFloat(document.getElementById('pf-price-min').value);
+      var priceMax = parseFloat(document.getElementById('pf-price-max').value);
+      var radius = parseFloat(document.getElementById('pf-radius').value);
+      var matchType = document.getElementById('pf-match').value;
+      var err = [];
+      if (!category) err.push('请选择品类');
+      if (!(weight > 0)) err.push('请填写目标重量');
+      if (!(priceMin >= 0)) err.push('请填写最低单价');
+      if (!(priceMax >= 0)) err.push('请填写最高单价');
+      if (priceMax < priceMin) err.push('最高单价不能低于最低单价');
+      if (!(radius > 0)) err.push('请填写采购半径');
+      if (err.length) { TH.toast(err[0], 'error'); return; }
+
+      var now = new Date();
+      var pad = function (n) { return n < 10 ? '0' + n : '' + n; };
+      var seq = 601 + purchaseList.length;
+      var no = 'DMD-' + now.getFullYear() + '-' + pad(Math.min(seq, 9999));
+      var item = {
+        no: no,
+        category: category,
+        weight: weight + ' 吨',
+        priceMin: priceMin,
+        priceMax: priceMax,
+        radius: radius,
+        matches: 0,
+        matchType: matchType,
+        status: '待审核',
+        statusType: 'warning',
+        date: now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate()),
+        quality: '—'
+      };
+      purchaseList.unshift(item);
+      purchaseFilter = 'warning';
+      closePurchaseModal();
+      document.getElementById('page-content').innerHTML = purchaseView();
+      TH.refreshIcons();
+      bindPurchaseEvents();
+      TH.toast('需求 ' + no + ' 已提交，进入待审核', 'success');
+    }
+
+    function showPurchase() {
+      document.getElementById('page-content').innerHTML = purchaseView();
+      TH.refreshIcons();
+      bindPurchaseEvents();
+    }
+
+    function bindPurchaseEvents() {
+      document.getElementById('purchase-tabs').addEventListener('click', function (e) {
+        var b = e.target.closest('[data-pf]');
+        if (!b) return;
+        purchaseFilter = b.getAttribute('data-pf');
+        document.getElementById('page-content').innerHTML = purchaseView();
+        TH.refreshIcons();
+        bindPurchaseEvents();
+      });
+      document.getElementById('purchase-search').addEventListener('input', function () {
+        // 演示：搜索交互
+      });
+      document.getElementById('purchase-new').addEventListener('click', openPurchaseModal);
+      document.getElementById('purchase-modal-close').addEventListener('click', closePurchaseModal);
+      document.getElementById('purchase-modal-cancel').addEventListener('click', closePurchaseModal);
+      document.getElementById('purchase-modal').addEventListener('click', function (e) { if (e.target === this) closePurchaseModal(); });
+      document.getElementById('purchase-form').addEventListener('submit', function (e) { e.preventDefault(); submitPurchase(); });
+      document.addEventListener('click', function (e) {
+        var act = e.target.closest('[data-pa]');
+        if (!act) return;
+        var no = act.getAttribute('data-no');
+        var type = act.getAttribute('data-pa');
+        var p = purchaseList.find(function (x) { return x.no === no; });
+        if (!p) return;
+        if (type === 'view') { openPurchaseDetail(no); }
+        if (type === 'edit') { openPurchaseEdit(no); }
+        if (type === 'revoke') {
+          thConfirm('撤销采购需求', '确认撤销需求「' + no + ' · ' + p.category + '」吗？撤销后该需求将从列表隐藏。', '确认撤销', function () {
+            purchaseList = purchaseList.filter(function (x) { return x.no !== no; });
+            document.getElementById('page-content').innerHTML = purchaseView();
+            TH.refreshIcons();
+            bindPurchaseEvents();
+            TH.toast('需求 ' + no + ' 已撤销', 'success');
+          });
+        }
+      });
+    }
+
+    /* ---------- 匹配地 / 需求详情 / 编辑选匹配地 ---------- */
+    function purchaseCandidates(p) {
+      return [
+        { id: 'c1', supplier: '绿色农场', location: '河北邢台', distance: 42, price: p.priceMin + 10, score: 96 },
+        { id: 'c2', supplier: '鲁西牧业', location: '山东济南', distance: 78, price: p.priceMin + 20, score: 92 },
+        { id: 'c3', supplier: '周口农合社', location: '河南周口', distance: 65, price: p.priceMin + 5, score: 90 },
+        { id: 'c4', supplier: '川西养殖联合体', location: '四川成都', distance: 120, price: p.priceMin - 5, score: 85 }
+      ];
+    }
+
+    function showPurchaseModal(id, title, body, footerHtml, onMount) {
+      var prev = document.getElementById(id);
+      if (prev) prev.remove();
+      var wrap = document.createElement('div');
+      wrap.id = id;
+      wrap.style.cssText = 'position:fixed;inset:0;z-index:85;background:rgba(24,18,8,0.45);display:flex;align-items:center;justify-content:center;padding:24px;';
+      wrap.innerHTML = '<div style="width:min(580px,100%);background:var(--th-card);border:1px solid var(--th-border);border-radius:var(--th-radius);box-shadow:var(--th-shadow-2xl);padding:24px;max-height:82vh;overflow-y:auto;">' +
+        '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;">' +
+          '<h3 style="margin:0;font-size:var(--th-font-size-h3);font-weight:600;color:var(--th-foreground);">' + title + '</h3>' +
+          '<button type="button" data-pmclose style="background:var(--th-secondary);border:none;width:32px;height:32px;border-radius:var(--th-radius-full);cursor:pointer;color:var(--th-muted-foreground);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="x" style="width:16px;height:16px;"></i></button>' +
+        '</div>' + body +
+        (footerHtml ? '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;">' + footerHtml + '</div>' : '') +
+      '</div>';
+      document.body.appendChild(wrap);
+      TH.refreshIcons(wrap);
+      wrap.addEventListener('click', function (e) {
+        if (e.target === wrap || e.target.closest('[data-pmclose]')) wrap.remove();
+      });
+      if (onMount) onMount(wrap);
+      return wrap;
+    }
+
+    function purchaseInfoHtml(p) {
+      return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;padding:14px;border:1px solid var(--th-border);border-radius:var(--th-radius);background:var(--th-background);margin-bottom:14px;">' +
+        '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">品类</p><p style="margin:0;font-weight:600;">' + p.category + '</p></div>' +
+        '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">目标重量</p><p style="margin:0;font-weight:600;">' + p.weight + '</p></div>' +
+        '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">预期单价</p><p style="margin:0;font-weight:600;">¥' + p.priceMin + ' - ' + p.priceMax + '/吨</p></div>' +
+        '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">采购半径</p><p style="margin:0;font-weight:600;">' + p.radius + ' km</p></div>' +
+        '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">状态</p><p style="margin:0;font-weight:600;">' + p.status + '</p></div>' +
+        '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">发布时间</p><p style="margin:0;font-weight:600;">' + p.date + '</p></div>' +
+      '</div>';
+    }
+
+    function purchaseCandRowHtml(c, withSelect) {
+      var select = withSelect
+        ? '<input type="radio" name="pc" value="' + c.supplier + '" style="width:16px;height:16px;accent-color:var(--th-primary);flex-shrink:0;">'
+        : '<i data-lucide="map-pin" style="width:16px;height:16px;color:var(--th-primary);flex-shrink:0;"></i>';
+      return '<label style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--th-border);cursor:' + (withSelect ? 'pointer' : 'default') + ';">' +
+        select +
+        '<div style="flex:1;min-width:0;"><p style="margin:0;font-size:var(--th-font-size-sm);font-weight:600;color:var(--th-foreground);">' + c.supplier + '</p>' +
+        '<p class="th-body-sm" style="margin:2px 0 0 0;color:var(--th-muted-foreground);">' + c.location + ' · 距离 ' + c.distance + 'km · ¥' + c.price + '/吨</p></div>' +
+        '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--th-radius-full);background:var(--th-state-success-surface);color:var(--th-state-success);font-size:var(--th-font-size-xs);font-weight:600;flex-shrink:0;">匹配度 ' + c.score + '%</span></label>';
+    }
+
+    function openPurchaseDetail(no) {
+      var p = purchaseList.find(function (x) { return x.no === no; });
+      if (!p) return;
+      var cands = purchaseCandidates(p);
+      var rows = cands.map(function (c) { return purchaseCandRowHtml(c, false); }).join('');
+      showPurchaseModal('purchase-detail-modal', '需求详情 · ' + p.no,
+        purchaseInfoHtml(p) +
+        '<p style="margin:0 0 4px 0;font-size:var(--th-font-size-sm);font-weight:600;color:var(--th-foreground);">对应匹配供给地（' + cands.length + '）</p>' + rows,
+        '<p class="th-body-sm" style="margin:0;color:var(--th-muted-foreground);">查看商品需求及其匹配的供给地</p><button type="button" data-pmclose style="padding:9px 18px;border-radius:var(--th-radius-full);border:none;background:var(--th-primary);color:var(--th-primary-foreground);font-size:var(--th-font-size-sm);font-weight:600;cursor:pointer;">知道了</button>'
+      );
+    }
+
+    function openPurchaseEdit(no) {
+      var p = purchaseList.find(function (x) { return x.no === no; });
+      if (!p) return;
+      var cands = purchaseCandidates(p);
+      var rows = cands.map(function (c) { return purchaseCandRowHtml(c, true); }).join('');
+      showPurchaseModal('purchase-edit-modal', '选择匹配地 · ' + p.no,
+        purchaseInfoHtml(p) +
+        '<p class="th-body-sm" style="margin:0 0 8px 0;color:var(--th-muted-foreground);">请为需求选择匹配的供给地（进行中/待审核可调整）</p>' + rows,
+        '<span class="th-body-sm" style="color:var(--th-muted-foreground);">选择后平台将撮合该供应商</span>' +
+          '<div style="display:flex;gap:10px;"><button type="button" data-pmclose style="padding:9px 18px;border-radius:var(--th-radius-full);border:1px solid var(--th-border);background:var(--th-card);color:var(--th-secondary-foreground);font-size:var(--th-font-size-sm);font-weight:500;cursor:pointer;">取消</button>' +
+          '<button type="button" id="purchase-edit-confirm" style="display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:var(--th-radius-full);border:none;background:var(--th-primary);color:var(--th-primary-foreground);font-size:var(--th-font-size-sm);font-weight:600;cursor:pointer;"><i data-lucide="check" style="width:15px;height:15px;"></i>确认选择</button></div>',
+        function (wrap) {
+          wrap.querySelector('#purchase-edit-confirm').addEventListener('click', function () {
+            var sel = wrap.querySelector('input[name="pc"]:checked');
+            if (!sel) { TH.toast('请选择一个匹配地', 'error'); return; }
+            wrap.remove();
+            TH.toast('已选择匹配地：' + sel.value + '（撮合中）', 'success');
+          });
+        }
+      );
+    }
+
+    /* =====================================================
+       收运任务视图
+       ===================================================== */
+    var dispatchStats = [
+      { label: '收运任务', sub: '全部任务', icon: 'truck', color: 'var(--th-primary)' },
+      { label: '运输中', sub: '正在收运', icon: 'loader', color: 'var(--th-state-info)' },
+      { label: '待派单', sub: '等待派单', icon: 'clock', color: 'var(--th-state-warning)' },
+      { label: '已完成', sub: '累计完成', icon: 'check-circle-2', color: 'var(--th-state-success)' }
+    ];
+
+    function dispatchStatValues() {
+      var cnt = function (t) { return dispatchList.filter(function (p) { return p.statusType === t; }).length; };
+      return [dispatchList.length, cnt('success'), cnt('warning'), cnt('neutral')];
+    }
+
+    var dispatchList = [
+      // 运输中（4）
+      { no: 'TSK-2026-0801', type: '鸡粪', driver: '王师傅', vehicle: '苏A12345', route: '河北邢台 → 有机肥厂', fee: 1800, statusType: 'success', date: '2026-08-01' },
+      { no: 'TSK-2026-0802', type: '秸秆', driver: '李师傅', vehicle: '苏A23456', route: '河南周口 → 有机肥厂', fee: 2400, statusType: 'success', date: '2026-08-03' },
+      { no: 'TSK-2026-0803', type: '牛粪', driver: '赵师傅', vehicle: '苏A34567', route: '山东济南 → 有机肥厂', fee: 2200, statusType: 'success', date: '2026-08-05' },
+      { no: 'TSK-2026-0804', type: '猪粪', driver: '陈师傅', vehicle: '苏A45678', route: '四川成都 → 有机肥厂', fee: 2800, statusType: 'success', date: '2026-07-28' },
+      // 待派单（3）
+      { no: 'TSK-2026-0805', type: '鸡粪', driver: null, vehicle: null, route: '河北邢台 → 有机肥厂', fee: null, statusType: 'warning', date: '2026-08-06' },
+      { no: 'TSK-2026-0806', type: '羊粪', driver: null, vehicle: null, route: '内蒙古赤峰 → 有机肥厂', fee: null, statusType: 'warning', date: '2026-08-10' },
+      { no: 'TSK-2026-0807', type: '秸秆', driver: null, vehicle: null, route: '河南周口 → 有机肥厂', fee: null, statusType: 'warning', date: '2026-07-30' },
+      // 已完成（5）
+      { no: 'TSK-2026-0808', type: '牛粪', driver: '王师傅', vehicle: '苏A12345', route: '山东济南 → 有机肥厂', fee: 2100, statusType: 'neutral', date: '2026-07-25' },
+      { no: 'TSK-2026-0809', type: '稻壳', driver: '李师傅', vehicle: '苏A23456', route: '江苏盐城 → 有机肥厂', fee: 1900, statusType: 'neutral', date: '2026-07-20' },
+      { no: 'TSK-2026-0810', type: '花生壳', driver: '赵师傅', vehicle: '苏A34567', route: '山东临沂 → 有机肥厂', fee: 1700, statusType: 'neutral', date: '2026-07-15' },
+      { no: 'TSK-2026-0811', type: '玉米芯', driver: '陈师傅', vehicle: '苏A45678', route: '吉林四平 → 有机肥厂', fee: 2600, statusType: 'neutral', date: '2026-07-10' },
+      { no: 'TSK-2026-0812', type: '鸡粪', driver: '王师傅', vehicle: '苏A12345', route: '河北邢台 → 有机肥厂', fee: 1800, statusType: 'neutral', date: '2026-07-05' }
+    ];
+
+    var dispatchFilter = 'all';
+    var dispatchFilters = [
+      { key: 'all', label: '全部' },
+      { key: 'success', label: '运输中' },
+      { key: 'warning', label: '待派单' },
+      { key: 'neutral', label: '已完成' }
+    ];
+
+    function dispatchStatusBadge(t) {
+      var map = {
+        success: 'background:var(--th-state-success-surface); color:var(--th-state-success);',
+        warning: 'background:var(--th-state-warning-surface); color:var(--th-state-warning);',
+        neutral: 'background:var(--th-secondary); color:var(--th-secondary-foreground);'
+      };
+      return '<span style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:var(--th-radius-full); font-size:var(--th-font-size-xs); font-weight:600; white-space:nowrap;' + (map[t] || map.neutral) + '"><span style="width:6px;height:6px;border-radius:var(--th-radius-full);background:currentColor;"></span>' + (t === 'success' ? '运输中' : t === 'warning' ? '待派单' : '已完成') + '</span>';
+    }
+
+    function dispatchFilterTabsHtml() {
+      return dispatchFilters.map(function (f) {
+        var active = f.key === dispatchFilter;
+        return '<button data-df="' + f.key + '" style="padding:7px 16px;border-radius:var(--th-radius-full);border:1px solid ' + (active ? 'var(--th-primary)' : 'var(--th-border)') + ';background:' + (active ? 'var(--th-primary)' : 'var(--th-card)') + ';color:' + (active ? 'var(--th-primary-foreground)' : 'var(--th-secondary-foreground)') + ';font-size:var(--th-font-size-sm);font-weight:500;cursor:pointer;white-space:nowrap;">' + f.label + '</button>';
+      }).join('');
+    }
+
+    function dispatchView() {
+      var list = dispatchFilter === 'all' ? dispatchList : dispatchList.filter(function (p) { return p.statusType === dispatchFilter; });
+      var rows = list.map(function (p) {
+        var driverCell = p.driver ? '<span style="white-space:nowrap;">' + p.driver + (p.vehicle ? ' <span style="color:var(--th-muted-foreground);font-size:var(--th-font-size-xs);">' + p.vehicle + '</span>' : '') + '</span>' : '<span style="color:var(--th-muted-foreground);">—</span>';
+        var feeCell = p.fee != null ? '<span class="th-mono" style="color:var(--th-primary);font-weight:600;white-space:nowrap;">¥' + p.fee.toLocaleString('zh-CN') + '</span>' : '<span style="color:var(--th-muted-foreground);">—</span>';
+        var ops = '<button data-da="view" data-no="' + p.no + '" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:var(--th-radius-sm);border:1px solid var(--th-border);background:var(--th-card);color:var(--th-secondary-foreground);font-size:var(--th-font-size-xs);cursor:pointer;"><i data-lucide="eye" style="width:13px;height:13px;"></i>查看</button>';
+        if (p.statusType === 'warning') {
+          ops += '<button data-da="assign" data-no="' + p.no + '" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:var(--th-radius-sm);border:none;background:var(--th-primary);color:var(--th-primary-foreground);font-size:var(--th-font-size-xs);cursor:pointer;"><i data-lucide="user-plus" style="width:13px;height:13px;"></i>派单</button>';
+        }
+        return '<tr style="border-bottom:1px solid var(--th-border);">' +
+          '<td style="padding:14px 16px;white-space:nowrap;font-family:var(--th-font-mono);font-size:var(--th-font-size-xs);color:var(--th-muted-foreground);">' + p.no + '</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;font-weight:500;">' + p.type + '</td>' +
+          '<td style="padding:14px 16px;">' + driverCell + '</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;">' + p.route + '</td>' +
+          '<td style="padding:14px 16px;">' + feeCell + '</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;">' + dispatchStatusBadge(p.statusType) + '</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;color:var(--th-muted-foreground);">' + p.date + '</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;"><div style="display:flex;align-items:center;gap:4px;">' + ops + '</div></td></tr>';
+      }).join('');
+
+      var statVals = dispatchStatValues();
+      var statCards = dispatchStats.map(function (s, i) {
+        return '<div style="border:1px solid var(--th-border);border-radius:var(--th-radius);background:var(--th-card);padding:18px 20px;box-shadow:var(--th-shadow-xs);min-width:0;display:flex;align-items:center;gap:14px;">' +
+          '<span style="width:44px;height:44px;border-radius:var(--th-radius);background:color-mix(in srgb,' + s.color + ' 10%,transparent);color:' + s.color + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="' + s.icon + '" style="width:22px;height:22px;"></i></span>' +
+          '<div style="min-width:0;"><p style="margin:0;font-size:var(--th-font-size-sm);color:var(--th-muted-foreground);white-space:nowrap;">' + s.label + '</p>' +
+          '<p style="margin:2px 0 0 0;font-size:var(--th-font-size-h3);font-weight:700;color:var(--th-foreground);line-height:1.2;white-space:nowrap;">' + statVals[i] + '</p>' +
+          '<p style="margin:0;font-size:var(--th-font-size-xs);color:var(--th-muted-foreground);white-space:nowrap;">' + s.sub + '</p></div></div>';
+      }).join('');
+
+      return '<section style="margin-bottom:24px;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;">' +
+        '<div><h1 style="font-size:var(--th-font-size-h2);font-weight:600;line-height:var(--th-line-height-snug);color:var(--th-foreground);margin:0 0 4px 0;">收运任务</h1>' +
+        '<p class="th-body-sm" style="margin:0;color:var(--th-muted-foreground);">管理原料收运调度，派单司机并跟踪运输全程</p></div>' +
+        '<button id="dispatch-new" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:var(--th-radius-full);border:none;background:var(--th-primary);color:var(--th-primary-foreground);font-size:var(--th-font-size-sm);font-weight:600;cursor:pointer;box-shadow:var(--th-shadow-sm);"><i data-lucide="plus" style="width:16px;height:16px;"></i>新建派单</button></section>' +
+
+        '<section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4" style="margin-bottom:24px;">' + statCards + '</section>' +
+
+        '<section style="border:1px solid var(--th-border);border-radius:var(--th-radius);background:var(--th-card);box-shadow:var(--th-shadow-xs);overflow:hidden;">' +
+          '<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--th-border);">' +
+            '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;" id="dispatch-tabs">' + dispatchFilterTabsHtml() + '</div>' +
+            '<div style="position:relative;"><i data-lucide="search" style="width:15px;height:15px;position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--th-muted-foreground);"></i>' +
+            '<input id="dispatch-search" type="text" placeholder="搜索任务编号 / 原料类型" style="padding:8px 12px 8px 32px;border:1px solid var(--th-border);border-radius:var(--th-radius-full);background:var(--th-background);font-size:var(--th-font-size-sm);color:var(--th-foreground);outline:none;width:200px;"></div>' +
+          '</div>' +
+          '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:var(--th-font-size-sm);min-width:1080px;">' +
+            '<thead><tr style="border-bottom:1px solid var(--th-border);background:color-mix(in srgb,var(--th-secondary) 40%,transparent);">' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">任务编号</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">原料类型</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">司机</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">收运路线</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">运费</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">状态</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">日期</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">操作</th>' +
+            '</tr></thead><tbody>' + rows + '</tbody></table></div>' +
+          '<div style="padding:14px 20px;border-top:1px solid var(--th-border);display:flex;align-items:center;justify-content:space-between;color:var(--th-muted-foreground);font-size:var(--th-font-size-xs);">' +
+            '<span>共 ' + list.length + ' 条任务</span><span>调度全程可追溯，实时掌握收运进度</span></div>' +
+        '</section>' +
+        dispatchModalHtml();
+    }
+
+    /* ---------- 新建派单模态框 ---------- */
+    var dispatchDrivers = [
+      { id: 'd1', name: '王师傅', vehicle: '苏A12345', type: '厢式货车', status: 'busy', statusText: '运输中' },
+      { id: 'd2', name: '李师傅', vehicle: '苏A23456', type: '厢式货车', status: 'busy', statusText: '运输中' },
+      { id: 'd3', name: '赵师傅', vehicle: '苏A34567', type: '高栏车', status: 'busy', statusText: '运输中' },
+      { id: 'd4', name: '陈师傅', vehicle: '苏A45678', type: '厢式货车', status: 'busy', statusText: '运输中' },
+      { id: 'd5', name: '周师傅', vehicle: '苏A56789', type: '自卸车', status: 'idle', statusText: '空闲' },
+      { id: 'd6', name: '吴师傅', vehicle: '苏A67890', type: '厢式货车', status: 'idle', statusText: '空闲' },
+      { id: 'd7', name: '郑师傅', vehicle: '苏A78901', type: '高栏车', status: 'idle', statusText: '空闲' }
+    ];
+    var selectedDispatchDriver = null;
+
+    function dispatchPendingTasks() {
+      return dispatchList.filter(function (t) { return t.statusType === 'warning'; });
+    }
+
+    function dispatchDriverCardHtml(d, sel) {
+      var isBusy = d.status === 'busy';
+      var base = 'border:1px solid var(--th-border);border-radius:var(--th-radius);padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;min-width:0;transition:box-shadow var(--th-duration-fast) var(--th-ease),border-color var(--th-duration-fast) var(--th-ease);';
+      var extra = '';
+      if (isBusy) {
+        extra = 'opacity:0.55;cursor:not-allowed;';
+      } else if (sel) {
+        extra = 'border-color:var(--th-primary);box-shadow:0 0 0 2px color-mix(in srgb,var(--th-primary) 25%,transparent);background:color-mix(in srgb,var(--th-primary) 5%,transparent);';
+      }
+      var statusBadge = isBusy
+        ? '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--th-radius-full);background:var(--th-secondary);color:var(--th-secondary-foreground);font-size:var(--th-font-size-xs);font-weight:600;"><i data-lucide="truck" style="width:12px;height:12px;"></i>运输中</span>'
+        : '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--th-radius-full);background:var(--th-state-success-surface);color:var(--th-state-success);font-size:var(--th-font-size-xs);font-weight:600;"><i data-lucide="circle-check" style="width:12px;height:12px;"></i>空闲</span>';
+      return '<button type="button" data-dd="' + d.id + '" ' + (isBusy ? 'disabled' : '') + ' style="' + base + extra + 'text-align:left;">' +
+        '<span style="width:40px;height:40px;border-radius:var(--th-radius-full);background:' + (isBusy ? 'var(--th-secondary)' : 'var(--th-primary)') + ';color:' + (isBusy ? 'var(--th-secondary-foreground)' : 'var(--th-primary-foreground)') + ';display:flex;align-items:center;justify-content:center;font-weight:600;font-size:var(--th-font-size-sm);flex-shrink:0;">' + d.name.charAt(0) + '</span>' +
+        '<span style="flex:1;min-width:0;"><span style="display:block;font-size:var(--th-font-size-sm);font-weight:600;color:var(--th-foreground);white-space:nowrap;">' + d.name + '</span>' +
+        '<span style="display:block;font-size:var(--th-font-size-xs);color:var(--th-muted-foreground);white-space:nowrap;margin-top:2px;">' + d.vehicle + ' · ' + d.type + '</span></span>' +
+        statusBadge + '</button>';
+    }
+
+    function dispatchModalHtml() {
+      var pending = dispatchPendingTasks();
+      var taskOptions = pending.length
+        ? pending.map(function (t) {
+            return '<option value="' + t.no + '">' + t.no + ' · ' + t.type + ' · ' + t.route + '</option>';
+          }).join('')
+        : '<option value="">暂无可派单任务</option>';
+      var idleDrivers = dispatchDrivers.filter(function (d) { return d.status === 'idle'; });
+      var busyDrivers = dispatchDrivers.filter(function (d) { return d.status === 'busy'; });
+      var idleHtml = idleDrivers.map(function (d) { return dispatchDriverCardHtml(d, d.id === selectedDispatchDriver); }).join('');
+      var busyHtml = busyDrivers.map(function (d) { return dispatchDriverCardHtml(d, false); }).join('');
+      return '<div id="dispatch-modal" style="position:fixed;inset:0;z-index:80;background:rgba(24,18,8,0.45);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;">' +
+        '<div style="width:min(680px,100%);background:var(--th-card);border:1px solid var(--th-border);border-radius:var(--th-radius);box-shadow:var(--th-shadow-2xl);padding:24px;margin:auto 0;">' +
+          '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:20px;">' +
+            '<div><h3 style="margin:0;font-size:var(--th-font-size-h3);font-weight:600;color:var(--th-foreground);">新建派单</h3>' +
+            '<p class="th-body-sm" style="margin:2px 0 0 0;color:var(--th-muted-foreground);">选择待派单任务与空闲司机，指派后任务进入运输中</p></div>' +
+            '<button type="button" id="dispatch-modal-close" style="background:var(--th-secondary);border:none;width:34px;height:34px;border-radius:var(--th-radius-full);cursor:pointer;color:var(--th-muted-foreground);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="x" style="width:17px;height:17px;"></i></button>' +
+          '</div>' +
+          '<div style="margin-bottom:20px;"><label style="display:block;font-size:var(--th-font-size-sm);font-weight:500;color:var(--th-foreground);margin-bottom:6px;">选择待派单任务 <span style="color:var(--th-state-error);">*</span> <span class="th-body-sm" style="color:var(--th-muted-foreground);font-weight:400;">（共 ' + pending.length + ' 个待派单）</span></label>' +
+            '<select id="df-task" style="width:100%;padding:9px 12px;border:1px solid var(--th-border);border-radius:var(--th-radius-sm);background:var(--th-background);font-size:var(--th-font-size-sm);color:var(--th-foreground);outline:none;">' + taskOptions + '</select></div>' +
+          '<div style="margin-bottom:20px;"><label style="display:block;font-size:var(--th-font-size-sm);font-weight:500;color:var(--th-foreground);margin-bottom:10px;">空闲司机 <span style="color:var(--th-state-error);">*</span> <span class="th-body-sm" style="color:var(--th-state-success);font-weight:400;">' + idleDrivers.length + ' 位可指派</span></label>' +
+            '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">' + (idleHtml || '<p class="th-body-sm" style="color:var(--th-muted-foreground);">当前暂无空闲司机</p>') + '</div></div>' +
+          '<div><label style="display:block;font-size:var(--th-font-size-sm);font-weight:500;color:var(--th-foreground);margin-bottom:10px;">正在运输的司机 <span class="th-body-sm" style="color:var(--th-muted-foreground);font-weight:400;">（不可指派）</span></label>' +
+            '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">' + (busyHtml || '<p class="th-body-sm" style="color:var(--th-muted-foreground);">暂无运输中的司机</p>') + '</div></div>' +
+          '<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:24px;">' +
+            '<button type="button" id="dispatch-modal-cancel" style="padding:9px 18px;border-radius:var(--th-radius-full);border:1px solid var(--th-border);background:var(--th-card);color:var(--th-secondary-foreground);font-size:var(--th-font-size-sm);font-weight:500;cursor:pointer;">取消</button>' +
+            '<button type="button" id="dispatch-confirm" style="display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:var(--th-radius-full);border:none;background:var(--th-primary);color:var(--th-primary-foreground);font-size:var(--th-font-size-sm);font-weight:600;cursor:pointer;box-shadow:var(--th-shadow-sm);"><i data-lucide="user-check" style="width:15px;height:15px;"></i>确认派单</button>' +
+          '</div>' +
+        '</div></div>';
+    }
+
+    function openDispatchModal(taskNo) {
+      var m = document.getElementById('dispatch-modal');
+      if (!m) return;
+      m.style.display = 'flex';
+      if (taskNo) {
+        var sel = document.getElementById('df-task');
+        if (sel) sel.value = taskNo;
+      }
+      TH.refreshIcons();
+    }
+
+    function closeDispatchModal() {
+      var m = document.getElementById('dispatch-modal');
+      if (m) m.style.display = 'none';
+    }
+
+    function submitDispatch() {
+      var taskNo = document.getElementById('df-task').value;
+      if (!taskNo) { TH.toast('请选择待派单任务', 'error'); return; }
+      if (!selectedDispatchDriver) { TH.toast('请选择一名空闲司机', 'error'); return; }
+      var task = dispatchList.find(function (t) { return t.no === taskNo; });
+      var driver = dispatchDrivers.find(function (d) { return d.id === selectedDispatchDriver; });
+      if (!task || !driver) { TH.toast('任务或司机不存在', 'error'); return; }
+      task.driver = driver.name;
+      task.vehicle = driver.vehicle;
+      task.statusType = 'success';
+      if (task.fee == null) task.fee = 1500 + Math.floor(Math.random() * 1000);
+      driver.status = 'busy';
+      driver.statusText = '运输中';
+      selectedDispatchDriver = null;
+      closeDispatchModal();
+      document.getElementById('page-content').innerHTML = dispatchView();
+      TH.refreshIcons();
+      bindDispatchEvents();
+      TH.toast('任务 ' + taskNo + ' 已派单给 ' + driver.name, 'success');
+    }
+
+    function showDispatch() {
+      document.getElementById('page-content').innerHTML = dispatchView();
+      TH.refreshIcons();
+      bindDispatchEvents();
+    }
+
+    function bindDispatchEvents() {
+      document.getElementById('dispatch-tabs').addEventListener('click', function (e) {
+        var b = e.target.closest('[data-df]');
+        if (!b) return;
+        dispatchFilter = b.getAttribute('data-df');
+        document.getElementById('page-content').innerHTML = dispatchView();
+        TH.refreshIcons();
+        bindDispatchEvents();
+      });
+      document.getElementById('dispatch-search').addEventListener('input', function () {
+        // 演示：搜索交互
+      });
+      document.getElementById('dispatch-new').addEventListener('click', openDispatchModal);
+      document.getElementById('dispatch-modal-close').addEventListener('click', closeDispatchModal);
+      document.getElementById('dispatch-modal-cancel').addEventListener('click', closeDispatchModal);
+      document.getElementById('dispatch-confirm').addEventListener('click', submitDispatch);
+      document.getElementById('dispatch-modal').addEventListener('click', function (e) {
+        if (e.target === this) closeDispatchModal();
+      });
+      // 选择空闲司机
+      document.getElementById('dispatch-modal').addEventListener('click', function (e) {
+        var d = e.target.closest('[data-dd]');
+        if (!d) return;
+        selectedDispatchDriver = d.getAttribute('data-dd');
+        document.querySelectorAll('#dispatch-modal [data-dd]').forEach(function (c) {
+          var on = c.getAttribute('data-dd') === selectedDispatchDriver;
+          c.style.borderColor = on ? 'var(--th-primary)' : 'var(--th-border)';
+          c.style.boxShadow = on ? '0 0 0 2px color-mix(in srgb,var(--th-primary) 25%,transparent)' : 'none';
+          c.style.background = on ? 'color-mix(in srgb,var(--th-primary) 5%,transparent)' : 'transparent';
+        });
+      });
+      document.addEventListener('click', function (e) {
+        var act = e.target.closest('[data-da]');
+        if (!act) return;
+        var no = act.getAttribute('data-no');
+        var type = act.getAttribute('data-da');
+        if (type === 'view') openDispatchDetail(no);
+        if (type === 'assign') openDispatchModal(no);
+      });
+
+      function openDispatchDetail(no) {
+        var t = dispatchList.find(function (x) { return x.no === no; });
+        if (!t) return;
+        var routeParts = String(t.route || '').split(' → ');
+        var dispatchLoc = routeParts[0] || t.route || '—';
+        var dispatchTime = t.date + ' 09:30';
+        var dispatcher = '张厂长（有机肥厂）';
+        var statusBadge = dispatchStatusBadge(t.statusType);
+        var infoHtml = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;padding:14px;border:1px solid var(--th-border);border-radius:var(--th-radius);background:var(--th-background);margin-bottom:14px;">' +
+          '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">任务编号</p><p style="margin:0;font-weight:600;">' + t.no + '</p></div>' +
+          '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">原料类型</p><p style="margin:0;font-weight:600;">' + t.type + '</p></div>' +
+          '<div style="grid-column:1/-1;"><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">收运路线</p><p style="margin:0;font-weight:600;">' + t.route + '</p></div>' +
+          '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">司机</p><p style="margin:0;font-weight:600;">' + (t.driver || '—') + (t.vehicle ? ' <span style="color:var(--th-muted-foreground);font-size:var(--th-font-size-xs);">' + t.vehicle + '</span>' : '') + '</p></div>' +
+          '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">运费</p><p style="margin:0;font-weight:600;">' + (t.fee != null ? '¥' + t.fee.toLocaleString('zh-CN') : '—') + '</p></div>' +
+          '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">状态</p><p style="margin:0;">' + statusBadge + '</p></div>' +
+        '</div>' +
+        '<p style="margin:0 0 8px 0;font-size:var(--th-font-size-sm);font-weight:600;color:var(--th-foreground);">派单信息</p>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;padding:14px;border:1px solid var(--th-border);border-radius:var(--th-radius);background:var(--th-card);">' +
+          '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">派单人</p><p style="margin:0;font-weight:600;">' + dispatcher + '</p></div>' +
+          '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">派单时间</p><p style="margin:0;font-weight:600;">' + dispatchTime + '</p></div>' +
+          '<div style="grid-column:1/-1;"><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">派单地</p><p style="margin:0;font-weight:600;">' + dispatchLoc + '</p></div>' +
+        '</div>';
+        showPurchaseModal('dispatch-detail-modal', '任务详情 · ' + t.no, infoHtml,
+          '<p class="th-body-sm" style="margin:0;color:var(--th-muted-foreground);">派单全程可追溯</p><button type="button" data-pmclose style="padding:9px 18px;border-radius:var(--th-radius-full);border:none;background:var(--th-primary);color:var(--th-primary-foreground);font-size:var(--th-font-size-sm);font-weight:600;cursor:pointer;">知道了</button>'
+        );
+      }
+    }
+
+    /* =====================================================
+       通用二次确认弹窗
+       ===================================================== */
+    function thConfirm(title, message, okText, onOk) {
+      var wrap = document.getElementById('th-confirm');
+      if (!wrap) {
+        wrap = document.createElement('div');
+        wrap.id = 'th-confirm';
+        document.body.appendChild(wrap);
+      }
+      wrap.innerHTML = '<div style="position:fixed;inset:0;z-index:95;background:rgba(24,18,8,0.45);display:flex;align-items:center;justify-content:center;padding:24px;">' +
+        '<div style="width:min(420px,100%);background:var(--th-card);border:1px solid var(--th-border);border-radius:var(--th-radius);box-shadow:var(--th-shadow-2xl);padding:24px;">' +
+          '<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;">' +
+            '<span style="width:40px;height:40px;border-radius:var(--th-radius-full);background:var(--th-state-warning-surface);color:var(--th-state-warning);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="alert-triangle" style="width:20px;height:20px;"></i></span>' +
+            '<div style="min-width:0;"><h3 style="margin:2px 0 4px 0;font-size:var(--th-font-size-h3);font-weight:600;color:var(--th-foreground);">' + title + '</h3>' +
+            '<p class="th-body-sm" style="margin:0;color:var(--th-muted-foreground);">' + message + '</p></div>' +
+          '</div>' +
+          '<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;">' +
+            '<button type="button" data-tc="cancel" style="padding:9px 18px;border-radius:var(--th-radius-full);border:1px solid var(--th-border);background:var(--th-card);color:var(--th-secondary-foreground);font-size:var(--th-font-size-sm);font-weight:500;cursor:pointer;">取消</button>' +
+            '<button type="button" data-tc="ok" style="padding:9px 20px;border-radius:var(--th-radius-full);border:none;background:var(--th-primary);color:var(--th-primary-foreground);font-size:var(--th-font-size-sm);font-weight:600;cursor:pointer;">' + (okText || '确认') + '</button>' +
+          '</div>' +
+        '</div></div>';
+      TH.refreshIcons(wrap);
+      wrap.style.display = 'block';
+      wrap.onclick = function (e) {
+        var b = e.target.closest('[data-tc]');
+        if (!b) return;
+        wrap.style.display = 'none';
+        wrap.innerHTML = '';
+        if (b.getAttribute('data-tc') === 'ok' && onOk) onOk();
+      };
+    }
+
+    /* =====================================================
+       商品管理视图
+       ===================================================== */
+    var productStats = [
+      { label: '全部商品', sub: '在售 + 待审核', icon: 'package', color: 'var(--th-primary)' },
+      { label: '在售', sub: '正常销售', icon: 'badge-check', color: 'var(--th-state-success)' },
+      { label: '待审核', sub: '等待平台审核', icon: 'clock', color: 'var(--th-state-warning)' },
+      { label: '可上架', sub: '已下架 + 仓库在存', icon: 'archive-restore', color: 'var(--th-state-info)' }
+    ];
+    function productStatValues() {
+      // 全部商品 = 在售+待审核（库存≥1）；可上架 = 已下架 + 仓库在存
+      var cnt = function (t) { return productList.filter(function (p) { return p.statusType === t && p.stock >= 1; }).length; };
+      var visible = productList.filter(function (p) { return (p.statusType === 'success' || p.statusType === 'warning') && p.stock >= 1; }).length;
+      var toShelf = productList.filter(function (p) { return p.statusType === 'neutral' || p.statusType === 'instock'; }).length;
+      return [visible, cnt('success'), cnt('warning'), toShelf];
+    }
+    var productList = [
+      // 在售（4）
+      { code: 'P-2026-0101', name: '微生物菌剂有机肥', spec: '40kg/袋', price: 89, stock: 500, sales: 2386, statusType: 'success', date: '2026-06-01' },
+      { code: 'P-2026-0102', name: '复合微生物肥', spec: '25kg/袋', price: 128, stock: 320, sales: 1852, statusType: 'success', date: '2026-06-05' },
+      { code: 'P-2026-0103', name: '生物有机肥', spec: '50kg/袋', price: 76, stock: 800, sales: 3210, statusType: 'success', date: '2026-06-10' },
+      { code: 'P-2026-0104', name: '土壤调理剂', spec: '20kg/袋', price: 156, stock: 200, sales: 1045, statusType: 'success', date: '2026-06-15' },
+      // 待审核（3）
+      { code: 'P-2026-0105', name: '腐殖酸有机肥', spec: '40kg/袋', price: 98, stock: 0, sales: 896, statusType: 'warning', date: '2026-08-01' },
+      { code: 'P-2026-0106', name: '氨基酸水溶肥', spec: '10L/桶', price: 135, stock: 150, sales: 1523, statusType: 'warning', date: '2026-08-03' },
+      { code: 'P-2026-0107', name: '有机肥颗粒', spec: '20kg/袋', price: 65, stock: 0, sales: 0, statusType: 'warning', date: '2026-08-06' },
+      // 已下架（3）
+      { code: 'P-2026-0108', name: '菜籽饼肥', spec: '25kg/袋', price: 88, stock: 0, sales: 642, statusType: 'neutral', date: '2026-05-20' },
+      { code: 'P-2026-0109', name: '蚯蚓粪有机肥', spec: '5kg/袋', price: 42, stock: 0, sales: 301, statusType: 'neutral', date: '2026-05-12' },
+      { code: 'P-2026-0110', name: '生物菌肥', spec: '10kg/袋', price: 58, stock: 0, sales: 0, statusType: 'neutral', date: '2026-04-28' },
+      // 仓库在存（3）——有库存、未上架，可在此上架
+      { code: 'P-2026-0201', name: '有机复合肥', spec: '25kg/袋', price: 118, stock: 600, sales: 0, statusType: 'instock', date: '2026-08-10' },
+      { code: 'P-2026-0202', name: '生物菌剂颗粒', spec: '10kg/袋', price: 88, stock: 450, sales: 0, statusType: 'instock', date: '2026-08-12' },
+      { code: 'P-2026-0203', name: '腐殖酸水溶肥', spec: '5L/桶', price: 68, stock: 800, sales: 0, statusType: 'instock', date: '2026-08-15' }
+    ];
+    var productFilter = 'all';
+    var productFilters = [
+      { key: 'all', label: '全部' },
+      { key: 'success', label: '在售' },
+      { key: 'warning', label: '待审核' }
+    ];
+    function productStatusBadge(t) {
+      var map = {
+        success: 'background:var(--th-state-success-surface); color:var(--th-state-success);',
+        warning: 'background:var(--th-state-warning-surface); color:var(--th-state-warning);',
+        neutral: 'background:var(--th-secondary); color:var(--th-secondary-foreground);'
+      };
+      return '<span style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:var(--th-radius-full); font-size:var(--th-font-size-xs); font-weight:600; white-space:nowrap;' + (map[t] || map.neutral) + '"><span style="width:6px;height:6px;border-radius:var(--th-radius-full);background:currentColor;"></span>' + (t === 'success' ? '在售' : t === 'warning' ? '待审核' : '已下架') + '</span>';
+    }
+    function productFilterTabsHtml() {
+      return productFilters.map(function (f) {
+        var active = f.key === productFilter;
+        return '<button data-pf2="' + f.key + '" style="padding:7px 16px;border-radius:var(--th-radius-full);border:1px solid ' + (active ? 'var(--th-primary)' : 'var(--th-border)') + ';background:' + (active ? 'var(--th-primary)' : 'var(--th-card)') + ';color:' + (active ? 'var(--th-primary-foreground)' : 'var(--th-secondary-foreground)') + ';font-size:var(--th-font-size-sm);font-weight:500;cursor:pointer;white-space:nowrap;">' + f.label + '</button>';
+      }).join('');
+    }
+    function productView() {
+      // 主列表只显示在售/待审核（排除已下架、仓库在存未上架），且库存 ≥ 1
+      var list = productList.filter(function (p) {
+        return (p.statusType === 'success' || p.statusType === 'warning') && p.stock >= 1 && (productFilter === 'all' || p.statusType === productFilter);
+      });
+      var rows = list.map(function (p) {
+        // 在售/待审核 → 下架；已下架 → 上架
+        var ops2 = '';
+        if (p.statusType === 'success' || p.statusType === 'warning') {
+          ops2 += '<button data-po="down" data-no="' + p.code + '" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:var(--th-radius-sm);border:1px solid var(--th-border);background:var(--th-card);color:var(--th-secondary-foreground);font-size:var(--th-font-size-xs);cursor:pointer;"><i data-lucide="archive" style="width:13px;height:13px;"></i>下架</button>';
+        } else {
+          ops2 += '<button data-po="up" data-no="' + p.code + '" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:var(--th-radius-sm);border:none;background:var(--th-primary);color:var(--th-primary-foreground);font-size:var(--th-font-size-xs);cursor:pointer;"><i data-lucide="package-check" style="width:13px;height:13px;"></i>上架</button>';
+        }
+        return '<tr style="border-bottom:1px solid var(--th-border);">' +
+          '<td style="padding:14px 16px;white-space:nowrap;font-family:var(--th-font-mono);font-size:var(--th-font-size-xs);color:var(--th-muted-foreground);">' + p.code + '</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;font-weight:500;">' + p.name + '</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;color:var(--th-muted-foreground);">' + p.spec + '</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;"><span class="th-mono" style="color:var(--th-primary);font-weight:600;">¥' + p.price + '</span></td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;">' + p.stock + '</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;">' + p.sales.toLocaleString('zh-CN') + '</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;">' + productStatusBadge(p.statusType) + '</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;color:var(--th-muted-foreground);">' + p.date + '</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;"><div style="display:flex;align-items:center;gap:4px;">' + ops2 + '</div></td></tr>';
+      }).join('');
+      var statVals = productStatValues();
+      var statCards = productStats.map(function (s, i) {
+        return '<div style="border:1px solid var(--th-border);border-radius:var(--th-radius);background:var(--th-card);padding:18px 20px;box-shadow:var(--th-shadow-xs);min-width:0;display:flex;align-items:center;gap:14px;">' +
+          '<span style="width:44px;height:44px;border-radius:var(--th-radius);background:color-mix(in srgb,' + s.color + ' 10%,transparent);color:' + s.color + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="' + s.icon + '" style="width:22px;height:22px;"></i></span>' +
+          '<div style="min-width:0;"><p style="margin:0;font-size:var(--th-font-size-sm);color:var(--th-muted-foreground);white-space:nowrap;">' + s.label + '</p>' +
+          '<p style="margin:2px 0 0 0;font-size:var(--th-font-size-h3);font-weight:700;color:var(--th-foreground);line-height:1.2;white-space:nowrap;">' + statVals[i] + '</p>' +
+          '<p style="margin:0;font-size:var(--th-font-size-xs);color:var(--th-muted-foreground);white-space:nowrap;">' + s.sub + '</p></div></div>';
+      }).join('');
+      return '<section style="margin-bottom:24px;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;">' +
+        '<div><h1 style="font-size:var(--th-font-size-h2);font-weight:600;line-height:var(--th-line-height-snug);color:var(--th-foreground);margin:0 0 4px 0;">商品管理</h1>' +
+        '<p class="th-body-sm" style="margin:0;color:var(--th-muted-foreground);">管理有机肥商品上架、下架与库存，审核后进入有机肥商城</p></div>' +
+        '<button id="product-new" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:var(--th-radius-full);border:none;background:var(--th-primary);color:var(--th-primary-foreground);font-size:var(--th-font-size-sm);font-weight:600;cursor:pointer;box-shadow:var(--th-shadow-sm);"><i data-lucide="plus" style="width:16px;height:16px;"></i>上架商品</button></section>' +
+        '<section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4" style="margin-bottom:24px;">' + statCards + '</section>' +
+        '<section style="border:1px solid var(--th-border);border-radius:var(--th-radius);background:var(--th-card);box-shadow:var(--th-shadow-xs);overflow:hidden;">' +
+          '<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--th-border);">' +
+            '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;" id="product-tabs">' + productFilterTabsHtml() + '</div>' +
+            '<div style="position:relative;"><i data-lucide="search" style="width:15px;height:15px;position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--th-muted-foreground);"></i>' +
+            '<input id="product-search" type="text" placeholder="搜索商品编号 / 名称" style="padding:8px 12px 8px 32px;border:1px solid var(--th-border);border-radius:var(--th-radius-full);background:var(--th-background);font-size:var(--th-font-size-sm);color:var(--th-foreground);outline:none;width:200px;"></div>' +
+          '</div>' +
+          '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:var(--th-font-size-sm);min-width:1040px;">' +
+            '<thead><tr style="border-bottom:1px solid var(--th-border);background:color-mix(in srgb,var(--th-secondary) 40%,transparent);">' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">商品编号</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">商品名称</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">规格</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">单价</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">库存</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">销量</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">状态</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">上架日期</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">操作</th>' +
+            '</tr></thead><tbody>' + rows + '</tbody></table></div>' +
+          '<div style="padding:14px 20px;border-top:1px solid var(--th-border);display:flex;align-items:center;justify-content:space-between;color:var(--th-muted-foreground);font-size:var(--th-font-size-xs);">' +
+            '<span>共 ' + list.length + ' 个商品</span><span>下架商品可在「上架商品」中重新上架</span></div>' +
+        '</section>' +
+        productModalHtml();
+    }
+
+    /* ---------- 上架商品模态框 ---------- */
+    function productModalHtml() {
+      var fieldBase = 'width:88px;padding:7px 8px;border:1px solid var(--th-border);border-radius:var(--th-radius-sm);background:var(--th-background);font-size:var(--th-font-size-xs);color:var(--th-foreground);outline:none;';
+      var rowsHtml = productList.map(function (p) {
+        var statusMap = {
+          success: 'background:var(--th-state-success-surface);color:var(--th-state-success);',
+          warning: 'background:var(--th-state-warning-surface);color:var(--th-state-warning);',
+          neutral: 'background:var(--th-secondary);color:var(--th-secondary-foreground);',
+          instock: 'background:var(--th-state-info-surface);color:var(--th-state-info);'
+        };
+        var statusText = p.statusType === 'success' ? '在售' : p.statusType === 'warning' ? '待审核' : p.statusType === 'instock' ? '在存' : '已下架';
+        var badge = '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--th-radius-full);font-size:var(--th-font-size-xs);font-weight:600;white-space:nowrap;' + statusMap[p.statusType] + '">' + statusText + '</span>';
+        // 已下架 + 仓库在存可上架；待审核/在售禁用
+        var canUp = p.statusType === 'neutral' || p.statusType === 'instock';
+        var note = canUp ? '' : (p.statusType === 'warning' ? '<span class="th-body-sm" style="color:var(--th-state-warning);font-size:var(--th-font-size-xs);">审核中，不可上架</span>' : '<span class="th-body-sm" style="color:var(--th-muted-foreground);font-size:var(--th-font-size-xs);">已在售，无需上架</span>');
+        return '<div data-prow="' + p.code + '" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--th-border);' + (canUp ? '' : 'opacity:0.55;') + '">' +
+          '<input type="checkbox" data-pcheck="' + p.code + '" ' + (canUp ? '' : 'disabled') + ' style="width:16px;height:16px;accent-color:var(--th-primary);flex-shrink:0;">' +
+          '<div style="flex:1;min-width:0;"><p style="margin:0;font-size:var(--th-font-size-sm);font-weight:600;color:var(--th-foreground);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + p.name + '</p>' +
+          '<p class="th-body-sm" style="margin:2px 0 0 0;color:var(--th-muted-foreground);">' + p.code + ' · ' + p.spec + ' ' + note + '</p></div>' +
+          badge +
+          '<div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0;"><span class="th-body-sm" style="color:var(--th-muted-foreground);font-size:var(--th-font-size-xs);">上架数量(库存)</span>' +
+            '<input type="number" data-pqty="' + p.code + '" min="1" value="' + (p.stock || 1) + '" ' + (canUp ? '' : 'disabled') + ' style="' + fieldBase + '"></div>' +
+          '<div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0;"><span class="th-body-sm" style="color:var(--th-muted-foreground);font-size:var(--th-font-size-xs);">单价(¥)</span>' +
+            '<input type="number" data-pprice="' + p.code + '" min="0" value="' + p.price + '" ' + (canUp ? '' : 'disabled') + ' style="' + fieldBase + '"></div>' +
+        '</div>';
+      }).join('');
+      return '<div id="product-modal" style="position:fixed;inset:0;z-index:80;background:rgba(24,18,8,0.45);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;">' +
+        '<div style="width:min(720px,100%);background:var(--th-card);border:1px solid var(--th-border);border-radius:var(--th-radius);box-shadow:var(--th-shadow-2xl);padding:24px;margin:auto 0;">' +
+          '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;">' +
+            '<div><h3 style="margin:0;font-size:var(--th-font-size-h3);font-weight:600;color:var(--th-foreground);">上架商品</h3>' +
+            '<p class="th-body-sm" style="margin:2px 0 0 0;color:var(--th-muted-foreground);">勾选要上架的商品，设置上架数量与单价；下架商品保留数据可重新上架</p></div>' +
+            '<button type="button" id="product-modal-close" style="background:var(--th-secondary);border:none;width:34px;height:34px;border-radius:var(--th-radius-full);cursor:pointer;color:var(--th-muted-foreground);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="x" style="width:17px;height:17px;"></i></button>' +
+          '</div>' +
+          '<div style="max-height:52vh;overflow-y:auto;padding-right:4px;" id="product-modal-list">' + rowsHtml + '</div>' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;">' +
+            '<span class="th-body-sm" style="color:var(--th-muted-foreground);" id="product-modal-selected">已选 0 件</span>' +
+            '<div style="display:flex;gap:10px;">' +
+              '<button type="button" id="product-modal-cancel" style="padding:9px 18px;border-radius:var(--th-radius-full);border:1px solid var(--th-border);background:var(--th-card);color:var(--th-secondary-foreground);font-size:var(--th-font-size-sm);font-weight:500;cursor:pointer;">取消</button>' +
+              '<button type="button" id="product-modal-confirm" style="display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:var(--th-radius-full);border:none;background:var(--th-primary);color:var(--th-primary-foreground);font-size:var(--th-font-size-sm);font-weight:600;cursor:pointer;box-shadow:var(--th-shadow-sm);"><i data-lucide="package-check" style="width:15px;height:15px;"></i>确认上架</button>' +
+            '</div>' +
+          '</div>' +
+        '</div></div>';
+    }
+
+    function openProductModal() {
+      var m = document.getElementById('product-modal');
+      if (!m) return;
+      m.style.display = 'flex';
+      TH.refreshIcons();
+    }
+
+    function closeProductModal() {
+      var m = document.getElementById('product-modal');
+      if (m) m.style.display = 'none';
+    }
+
+    function submitProductModal() {
+      var checked = productList.filter(function (p) {
+        var cb = document.querySelector('[data-pcheck="' + p.code + '"]');
+        return cb && cb.checked;
+      });
+      if (!checked.length) { TH.toast('请至少勾选一个商品', 'error'); return; }
+      var names = [];
+      checked.forEach(function (p) {
+        var qtyEl = document.querySelector('[data-pqty="' + p.code + '"]');
+        var priceEl = document.querySelector('[data-pprice="' + p.code + '"]');
+        var qty = parseInt(qtyEl.value, 10);
+        var price = parseFloat(priceEl.value);
+        if (qty > 0) p.stock = qty;
+        if (price >= 0) p.price = price;
+        p.statusType = 'warning'; // 上架进入待审核
+        p.date = new Date().getFullYear() + '-' + (new Date().getMonth() + 1 < 10 ? '0' : '') + (new Date().getMonth() + 1) + '-' + (new Date().getDate() < 10 ? '0' : '') + new Date().getDate();
+        names.push(p.name);
+      });
+      closeProductModal();
+      productFilter = 'all';
+      document.getElementById('page-content').innerHTML = productView();
+      TH.refreshIcons();
+      bindProductEvents();
+      TH.toast('已上架 ' + checked.length + ' 件商品（进入待审核）：' + names.join('、'), 'success');
+    }
+    function showProducts() {
+      document.getElementById('page-content').innerHTML = productView();
+      TH.refreshIcons();
+      bindProductEvents();
+    }
+    function bindProductEvents() {
+      document.getElementById('product-tabs').addEventListener('click', function (e) {
+        var b = e.target.closest('[data-pf2]');
+        if (!b) return;
+        productFilter = b.getAttribute('data-pf2');
+        document.getElementById('page-content').innerHTML = productView();
+        TH.refreshIcons();
+        bindProductEvents();
+      });
+      document.getElementById('product-search').addEventListener('input', function () {});
+      document.getElementById('product-new').addEventListener('click', openProductModal);
+      document.getElementById('product-modal-close').addEventListener('click', closeProductModal);
+      document.getElementById('product-modal-cancel').addEventListener('click', closeProductModal);
+      document.getElementById('product-modal').addEventListener('click', function (e) { if (e.target === this) closeProductModal(); });
+      document.getElementById('product-modal-confirm').addEventListener('click', submitProductModal);
+      document.getElementById('product-modal-list').addEventListener('change', function (e) {
+        if (e.target.matches('[data-pcheck]')) {
+          var n = document.querySelectorAll('#product-modal-list [data-pcheck]:checked').length;
+          document.getElementById('product-modal-selected').textContent = '已选 ' + n + ' 件';
+        }
+      });
+      document.addEventListener('click', function (e) {
+        var act = e.target.closest('[data-po]');
+        if (!act) return;
+        var no = act.getAttribute('data-no');
+        var type = act.getAttribute('data-po');
+        var p = productList.find(function (x) { return x.code === no; });
+        if (type === 'down') {
+          thConfirm('下架商品', '确认下架「' + p.name + '」吗？下架后将在有机肥商城隐藏。', '确认下架', function () {
+            p.statusType = 'neutral';
+            document.getElementById('page-content').innerHTML = productView();
+            TH.refreshIcons();
+            bindProductEvents();
+            TH.toast('商品 ' + no + ' 已下架', 'success');
+          });
+        }
+        if (type === 'up') {
+          thConfirm('上架商品', '确认上架「' + p.name + '」吗？上架后将进入平台待审核。', '确认上架', function () {
+            p.statusType = 'warning';
+            document.getElementById('page-content').innerHTML = productView();
+            TH.refreshIcons();
+            bindProductEvents();
+            TH.toast('商品 ' + no + ' 已上架，进入待审核', 'success');
+          });
+        }
+      });
+    }
+
+    /* =====================================================
+       订单管理视图
+       ===================================================== */
+    var orderStats = [
+      { label: '全部订单', sub: '原料+商品', icon: 'clipboard-list', color: 'var(--th-primary)' },
+      { label: '待支付', sub: '等待买家支付', icon: 'wallet', color: 'var(--th-state-warning)' },
+      { label: '进行中', sub: '生产/运输中', icon: 'loader', color: 'var(--th-state-info)' },
+      { label: '已完成', sub: '累计完成', icon: 'check-circle-2', color: 'var(--th-state-success)' }
+    ];
+    function orderStatValues() {
+      var cnt = function (t) { return orderList.filter(function (o) { return o.statusType === t; }).length; };
+      return [orderList.length, cnt('warning'), cnt('info'), cnt('success')];
+    }
+    var orderList = [
+      { no: 'MO-2026-0801', type: '原料采购', sub: '鸡粪 50吨', amount: 18000, statusType: 'info', date: '2026-08-01' },
+      { no: 'PO-2026-0802', type: '商品订单', sub: '微生物菌剂 200袋', amount: 17800, statusType: 'warning', date: '2026-08-02' },
+      { no: 'PO-2026-0803', type: '商品订单', sub: '生物有机肥 300袋', amount: 22800, statusType: 'success', date: '2026-07-28' },
+      { no: 'MO-2026-0804', type: '原料采购', sub: '秸秆 200吨', amount: 12000, statusType: 'info', date: '2026-07-25' },
+      { no: 'PO-2026-0805', type: '商品订单', sub: '土壤调理剂 100袋', amount: 15600, statusType: 'warning', date: '2026-07-22' },
+      { no: 'MO-2026-0806', type: '原料采购', sub: '牛粪 80吨', amount: 16500, statusType: 'success', date: '2026-07-20' },
+      { no: 'PO-2026-0807', type: '商品订单', sub: '复合微生物肥 200袋', amount: 25600, statusType: 'info', date: '2026-07-18' },
+      { no: 'MO-2026-0808', type: '原料采购', sub: '猪粪 60吨', amount: 7800, statusType: 'success', date: '2026-07-15' },
+      { no: 'PO-2026-0809', type: '商品订单', sub: '氨基酸水溶肥 100桶', amount: 13500, statusType: 'warning', date: '2026-07-12' },
+      { no: 'MO-2026-0810', type: '原料采购', sub: '羊粪 45吨', amount: 6750, statusType: 'success', date: '2026-07-08' }
+    ];
+    var orderFilter = 'all';
+    var orderFilters = [
+      { key: 'all', label: '全部' },
+      { key: 'warning', label: '待支付' },
+      { key: 'info', label: '进行中' },
+      { key: 'success', label: '已完成' }
+    ];
+    function orderStatusBadge(t) {
+      var map = {
+        warning: 'background:var(--th-state-warning-surface); color:var(--th-state-warning);',
+        info: 'background:var(--th-state-info-surface); color:var(--th-state-info);',
+        success: 'background:var(--th-state-success-surface); color:var(--th-state-success);'
+      };
+      return '<span style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:var(--th-radius-full); font-size:var(--th-font-size-xs); font-weight:600; white-space:nowrap;' + (map[t] || map.success) + '"><span style="width:6px;height:6px;border-radius:var(--th-radius-full);background:currentColor;"></span>' + (t === 'warning' ? '待支付' : t === 'info' ? '进行中' : '已完成') + '</span>';
+    }
+    function orderFilterTabsHtml() {
+      return orderFilters.map(function (f) {
+        var active = f.key === orderFilter;
+        return '<button data-of="' + f.key + '" style="padding:7px 16px;border-radius:var(--th-radius-full);border:1px solid ' + (active ? 'var(--th-primary)' : 'var(--th-border)') + ';background:' + (active ? 'var(--th-primary)' : 'var(--th-card)') + ';color:' + (active ? 'var(--th-primary-foreground)' : 'var(--th-secondary-foreground)') + ';font-size:var(--th-font-size-sm);font-weight:500;cursor:pointer;white-space:nowrap;">' + f.label + '</button>';
+      }).join('');
+    }
+    function orderView() {
+      var list = orderFilter === 'all' ? orderList : orderList.filter(function (o) { return o.statusType === orderFilter; });
+      var rows = list.map(function (o) {
+        var ops = '<button data-oo="view" data-no="' + o.no + '" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:var(--th-radius-sm);border:1px solid var(--th-border);background:var(--th-card);color:var(--th-secondary-foreground);font-size:var(--th-font-size-xs);cursor:pointer;"><i data-lucide="eye" style="width:13px;height:13px;"></i>查看</button>';
+        if (o.statusType === 'warning') {
+          ops += '<button data-oo="pay" data-no="' + o.no + '" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:var(--th-radius-sm);border:none;background:var(--th-primary);color:var(--th-primary-foreground);font-size:var(--th-font-size-xs);cursor:pointer;"><i data-lucide="badge-check" style="width:13px;height:13px;"></i>确认收款</button>';
+        }
+        return '<tr style="border-bottom:1px solid var(--th-border);">' +
+          '<td style="padding:14px 16px;white-space:nowrap;font-family:var(--th-font-mono);font-size:var(--th-font-size-xs);color:var(--th-muted-foreground);">' + o.no + '</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;"><span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--th-radius-full);background:var(--th-secondary);color:var(--th-secondary-foreground);font-size:var(--th-font-size-xs);font-weight:500;">' + o.type + '</span></td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;">' + o.sub + '</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;"><span class="th-mono" style="color:var(--th-primary);font-weight:600;">¥' + o.amount.toLocaleString('zh-CN') + '</span></td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;">' + orderStatusBadge(o.statusType) + '</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;color:var(--th-muted-foreground);">' + o.date + '</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;"><div style="display:flex;align-items:center;gap:4px;">' + ops + '</div></td></tr>';
+      }).join('');
+      var statVals = orderStatValues();
+      var statCards = orderStats.map(function (s, i) {
+        return '<div style="border:1px solid var(--th-border);border-radius:var(--th-radius);background:var(--th-card);padding:18px 20px;box-shadow:var(--th-shadow-xs);min-width:0;display:flex;align-items:center;gap:14px;">' +
+          '<span style="width:44px;height:44px;border-radius:var(--th-radius);background:color-mix(in srgb,' + s.color + ' 10%,transparent);color:' + s.color + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="' + s.icon + '" style="width:22px;height:22px;"></i></span>' +
+          '<div style="min-width:0;"><p style="margin:0;font-size:var(--th-font-size-sm);color:var(--th-muted-foreground);white-space:nowrap;">' + s.label + '</p>' +
+          '<p style="margin:2px 0 0 0;font-size:var(--th-font-size-h3);font-weight:700;color:var(--th-foreground);line-height:1.2;white-space:nowrap;">' + statVals[i] + '</p>' +
+          '<p style="margin:0;font-size:var(--th-font-size-xs);color:var(--th-muted-foreground);white-space:nowrap;">' + s.sub + '</p></div></div>';
+      }).join('');
+      return '<section style="margin-bottom:24px;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;">' +
+        '<div><h1 style="font-size:var(--th-font-size-h2);font-weight:600;line-height:var(--th-line-height-snug);color:var(--th-foreground);margin:0 0 4px 0;">订单管理</h1>' +
+        '<p class="th-body-sm" style="margin:0;color:var(--th-muted-foreground);">统一管理原料采购与商品销售订单，跟踪支付与履约进度</p></div>' +
+        '</section>' +
+        '<section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4" style="margin-bottom:24px;">' + statCards + '</section>' +
+        '<section style="border:1px solid var(--th-border);border-radius:var(--th-radius);background:var(--th-card);box-shadow:var(--th-shadow-xs);overflow:hidden;">' +
+          '<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--th-border);">' +
+            '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;" id="order-tabs">' + orderFilterTabsHtml() + '</div>' +
+            '<div style="position:relative;"><i data-lucide="search" style="width:15px;height:15px;position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--th-muted-foreground);"></i>' +
+            '<input id="order-search" type="text" placeholder="搜索订单号" style="padding:8px 12px 8px 32px;border:1px solid var(--th-border);border-radius:var(--th-radius-full);background:var(--th-background);font-size:var(--th-font-size-sm);color:var(--th-foreground);outline:none;width:200px;"></div>' +
+          '</div>' +
+          '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:var(--th-font-size-sm);min-width:900px;">' +
+            '<thead><tr style="border-bottom:1px solid var(--th-border);background:color-mix(in srgb,var(--th-secondary) 40%,transparent);">' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">订单号</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">类型</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">内容</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">金额</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">状态</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">日期</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">操作</th>' +
+            '</tr></thead><tbody>' + rows + '</tbody></table></div>' +
+          '<div style="padding:14px 20px;border-top:1px solid var(--th-border);display:flex;align-items:center;justify-content:space-between;color:var(--th-muted-foreground);font-size:var(--th-font-size-xs);">' +
+            '<span>共 ' + list.length + ' 笔订单</span><span>订单全流程可追溯</span></div>' +
+        '</section>';
+    }
+    function showOrders() {
+      document.getElementById('page-content').innerHTML = orderView();
+      TH.refreshIcons();
+      bindOrderEvents();
+    }
+    function bindOrderEvents() {
+      document.getElementById('order-tabs').addEventListener('click', function (e) {
+        var b = e.target.closest('[data-of]');
+        if (!b) return;
+        orderFilter = b.getAttribute('data-of');
+        document.getElementById('page-content').innerHTML = orderView();
+        TH.refreshIcons();
+        bindOrderEvents();
+      });
+      document.getElementById('order-search').addEventListener('input', function () {});
+      document.addEventListener('click', function (e) {
+        var act = e.target.closest('[data-oo]');
+        if (!act) return;
+        var no = act.getAttribute('data-no');
+        var type = act.getAttribute('data-oo');
+        var o = orderList.find(function (x) { return x.no === no; });
+        if (type === 'view') openOrderDetail(no);
+        if (type === 'pay') { o.statusType = 'success'; document.getElementById('page-content').innerHTML = orderView(); TH.refreshIcons(); bindOrderEvents(); TH.toast('订单 ' + no + ' 已确认收款', 'success'); }
+      });
+    }
+
+    /* =====================================================
+       订单详情（查看）
+       ===================================================== */
+    var orderDetailMap = {
+      // —— 原料采购 ——
+      'MO-2026-0801': { counterparty: '绿色农场（供应商）', source: '章丘区旭升村养殖基地', dest: '有机肥厂 · 原料仓', spec: '散装', qty: 50, unit: 340, fee: 1000, driver: '赵师傅', vehicle: '鲁A·8G21' },
+      'MO-2026-0804': { counterparty: '垛石秸秆合作社（供应商）', source: '济阳区垛石街道', dest: '有机肥厂 · 原料仓', spec: '打包秸秆', qty: 200, unit: 55, fee: 1000, driver: '王师傅', vehicle: '鲁A·7H12' },
+      'MO-2026-0806': { counterparty: '平阴奶牛养殖场（供应商）', source: '平阴县孔村镇', dest: '有机肥厂 · 原料仓', spec: '散装', qty: 80, unit: 190, fee: 1300, driver: '李师傅', vehicle: '鲁A·5M88' },
+      'MO-2026-0808': { counterparty: '兴旺猪场（供应商）', source: '商河县玉皇庙镇', dest: '有机肥厂 · 原料仓', spec: '散装', qty: 60, unit: 120, fee: 600, driver: '陈师傅', vehicle: '鲁A·9K30' },
+      'MO-2026-0810': { counterparty: '绿源养殖场（供应商）', source: '长清区万德镇', dest: '有机肥厂 · 原料仓', spec: '散装', qty: 45, unit: 140, fee: 450, driver: '刘师傅', vehicle: '鲁A·3P57' },
+      // —— 商品订单 ——
+      'PO-2026-0802': { counterparty: '买家 · 王建国', source: '有机肥厂（发货地）', dest: '济南市长清区归德镇', spec: '40kg/袋', qty: 200, unit: 85, fee: 800, delivery: '平台物流配送' },
+      'PO-2026-0803': { counterparty: '买家 · 李桂芳', source: '有机肥厂（发货地）', dest: '德州市齐河县焦庙镇', spec: '50kg/袋', qty: 300, unit: 74, fee: 600, delivery: '平台物流配送' },
+      'PO-2026-0805': { counterparty: '买家 · 张伟', source: '有机肥厂（发货地）', dest: '济南市市中区党家街道', spec: '20kg/袋', qty: 100, unit: 150, fee: 600, delivery: '平台物流配送' },
+      'PO-2026-0807': { counterparty: '买家 · 赵敏', source: '有机肥厂（发货地）', dest: '泰安市岱岳区满庄镇', spec: '25kg/袋', qty: 200, unit: 125, fee: 600, delivery: '平台物流配送' },
+      'PO-2026-0809': { counterparty: '买家 · 孙秀兰', source: '有机肥厂（发货地）', dest: '聊城市茌平区温陈街道', spec: '10L/桶', qty: 100, unit: 130, fee: 500, delivery: '平台物流配送' }
+    };
+    function openOrderDetail(no) {
+      var o = orderList.find(function (x) { return x.no === no; });
+      if (!o) return;
+      var d = orderDetailMap[no] || {};
+      var isMat = o.type === '原料采购';
+      var qtyNum = d.qty || 0;
+      var subTotal = qtyNum * (d.unit || 0);
+      var fee = d.fee || 0;
+      var total = o.amount;
+      var fmt = function (n) { return '¥' + n.toLocaleString('zh-CN'); };
+      var infoHtml = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;padding:14px;border:1px solid var(--th-border);border-radius:var(--th-radius);background:var(--th-background);margin-bottom:14px;">' +
+        '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">订单号</p><p style="margin:0;font-weight:600;font-family:var(--th-font-mono);">' + o.no + '</p></div>' +
+        '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">订单类型</p><p style="margin:0;font-weight:600;">' + o.type + '</p></div>' +
+        '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">下单日期</p><p style="margin:0;font-weight:600;">' + o.date + '</p></div>' +
+        '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">订单状态</p><p style="margin:0;">' + orderStatusBadge(o.statusType) + '</p></div>' +
+        '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">' + (isMat ? '供应商' : '买家') + '</p><p style="margin:0;font-weight:600;">' + (d.counterparty || '—') + '</p></div>' +
+        '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">' + (isMat ? '送达地' : '收货地') + '</p><p style="margin:0;font-weight:600;">' + (d.dest || '—') + '</p></div>' +
+        '<div style="grid-column:1/-1;"><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">' + (isMat ? '原料地（产地）' : '发货地') + '</p><p style="margin:0;font-weight:600;">' + (d.source || '—') + '</p></div>' +
+      '</div>';
+      var lineHtml = '<table style="width:100%;border-collapse:collapse;font-size:var(--th-font-size-sm);margin-bottom:14px;">' +
+        '<thead><tr style="border-bottom:1px solid var(--th-border);background:color-mix(in srgb,var(--th-secondary) 40%,transparent);">' +
+          '<th style="padding:9px 12px;text-align:left;color:var(--th-muted-foreground);font-weight:500;">名称 / 规格</th>' +
+          '<th style="padding:9px 12px;text-align:left;color:var(--th-muted-foreground);font-weight:500;">数量</th>' +
+          '<th style="padding:9px 12px;text-align:left;color:var(--th-muted-foreground);font-weight:500;">单价</th>' +
+          '<th style="padding:9px 12px;text-align:right;color:var(--th-muted-foreground);font-weight:500;">小计</th></tr></thead>' +
+        '<tbody><tr style="border-bottom:1px solid var(--th-border);">' +
+          '<td style="padding:11px 12px;font-weight:500;">' + o.sub.split(' ')[0] + ' <span style="color:var(--th-muted-foreground);">(' + (d.spec || '—') + ')</span></td>' +
+          '<td style="padding:11px 12px;">' + qtyNum + (isMat ? ' 吨' : ' 件') + '</td>' +
+          '<td style="padding:11px 12px;">' + fmt(d.unit || 0) + (isMat ? '/吨' : '/件') + '</td>' +
+          '<td style="padding:11px 12px;text-align:right;font-weight:600;">' + fmt(subTotal) + '</td></tr></tbody></table>';
+      var transHtml = '<p style="margin:0 0 8px 0;font-size:var(--th-font-size-sm);font-weight:600;color:var(--th-foreground);">' + (isMat ? '运输信息' : '履约信息') + '</p>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;padding:14px;border:1px solid var(--th-border);border-radius:var(--th-radius);background:var(--th-card);margin-bottom:14px;">' +
+        (isMat
+          ? '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">司机</p><p style="margin:0;font-weight:600;">' + (d.driver || '—') + '</p></div>' +
+            '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">车辆</p><p style="margin:0;font-weight:600;font-family:var(--th-font-mono);">' + (d.vehicle || '—') + '</p></div>' +
+            '<div style="grid-column:1/-1;"><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">运输路线</p><p style="margin:0;font-weight:600;">' + (d.source || '—') + ' → ' + (d.dest || '—') + '</p></div>'
+          : '<div style="grid-column:1/-1;"><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">配送方式</p><p style="margin:0;font-weight:600;">' + (d.delivery || '—') + '</p></div>' +
+            '<div style="grid-column:1/-1;"><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">收货地址</p><p style="margin:0;font-weight:600;">' + (d.dest || '—') + '</p></div>') +
+        '</div>';
+      var feeHtml = '<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 14px;border:1px solid var(--th-border);border-radius:var(--th-radius);background:var(--th-background);flex-wrap:wrap;">' +
+        '<p class="th-body-sm" style="margin:0;color:var(--th-muted-foreground);">货款小计 ' + fmt(subTotal) + ' + ' + (isMat ? '运费' : '配送费') + ' ' + fmt(fee) + '</p>' +
+        '<p style="margin:0;font-size:var(--th-font-size-h3);font-weight:700;color:var(--th-primary);">合计 ' + fmt(total) + '</p></div>';
+      showPurchaseModal('order-detail-modal', '订单详情 · ' + o.no, infoHtml + lineHtml + transHtml + feeHtml,
+        '<p class="th-body-sm" style="margin:0;color:var(--th-muted-foreground);">订单全流程可追溯</p><button type="button" data-pmclose style="padding:9px 18px;border-radius:var(--th-radius-full);border:none;background:var(--th-primary);color:var(--th-primary-foreground);font-size:var(--th-font-size-sm);font-weight:600;cursor:pointer;">知道了</button>'
+      );
+    }
+
+    /* =====================================================
+       结算中心视图
+       ===================================================== */
+    var settleList = [
+      { bill_no: 'ST-2026-0801', name: '原料采购结算 · 鸡粪', direction: '应收', amount: 18000, statusType: 'warning', date: '2026-08-01' },
+      { bill_no: 'ST-2026-0802', name: '司机运费结算', direction: '应付', amount: 1800, statusType: 'warning', date: '2026-08-02' },
+      { bill_no: 'ST-2026-0803', name: '商品销售结算 · 生物有机肥', direction: '应收', amount: 22800, statusType: 'success', date: '2026-07-28' },
+      { bill_no: 'ST-2026-0804', name: '原料采购结算 · 牛粪', direction: '应收', amount: 12000, statusType: 'success', date: '2026-07-25' },
+      { bill_no: 'ST-2026-0805', name: '供应商货款 · 秸秆', direction: '应付', amount: 9600, statusType: 'warning', date: '2026-07-22' },
+      { bill_no: 'ST-2026-0806', name: '商品销售结算 · 土壤调理剂', direction: '应收', amount: 15600, statusType: 'success', date: '2026-07-20' },
+      { bill_no: 'ST-2026-0807', name: '司机运费结算', direction: '应付', amount: 2400, statusType: 'warning', date: '2026-07-18' },
+      { bill_no: 'ST-2026-0808', name: '商品销售结算 · 复合微生物肥', direction: '应收', amount: 25600, statusType: 'success', date: '2026-07-15' }
+    ];
+    function settleStatValues() {
+      var recv = 0, pay = 0, done = 0, pending = 0;
+      settleList.forEach(function (s) {
+        if (s.direction === '应收') recv += s.amount; else pay += s.amount;
+        if (s.statusType === 'success') done++; else pending++;
+      });
+      return [recv, pay, done, pending];
+    }
+    function settleView() {
+      var rows = settleList.map(function (s) {
+        var ops = '<button data-so="view" data-no="' + s.bill_no + '" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:var(--th-radius-sm);border:1px solid var(--th-border);background:var(--th-card);color:var(--th-secondary-foreground);font-size:var(--th-font-size-xs);cursor:pointer;"><i data-lucide="eye" style="width:13px;height:13px;"></i>查看</button>';
+        if (s.statusType === 'warning') {
+          ops += '<button data-so="settle" data-no="' + s.bill_no + '" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:var(--th-radius-sm);border:none;background:var(--th-primary);color:var(--th-primary-foreground);font-size:var(--th-font-size-xs);cursor:pointer;"><i data-lucide="check" style="width:13px;height:13px;"></i>结算</button>';
+        }
+        return '<tr style="border-bottom:1px solid var(--th-border);">' +
+          '<td style="padding:14px 16px;white-space:nowrap;font-family:var(--th-font-mono);font-size:var(--th-font-size-xs);color:var(--th-muted-foreground);">' + s.bill_no + '</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;">' + s.name + '</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;"><span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--th-radius-full);background:' + (s.direction === '应收' ? 'var(--th-state-success-surface)' : 'var(--th-state-error-surface)') + ';color:' + (s.direction === '应收' ? 'var(--th-state-success)' : 'var(--th-state-error)') + ';font-size:var(--th-font-size-xs);font-weight:600;">' + s.direction + '</span></td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;"><span class="th-mono" style="color:var(--th-primary);font-weight:600;">¥' + s.amount.toLocaleString('zh-CN') + '</span></td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;"><span style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:var(--th-radius-full);font-size:var(--th-font-size-xs);font-weight:600;white-space:nowrap;' + (s.statusType === 'success' ? 'background:var(--th-state-success-surface);color:var(--th-state-success);' : 'background:var(--th-state-warning-surface);color:var(--th-state-warning);') + '"><span style="width:6px;height:6px;border-radius:var(--th-radius-full);background:currentColor;"></span>' + (s.statusType === 'success' ? '已结算' : '待结算') + '</span></td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;color:var(--th-muted-foreground);">' + s.date + '</td>' +
+          '<td style="padding:14px 16px;white-space:nowrap;"><div style="display:flex;align-items:center;gap:4px;">' + ops + '</div></td></tr>';
+      }).join('');
+      var vals = settleStatValues();
+      var statDefs = [
+        { label: '应收金额', sub: '来自销售/采购', icon: 'trending-up', color: 'var(--th-state-success)' },
+        { label: '应付金额', sub: '供应商/司机', icon: 'trending-down', color: 'var(--th-state-error)' },
+        { label: '已结算', sub: '结算完成', icon: 'check-circle-2', color: 'var(--th-primary)' },
+        { label: '待结算', sub: '待处理', icon: 'clock', color: 'var(--th-state-warning)' }
+      ];
+      var statCards = statDefs.map(function (s, i) {
+        var val = i < 2 ? '¥' + vals[i].toLocaleString('zh-CN') : vals[i];
+        return '<div style="border:1px solid var(--th-border);border-radius:var(--th-radius);background:var(--th-card);padding:18px 20px;box-shadow:var(--th-shadow-xs);min-width:0;display:flex;align-items:center;gap:14px;">' +
+          '<span style="width:44px;height:44px;border-radius:var(--th-radius);background:color-mix(in srgb,' + s.color + ' 10%,transparent);color:' + s.color + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="' + s.icon + '" style="width:22px;height:22px;"></i></span>' +
+          '<div style="min-width:0;"><p style="margin:0;font-size:var(--th-font-size-sm);color:var(--th-muted-foreground);white-space:nowrap;">' + s.label + '</p>' +
+          '<p style="margin:2px 0 0 0;font-size:var(--th-font-size-h3);font-weight:700;color:var(--th-foreground);line-height:1.2;white-space:nowrap;">' + val + '</p>' +
+          '<p style="margin:0;font-size:var(--th-font-size-xs);color:var(--th-muted-foreground);white-space:nowrap;">' + s.sub + '</p></div></div>';
+      }).join('');
+      return '<section style="margin-bottom:24px;"><h1 style="font-size:var(--th-font-size-h2);font-weight:600;line-height:var(--th-line-height-snug);color:var(--th-foreground);margin:0 0 4px 0;">结算中心</h1>' +
+        '<p class="th-body-sm" style="margin:0;color:var(--th-muted-foreground);">集中管理应收应付账单，完成供应商与司机的资金结算</p></section>' +
+        '<section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4" style="margin-bottom:24px;">' + statCards + '</section>' +
+        '<section style="border:1px solid var(--th-border);border-radius:var(--th-radius);background:var(--th-card);box-shadow:var(--th-shadow-xs);overflow:hidden;">' +
+          '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:var(--th-font-size-sm);min-width:960px;">' +
+            '<thead><tr style="border-bottom:1px solid var(--th-border);background:color-mix(in srgb,var(--th-secondary) 40%,transparent);">' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">账单编号</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">账单名称</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">方向</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">金额</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">状态</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">日期</th>' +
+              '<th style="padding:12px 16px;text-align:left;color:var(--th-muted-foreground);font-weight:500;white-space:nowrap;">操作</th>' +
+            '</tr></thead><tbody>' + rows + '</tbody></table></div>' +
+          '<div style="padding:14px 20px;border-top:1px solid var(--th-border);display:flex;align-items:center;justify-content:space-between;color:var(--th-muted-foreground);font-size:var(--th-font-size-xs);">' +
+            '<span>共 ' + settleList.length + ' 笔账单</span><span>结算记录完整可追溯</span></div>' +
+        '</section>';
+    }
+    function showSettle() {
+      document.getElementById('page-content').innerHTML = settleView();
+      TH.refreshIcons();
+      bindSettleEvents();
+    }
+    function bindSettleEvents() {
+      document.addEventListener('click', function (e) {
+        var act = e.target.closest('[data-so]');
+        if (!act) return;
+        var no = act.getAttribute('data-no');
+        var type = act.getAttribute('data-so');
+        var s = settleList.find(function (x) { return x.bill_no === no; });
+        if (type === 'view') openSettleDetail(no);
+        if (type === 'settle') { s.statusType = 'success'; document.getElementById('page-content').innerHTML = settleView(); TH.refreshIcons(); bindSettleEvents(); TH.toast('账单 ' + no + ' 已结算', 'success'); }
+      });
+    }
+
+    /* =====================================================
+       账单详情（查看）
+       ===================================================== */
+    var settleDetailMap = {
+      'ST-2026-0801': { ref: 'MO-2026-0801', party: '绿色农场（供应商）', items: [{ name: '鸡粪', qty: 50, unitName: '吨', unit: 340 }], fee: 1000, feeName: '运费', method: '银行转账 · 对公账户', due: '2026-08-15 前结清' },
+      'ST-2026-0802': { ref: 'TSK-2026-0805', party: '司机 · 赵师傅', items: [{ name: '鸡粪收运', qty: 50, unitName: '吨', unit: 36 }], fee: 0, method: '微信转账', due: '2026-08-16 前结清' },
+      'ST-2026-0803': { ref: 'PO-2026-0803', party: '买家 · 李桂芳', items: [{ name: '生物有机肥', qty: 300, unitName: '袋', unit: 74 }], fee: 600, feeName: '配送费', method: '平台担保交易 · 自动到账', due: '2026-07-28 已入账' },
+      'ST-2026-0804': { ref: 'MO-2026-0806', party: '平阴奶牛养殖场（供应商）', items: [{ name: '牛粪', qty: 40, unitName: '吨', unit: 285 }], fee: 600, feeName: '运费', method: '银行转账 · 对公账户', due: '2026-07-25 已入账' },
+      'ST-2026-0805': { ref: 'MO-2026-0804', party: '垛石秸秆合作社（供应商）', items: [{ name: '秸秆', qty: 160, unitName: '吨', unit: 55 }], fee: 800, feeName: '运费', method: '银行转账 · 对公账户', due: '2026-08-05 前结清' },
+      'ST-2026-0806': { ref: 'PO-2026-0805', party: '买家 · 张伟', items: [{ name: '土壤调理剂', qty: 100, unitName: '袋', unit: 150 }], fee: 600, feeName: '配送费', method: '平台担保交易 · 自动到账', due: '2026-07-20 已入账' },
+      'ST-2026-0807': { ref: 'TSK-2026-0807', party: '司机 · 李师傅', items: [{ name: '牛粪收运', qty: 80, unitName: '吨', unit: 30 }], fee: 0, method: '微信转账', due: '2026-07-31 前结清' },
+      'ST-2026-0808': { ref: 'PO-2026-0807', party: '买家 · 赵敏', items: [{ name: '复合微生物肥', qty: 200, unitName: '袋', unit: 125 }], fee: 600, feeName: '配送费', method: '平台担保交易 · 自动到账', due: '2026-07-15 已入账' }
+    };
+    function openSettleDetail(no) {
+      var s = settleList.find(function (x) { return x.bill_no === no; });
+      if (!s) return;
+      var d = settleDetailMap[no] || {};
+      var fmt = function (n) { return '¥' + n.toLocaleString('zh-CN'); };
+      var itemRows = (d.items || []).map(function (it) {
+        return '<tr style="border-bottom:1px solid var(--th-border);">' +
+          '<td style="padding:11px 12px;font-weight:500;">' + it.name + '</td>' +
+          '<td style="padding:11px 12px;">' + it.qty + ' ' + it.unitName + '</td>' +
+          '<td style="padding:11px 12px;">' + fmt(it.unit) + (it.unitName === '吨' ? '/吨' : '/件') + '</td>' +
+          '<td style="padding:11px 12px;text-align:right;font-weight:600;">' + fmt(it.qty * it.unit) + '</td></tr>';
+      }).join('');
+      var subTotal = (d.items || []).reduce(function (a, it) { return a + it.qty * it.unit; }, 0);
+      var fee = d.fee || 0;
+      var directionHtml = s.direction === '应收'
+        ? '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--th-radius-full);background:var(--th-state-success-surface);color:var(--th-state-success);font-size:var(--th-font-size-xs);font-weight:600;">应收</span>'
+        : '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--th-radius-full);background:var(--th-state-error-surface);color:var(--th-state-error);font-size:var(--th-font-size-xs);font-weight:600;">应付</span>';
+      var statusHtml = s.statusType === 'success'
+        ? '<span style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:var(--th-radius-full);font-size:var(--th-font-size-xs);font-weight:600;background:var(--th-state-success-surface);color:var(--th-state-success);"><span style="width:6px;height:6px;border-radius:var(--th-radius-full);background:currentColor;"></span>已结算</span>'
+        : '<span style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:var(--th-radius-full);font-size:var(--th-font-size-xs);font-weight:600;background:var(--th-state-warning-surface);color:var(--th-state-warning);"><span style="width:6px;height:6px;border-radius:var(--th-radius-full);background:currentColor;"></span>待结算</span>';
+      var infoHtml = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;padding:14px;border:1px solid var(--th-border);border-radius:var(--th-radius);background:var(--th-background);margin-bottom:14px;">' +
+        '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">账单编号</p><p style="margin:0;font-weight:600;font-family:var(--th-font-mono);">' + s.bill_no + '</p></div>' +
+        '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">账单名称</p><p style="margin:0;font-weight:600;">' + s.name + '</p></div>' +
+        '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">方向</p><p style="margin:0;">' + directionHtml + '</p></div>' +
+        '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">状态</p><p style="margin:0;">' + statusHtml + '</p></div>' +
+        '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">账单日期</p><p style="margin:0;font-weight:600;">' + s.date + '</p></div>' +
+        '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">往来方</p><p style="margin:0;font-weight:600;">' + (d.party || '—') + '</p></div>' +
+        '<div style="grid-column:1/-1;"><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">关联单号</p><p style="margin:0;font-weight:600;font-family:var(--th-font-mono);">' + (d.ref || '—') + '</p></div>' +
+      '</div>';
+      var lineHtml = '<table style="width:100%;border-collapse:collapse;font-size:var(--th-font-size-sm);margin-bottom:14px;">' +
+        '<thead><tr style="border-bottom:1px solid var(--th-border);background:color-mix(in srgb,var(--th-secondary) 40%,transparent);">' +
+          '<th style="padding:9px 12px;text-align:left;color:var(--th-muted-foreground);font-weight:500;">项目</th>' +
+          '<th style="padding:9px 12px;text-align:left;color:var(--th-muted-foreground);font-weight:500;">数量</th>' +
+          '<th style="padding:9px 12px;text-align:left;color:var(--th-muted-foreground);font-weight:500;">单价</th>' +
+          '<th style="padding:9px 12px;text-align:right;color:var(--th-muted-foreground);font-weight:500;">小计</th></tr></thead>' +
+        '<tbody>' + itemRows + '</tbody></table>';
+      var settleHtml = '<p style="margin:0 0 8px 0;font-size:var(--th-font-size-sm);font-weight:600;color:var(--th-foreground);">结算信息</p>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;padding:14px;border:1px solid var(--th-border);border-radius:var(--th-radius);background:var(--th-card);margin-bottom:14px;">' +
+          '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">结算方式</p><p style="margin:0;font-weight:600;">' + (d.method || '—') + '</p></div>' +
+          '<div><p class="th-body-sm" style="margin:0 0 2px 0;color:var(--th-muted-foreground);">' + (s.statusType === 'success' ? '结算时间' : '到期时间') + '</p><p style="margin:0;font-weight:600;">' + (d.due || '—') + '</p></div>' +
+        '</div>';
+      var feeHtml = '<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 14px;border:1px solid var(--th-border);border-radius:var(--th-radius);background:var(--th-background);flex-wrap:wrap;">' +
+        '<p class="th-body-sm" style="margin:0;color:var(--th-muted-foreground);">' + (fee ? '项目小计 ' + fmt(subTotal) + ' + ' + (d.feeName || '其他费用') + ' ' + fmt(fee) : '项目小计 ' + fmt(subTotal)) + '</p>' +
+        '<p style="margin:0;font-size:var(--th-font-size-h3);font-weight:700;color:var(--th-primary);">' + s.direction + '合计 ' + fmt(s.amount) + '</p></div>';
+      showPurchaseModal('settle-detail-modal', '账单详情 · ' + s.bill_no, infoHtml + lineHtml + settleHtml + feeHtml,
+        '<p class="th-body-sm" style="margin:0;color:var(--th-muted-foreground);">结算记录完整可追溯</p><button type="button" data-pmclose style="padding:9px 18px;border-radius:var(--th-radius-full);border:none;background:var(--th-primary);color:var(--th-primary-foreground);font-size:var(--th-font-size-sm);font-weight:600;cursor:pointer;">知道了</button>'
+      );
+    }
+
+    /* =====================================================
+       设置视图
+       ===================================================== */
+    var notifySettings = [
+      { key: 'order', label: '订单通知', sub: '新订单、收款到账时提醒', on: true },
+      { key: 'dispatch', label: '派单通知', sub: '收运任务派单与状态变化时提醒', on: true },
+      { key: 'settle', label: '结算通知', sub: '账单生成与结算完成时提醒', on: false }
+    ];
+    function settingsView() {
+      var fieldBase = 'width:100%;padding:10px 12px;border:1px solid var(--th-border);border-radius:var(--th-radius-sm);background:var(--th-background);font-size:var(--th-font-size-sm);color:var(--th-foreground);outline:none;';
+      var notifyHtml = notifySettings.map(function (n) {
+        return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid var(--th-border);">' +
+          '<div><p style="margin:0;font-size:var(--th-font-size-sm);font-weight:500;color:var(--th-foreground);">' + n.label + '</p>' +
+          '<p class="th-body-sm" style="margin:2px 0 0 0;color:var(--th-muted-foreground);">' + n.sub + '</p></div>' +
+          '<button type="button" data-nt="' + n.key + '" style="width:44px;height:24px;border-radius:var(--th-radius-full);border:none;cursor:pointer;position:relative;background:' + (n.on ? 'var(--th-primary)' : 'var(--th-secondary)') + ';transition:background var(--th-duration-fast) var(--th-ease);flex-shrink:0;">' +
+            '<span style="position:absolute;top:2px;' + (n.on ? 'right:2px' : 'left:2px') + ';width:20px;height:20px;border-radius:var(--th-radius-full);background:#fff;transition:left var(--th-duration-fast) var(--th-ease),right var(--th-duration-fast) var(--th-ease);"></span></button></div>';
+      }).join('');
+      return '<section style="margin-bottom:24px;"><h1 style="font-size:var(--th-font-size-h2);font-weight:600;line-height:var(--th-line-height-snug);color:var(--th-foreground);margin:0 0 4px 0;">设置</h1>' +
+        '<p class="th-body-sm" style="margin:0;color:var(--th-muted-foreground);">管理企业资料、通知偏好与账户安全</p></section>' +
+        '<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">' +
+          '<div style="border:1px solid var(--th-border);border-radius:var(--th-radius);background:var(--th-card);padding:22px;box-shadow:var(--th-shadow-xs);">' +
+            '<h2 class="th-h3" style="margin:0 0 16px 0;">企业资料</h2>' +
+            '<div class="flex flex-col gap-4">' +
+              '<div><label style="display:block;font-size:var(--th-font-size-sm);font-weight:500;color:var(--th-foreground);margin-bottom:6px;">企业名称</label><input id="st-name" value="有机肥厂" style="' + fieldBase + '"></div>' +
+              '<div><label style="display:block;font-size:var(--th-font-size-sm);font-weight:500;color:var(--th-foreground);margin-bottom:6px;">联系人</label><input id="st-contact" value="张厂长" style="' + fieldBase + '"></div>' +
+              '<div><label style="display:block;font-size:var(--th-font-size-sm);font-weight:500;color:var(--th-foreground);margin-bottom:6px;">联系电话</label><input id="st-phone" value="13800138000" style="' + fieldBase + '"></div>' +
+              '<div><label style="display:block;font-size:var(--th-font-size-sm);font-weight:500;color:var(--th-foreground);margin-bottom:6px;">企业地址</label><input id="st-address" value="河北省邢台市有机肥产业园区" style="' + fieldBase + '"></div>' +
+            '</div>' +
+            '<button id="st-save-profile" style="margin-top:18px;display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:var(--th-radius-full);border:none;background:var(--th-primary);color:var(--th-primary-foreground);font-size:var(--th-font-size-sm);font-weight:600;cursor:pointer;"><i data-lucide="save" style="width:15px;height:15px;"></i>保存资料</button>' +
+          '</div>' +
+          '<div class="flex flex-col gap-6">' +
+            '<div style="border:1px solid var(--th-border);border-radius:var(--th-radius);background:var(--th-card);padding:22px;box-shadow:var(--th-shadow-xs);">' +
+              '<h2 class="th-h3" style="margin:0 0 8px 0;">通知设置</h2>' +
+              '<p class="th-body-sm" style="margin:0 0 8px 0;color:var(--th-muted-foreground);">选择需要接收的通知类型</p>' + notifyHtml +
+            '</div>' +
+            '<div style="border:1px solid var(--th-border);border-radius:var(--th-radius);background:var(--th-card);padding:22px;box-shadow:var(--th-shadow-xs);">' +
+              '<h2 class="th-h3" style="margin:0 0 16px 0;">修改密码</h2>' +
+              '<div class="flex flex-col gap-4">' +
+                '<div><label style="display:block;font-size:var(--th-font-size-sm);font-weight:500;color:var(--th-foreground);margin-bottom:6px;">当前密码</label><input id="st-oldpw" type="password" placeholder="请输入当前密码" style="' + fieldBase + '"></div>' +
+                '<div><label style="display:block;font-size:var(--th-font-size-sm);font-weight:500;color:var(--th-foreground);margin-bottom:6px;">新密码</label><input id="st-newpw" type="password" placeholder="请输入新密码" style="' + fieldBase + '"></div>' +
+                '<div><label style="display:block;font-size:var(--th-font-size-sm);font-weight:500;color:var(--th-foreground);margin-bottom:6px;">确认新密码</label><input id="st-newpw2" type="password" placeholder="请再次输入新密码" style="' + fieldBase + '"></div>' +
+              '</div>' +
+              '<button id="st-change-pw" style="margin-top:18px;display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:var(--th-radius-full);border:none;background:var(--th-primary);color:var(--th-primary-foreground);font-size:var(--th-font-size-sm);font-weight:600;cursor:pointer;"><i data-lucide="shield" style="width:15px;height:15px;"></i>修改密码</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+    }
+    function showSettings() {
+      document.getElementById('page-content').innerHTML = settingsView();
+      TH.refreshIcons();
+      bindSettingsEvents();
+    }
+    function bindSettingsEvents() {
+      document.getElementById('st-save-profile').addEventListener('click', function () {
+        var name = document.getElementById('st-name').value.trim();
+        if (!name) { TH.toast('请输入企业名称', 'error'); return; }
+        TH.toast('企业资料已保存', 'success');
+      });
+      document.getElementById('st-change-pw').addEventListener('click', function () {
+        var a = document.getElementById('st-oldpw').value;
+        var b = document.getElementById('st-newpw').value;
+        var c = document.getElementById('st-newpw2').value;
+        if (!a || !b || !c) { TH.toast('请完整填写密码信息', 'error'); return; }
+        if (b !== c) { TH.toast('两次输入的新密码不一致', 'error'); return; }
+        TH.toast('密码修改成功（演示）', 'success');
+        document.getElementById('st-oldpw').value = '';
+        document.getElementById('st-newpw').value = '';
+        document.getElementById('st-newpw2').value = '';
+      });
+      document.querySelectorAll('[data-nt]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var n = notifySettings.find(function (x) { return x.key === btn.getAttribute('data-nt'); });
+          if (!n) return;
+          n.on = !n.on;
+          btn.style.background = n.on ? 'var(--th-primary)' : 'var(--th-secondary)';
+          var knob = btn.querySelector('span');
+          knob.style.left = n.on ? 'auto' : '2px';
+          knob.style.right = n.on ? '2px' : 'auto';
+        });
+      });
     }
 
     document.addEventListener('click', function (e) {
@@ -161,19 +1534,36 @@
       if (item) { e.preventDefault(); handleNavClick(item.getAttribute('data-key')); }
     });
 
+    function renderDashboard() {
     // KPI
     document.getElementById('kpi-cards').innerHTML = data.kpi.map(function (k) {
       var badge = k.badge ? '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--th-radius-full); background:' + (k.badgeType === 'success' ? 'var(--th-state-success-surface)' : 'var(--th-secondary)') + '; color:' + (k.badgeType === 'success' ? 'var(--th-state-success)' : 'var(--th-secondary-foreground)') + '; font-size:var(--th-font-size-xs); font-weight:600; white-space:nowrap;">' + k.badge + '</span>' : '';
+      // 采购需求数量与采购需求页列表实时联动
+      var kpiVal = (k.label === '采购需求') ? purchaseList.length : k.value;
       return '<div class="kpi-card" style="border:1px solid var(--th-border); border-radius:var(--th-radius); background:var(--th-card); padding:20px; box-shadow:var(--th-shadow-xs); min-width:0;">' +
         '<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;"><p class="th-body-sm" style="margin:0; color:var(--th-muted-foreground);">' + k.label + '</p>' + badge + '</div>' +
-        '<p class="th-mono" style="margin:0; font-size:var(--th-font-size-h1); font-weight:700; color:var(--th-primary); line-height:var(--th-line-height-tight); white-space:nowrap;">' + k.value + '</p></div>';
+        '<p class="th-mono" style="margin:0; font-size:var(--th-font-size-h1); font-weight:700; color:var(--th-primary); line-height:var(--th-line-height-tight); white-space:nowrap;">' + kpiVal + '</p></div>';
     }).join('');
 
-    // 待办
+    // 待办（与采购需求/收运任务/订单管理动态联动）
     document.getElementById('todo-list').innerHTML = data.todos.map(function (t) {
+      var sub = t.sub;
+      if (t.title === '待匹配需求') {
+        // 采购需求：待审核（待匹配）数
+        var waiting = purchaseList.filter(function (p) { return p.statusType === 'warning'; }).length;
+        sub = waiting + '条采购需求待匹配';
+      } else if (t.title === '待派单任务') {
+        // 收运任务：待派单数
+        var pendingAssign = dispatchList.filter(function (p) { return p.statusType === 'warning'; }).length;
+        sub = pendingAssign + '个收运任务待派单';
+      } else if (t.title === '待结算订单') {
+        // 订单管理：待支付（待结算）数
+        var pendingPay = orderList.filter(function (o) { return o.statusType === 'warning'; }).length;
+        sub = pendingPay + '笔订单待结算';
+      }
       return '<div class="todo-card" style="border:1px solid var(--th-border); border-radius:var(--th-radius); background:var(--th-card); padding:14px 16px; box-shadow:var(--th-shadow-xs); display:flex; align-items:center; justify-content:space-between; gap:12px; min-width:0;">' +
         '<div style="flex:1; min-width:0;"><p style="margin:0; font-size:var(--th-font-size-sm); font-weight:500; color:var(--th-foreground); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + t.title + '</p>' +
-        '<p class="th-body-sm" style="margin:2px 0 0 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + t.sub + '</p></div>' +
+        '<p class="th-body-sm" style="margin:2px 0 0 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + sub + '</p></div>' +
         '<a href="#" data-todo="' + t.title + '" style="flex-shrink:0; font-size:var(--th-font-size-sm); color:var(--th-primary); text-decoration:none; font-weight:500; white-space:nowrap;">去处理</a></div>';
     }).join('');
 
@@ -200,22 +1590,96 @@
         '<span style="font-size:var(--th-font-size-body); font-weight:600; color:var(--th-foreground); white-space:nowrap;">' + q.label + '</span></div>' +
         '<i data-lucide="arrow-right" style="width:18px;height:18px; color:var(--th-muted-foreground); flex-shrink:0;"></i></a>';
     }).join('');
+    }
 
     // 交互
-    document.getElementById('bell').addEventListener('click', function () { TH.toast('您有新的系统通知', 'info'); });
+    document.getElementById('bell').addEventListener('click', function (e) { e.stopPropagation(); toggleBellPanel(); });
+    document.getElementById('bell-clear').addEventListener('click', function (e) {
+      e.preventDefault();
+      var dot = document.getElementById('bell-dot');
+      if (dot) dot.style.display = 'none';
+      closeBellPanel();
+      TH.toast('已全部标记为已读', 'success');
+    });
     document.getElementById('user-menu').addEventListener('click', function () { TH.toast('账号：张厂长（企业）', 'info'); });
     document.getElementById('sidebar-toggle').addEventListener('click', function () { document.getElementById('sidebar-drawer').classList.add('th-drawer-open'); });
     document.getElementById('sidebar-close').addEventListener('click', function () { document.getElementById('sidebar-drawer').classList.remove('th-drawer-open'); });
     document.getElementById('sidebar-drawer').addEventListener('click', function (e) { if (e.target === this) this.classList.remove('th-drawer-open'); });
 
+    // 通知待办面板（与工作台待办动态联动）
+    function closeBellPanel() {
+      var p = document.getElementById('bell-panel');
+      if (p) p.style.display = 'none';
+    }
+    function fillBellPanel() {
+      var waiting = purchaseList.filter(function (x) { return x.statusType === 'warning'; }).length;
+      var pendingAssign = dispatchList.filter(function (x) { return x.statusType === 'warning'; }).length;
+      var pendingPay = orderList.filter(function (o) { return o.statusType === 'warning'; }).length;
+      var total = waiting + pendingAssign + pendingPay;
+      var cnt = document.getElementById('bell-count');
+      var lst = document.getElementById('bell-list');
+      if (cnt) cnt.textContent = total;
+      if (!lst) return;
+      if (total === 0) {
+        lst.innerHTML = '<div style="padding:30px 16px;text-align:center;color:var(--th-muted-foreground);font-size:var(--th-font-size-sm);"><i data-lucide="bell-off" style="width:30px;height:30px;margin:0 auto 10px;display:block;"></i>暂无待办事项</div>';
+        return;
+      }
+      var items = [
+        { icon: 'shopping-bag', color: 'var(--th-state-warning)', title: '待匹配需求', desc: waiting + '条采购需求待匹配' },
+        { icon: 'truck', color: 'var(--th-state-info)', title: '待派单任务', desc: pendingAssign + '个收运任务待派单' },
+        { icon: 'wallet', color: 'var(--th-state-error)', title: '待结算订单', desc: pendingPay + '笔订单待结算' }
+      ].filter(function (it) { return it.title === '待匹配需求' ? waiting > 0 : it.title === '待派单任务' ? pendingAssign > 0 : pendingPay > 0; });
+      lst.innerHTML = items.map(function (it) {
+        return '<div style="padding:12px 16px;border-bottom:1px solid var(--th-border);display:flex;align-items:center;gap:12px;">' +
+          '<span style="width:32px;height:32px;border-radius:var(--th-radius);background:color-mix(in srgb,' + it.color + ' 10%,transparent);color:' + it.color + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="' + it.icon + '" style="width:16px;height:16px;"></i></span>' +
+          '<div style="flex:1;min-width:0;"><p style="margin:0;font-size:var(--th-font-size-sm);font-weight:500;color:var(--th-foreground);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + it.title + '</p>' +
+          '<p class="th-body-sm" style="margin:1px 0 0 0;color:var(--th-muted-foreground);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + it.desc + '</p></div>' +
+          '<a href="#" data-todo="' + it.title + '" style="flex-shrink:0;font-size:var(--th-font-size-sm);color:var(--th-primary);text-decoration:none;font-weight:500;white-space:nowrap;">去处理</a></div>';
+      }).join('');
+    }
+    function toggleBellPanel() {
+      var p = document.getElementById('bell-panel');
+      if (!p) return;
+      if (p.style.display === 'block') { p.style.display = 'none'; return; }
+      fillBellPanel();
+      p.style.display = 'block';
+      TH.refreshIcons();
+    }
+
     document.addEventListener('click', function (e) {
+      var bp = document.getElementById('bell-panel');
+      var bb = document.getElementById('bell');
+      if (bp && bp.style.display === 'block' && !bp.contains(e.target) && !(bb && bb.contains(e.target))) bp.style.display = 'none';
       var todo = e.target.closest('[data-todo]');
-      if (todo) { e.preventDefault(); TH.toast('正在处理「' + todo.getAttribute('data-todo') + '」（演示）', 'info'); }
+      if (todo) {
+        e.preventDefault();
+        var todoLabel = todo.getAttribute('data-todo');
+        closeBellPanel();
+        // 去处理 → 跳转对应模块视图
+        if (todoLabel === '待匹配需求') { activeNav = 'purchase'; renderNav(); showPurchase(); }
+        else if (todoLabel === '待派单任务') { activeNav = 'dispatch'; renderNav(); showDispatch(); }
+        else if (todoLabel === '待结算订单') { activeNav = 'orders'; renderNav(); showOrders(); }
+        else { TH.toast('正在处理「' + todoLabel + '」（演示）', 'info'); }
+      }
       var ql = e.target.closest('.quick-link');
-      if (ql) { e.preventDefault(); TH.toast('「' + ql.textContent.trim() + '」模块为演示', 'info'); }
+      if (ql) {
+        e.preventDefault();
+        var qlLabel = ql.textContent.trim();
+        // 发布需求 → 打开采购需求的新建需求模态框（与采购需求页"新建需求"一致）
+        if (qlLabel.indexOf('发布需求') !== -1) {
+          activeNav = 'purchase';
+          renderNav();
+          showPurchase();
+          openPurchaseModal();
+        } else {
+          TH.toast('「' + qlLabel + '」模块为演示', 'info');
+        }
+      }
     });
 
+    dashboardHtml = document.getElementById('page-content').innerHTML;
     renderNav();
+    renderDashboard();
     TH.refreshIcons();
   </script>
 
