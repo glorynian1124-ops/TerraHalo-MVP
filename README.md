@@ -40,7 +40,8 @@ start_dev.bat        # 一键启动 后端(:5000) + 网页端(:8000)，并自动
 .
 ├── README.md                      # 本文件
 ├── .gitignore                     # Python/Flask 忽略规则
-├── ENTER_HERE.html                # 项目总入口页
+├── index.html                     # 自动跳转到网页端主界面
+├── TerraHalo-Web/                 # 🎯 网页端主界面（对接后端 API）
 └── TerraHalo/
     ├── 01_设计文档/                # MVP 功能清单、线框图、数据库设计
     │   ├── 沃土之环_MVP功能清单_页面结构图_数据库核心表设计.md
@@ -59,7 +60,6 @@ start_dev.bat        # 一键启动 后端(:5000) + 网页端(:8000)，并自动
     ├── Frontend_folder/           # 前端占位页（待替换为小程序/React）
     │   ├── Admin_folder/          # 管理端（Desktop/Mobile/Web）
     │   └── User_folder/           # 用户端（农户/企业/司机）
-    └── ENTER_HERE.html            # TerraHalo 子模块入口
 ```
 
 ## 快速启动
